@@ -1,99 +1,327 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useApi } from '../../hooks/useApi';
 import { getOnboarding } from '../../services/api';
-import { HiOutlineArrowRight } from 'react-icons/hi';
 
-const PHASE_COLORS = { 'Entry Point': '#f43f5e', 'Core Module': '#6366f1', 'Utility': '#10b981' };
-const PHASE_ICONS = { 'Entry Point': '🚀', 'Core Module': '⭐', 'Utility': '🔧' };
+const PHASE_COLORS = {
+  'Entry Point': '#f43f5e',
+  'Core Module': '#6366f1',
+  'Utility':     '#10b981',
+};
 
+const PHASE_ICONS = {
+  'Entry Point': '▶️',
+  'Core Module': '◈',
+  'Utility':     '⚙',
+};
+
+/* ─── Styles ────────────────────────────────────────────────────────────── */
+const s = {
+  panel: {
+    background: '#0d0e1a',
+    borderRadius: 16,
+    border: '1px solid rgba(99,102,241,0.18)',
+    overflow: 'hidden',
+    fontFamily: "'SF Mono', 'Fira Code', monospace",
+    maxWidth: 560,
+    margin: '0 auto',
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100%',
+  },
+  panelHeader: {
+    padding: '16px 20px 14px',
+    borderBottom: '1px solid rgba(99,102,241,0.18)',
+    display: 'flex',
+    alignItems: 'center',
+    gap: 12,
+    background: '#13152a',
+  },
+  logoHex: {
+    width: 32, height: 32,
+    background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+    borderRadius: 8,
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    fontSize: 13, fontWeight: 700, color: '#fff',
+    flexShrink: 0,
+  },
+  headerTitle: {
+    fontSize: 13, fontWeight: 700, color: '#e2e4f0',
+    letterSpacing: '0.12em', textTransform: 'uppercase', margin: 0,
+  },
+  headerSub: {
+    fontSize: 10, color: '#7b7fa8', letterSpacing: '0.08em', marginTop: 1,
+  },
+  versionBadge: {
+    marginLeft: 'auto',
+    background: '#202440',
+    border: '1px solid rgba(99,102,241,0.18)',
+    borderRadius: 20,
+    padding: '3px 10px',
+    fontSize: 10,
+    color: '#7b7fa8',
+    letterSpacing: '0.06em',
+    whiteSpace: 'nowrap',
+  },
+  subHeader: {
+    padding: '12px 20px',
+    borderBottom: '1px solid rgba(99,102,241,0.18)',
+    background: '#0f1120',
+  },
+  subHeaderText: {
+    fontSize: 11, color: '#7b7fa8', lineHeight: 1.6,
+  },
+  scrollArea: {
+    flex: 1,
+    overflowY: 'auto',
+    padding: '16px 20px 24px',
+  },
+  sectionLabel: {
+    fontSize: 9, fontWeight: 700, letterSpacing: '0.14em',
+    textTransform: 'uppercase', color: '#4b4f72',
+    marginBottom: 12,
+  },
+  stepList: { display: 'flex', flexDirection: 'column' },
+  stepRow: {
+    display: 'flex',
+    alignItems: 'stretch',
+    gap: 12,
+    cursor: 'pointer',
+    borderRadius: 10,
+    padding: '8px 10px',
+    transition: 'background 0.15s',
+    border: '1px solid transparent',
+    width: '100%',
+    background: 'none',
+    textAlign: 'left',
+    fontFamily: 'inherit',
+  },
+  stepLeft: {
+    display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0,
+  },
+  stepIconWrap: {
+    width: 32, height: 32, borderRadius: 8,
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    fontSize: 14, flexShrink: 0,
+  },
+  connector: {
+    width: 1, flex: 1, minHeight: 12, marginTop: 4, marginBottom: 2,
+    alignSelf: 'stretch',
+  },
+  stepContent: { flex: 1, minWidth: 0, paddingBottom: 4 },
+  stepTopRow: {
+    display: 'flex', alignItems: 'center', gap: 6,
+    flexWrap: 'wrap', marginBottom: 3,
+  },
+  stepNum: { fontSize: 9, color: '#4b4f72', letterSpacing: '0.06em', fontWeight: 700 },
+  stepLabel: { fontSize: 12, fontWeight: 700, color: '#e2e4f0' },
+  phaseBadge: {
+    fontSize: 9, fontWeight: 700,
+    padding: '2px 7px', borderRadius: 20,
+    textTransform: 'uppercase', letterSpacing: '0.06em',
+  },
+  stepReason: {
+    fontSize: 10, color: '#9396b8', lineHeight: 1.6,
+  },
+  stepDocstring: {
+    fontSize: 10, color: '#6366f1', fontStyle: 'italic',
+    lineHeight: 1.5, marginTop: 4,
+    paddingLeft: 8,
+    borderLeft: '2px solid rgba(99,102,241,0.3)',
+  },
+  exploreRow: {
+    display: 'flex', alignItems: 'center', gap: 4,
+    fontSize: 10, color: '#10b981', fontWeight: 700,
+    marginTop: 6, letterSpacing: '0.04em',
+    opacity: 0, transition: 'opacity 0.15s',
+  },
+  divider: {
+    height: 1, background: 'rgba(99,102,241,0.1)', margin: '20px 0',
+  },
+  statsGrid: {
+    display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8,
+    marginTop: 4,
+  },
+  statCard: {
+    borderRadius: 10,
+    padding: '12px 8px',
+    textAlign: 'center',
+    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
+  },
+  statVal: { fontSize: 20, fontWeight: 700, lineHeight: 1 },
+  statLabel: {
+    fontSize: 9, fontWeight: 700, letterSpacing: '0.1em',
+    textTransform: 'uppercase', color: '#7b7fa8', marginTop: 2,
+  },
+  centerBox: {
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    height: '100%', padding: 24,
+  },
+  spinner: {
+    width: 28, height: 28,
+    border: '2px solid rgba(99,102,241,0.2)',
+    borderTop: '2px solid #6366f1',
+    borderRadius: '50%',
+    animation: 'prism-spin 0.8s linear infinite',
+    marginBottom: 10,
+  },
+  loadingText: { fontSize: 11, color: '#7b7fa8', marginTop: 8 },
+  errorText: { fontSize: 11, color: '#f87171', textAlign: 'center' },
+};
+
+/* ─── Mock data for standalone preview ─────────────────────────────────── */
+const MOCK_DATA = {
+  total_files: 142,
+  entry_points:    [1, 2, 3],
+  core_modules:    [1, 2, 3, 4, 5],
+  utility_modules: [1, 2, 3, 4, 5, 6, 7, 8],
+  exploration_order: [
+    { step: 1, node_id: 'main-ts',      label: 'main.ts',              phase: 'Entry Point', reason: 'Application bootstrap — registers global pipes, middleware, and starts the HTTP server.',         docstring: 'Bootstraps the NestJS application, configures Swagger, and binds to PORT env variable.' },
+    { step: 2, node_id: 'app-module',   label: 'AppModule',            phase: 'Core Module', reason: 'Root module that wires together every feature module and global providers.',                    docstring: 'Root module importing AuthModule, UserModule, PaymentModule, and DatabaseModule.' },
+    { step: 3, node_id: 'auth-mid',     label: 'auth.middleware.ts',   phase: 'Entry Point', reason: 'All requests pass through JWT verification here before reaching any controller.',              docstring: 'Verifies bearer tokens, attaches decoded payload to request context.' },
+    { step: 4, node_id: 'user-ctrl',    label: 'UserController',       phase: 'Core Module', reason: 'Primary CRUD surface for user resources — good example of the controller pattern used throughout.', docstring: 'Handles GET /users, POST /users, PATCH /users/:id, DELETE /users/:id endpoints.' },
+    { step: 5, node_id: 'payment-svc',  label: 'PaymentService',       phase: 'Core Module', reason: 'Encapsulates Stripe integration; shows service-layer pattern and error handling conventions.',  docstring: 'Manages charge creation, subscription lifecycle, and refund processing via Stripe SDK.' },
+    { step: 6, node_id: 'db-conn',      label: 'connection.ts',        phase: 'Utility',     reason: 'Shared database connection pool — referenced by every repository class.',                      docstring: 'Creates and exports a TypeORM DataSource with connection-pool and retry configuration.' },
+    { step: 7, node_id: 'validators',   label: 'validators/index.ts',  phase: 'Utility',     reason: 'Custom class-validator decorators reused across all DTOs — understand these early.',           docstring: 'Exports IsStrongPassword, IsSlug, IsFutureDate, and IsE164Phone validators.' },
+  ],
+};
+
+/* ─── SummaryCard ───────────────────────────────────────────────────────── */
+function SummaryCard({ label, value, color }) {
+  return (
+    <div style={{ ...s.statCard, background: `${color}08`, border: `1px solid ${color}20` }}>
+      <span style={{ ...s.statVal, color }}>{value}</span>
+      <span style={s.statLabel}>{label}</span>
+    </div>
+  );
+}
+
+/* ─── StepRow ───────────────────────────────────────────────────────────── */
+function StepRow({ step, isLast, onSelectNode }) {
+  const [hovered, setHovered] = useState(false);
+  const color = PHASE_COLORS[step.phase] || '#6366f1';
+  const icon  = PHASE_ICONS[step.phase]  || '◇';
+
+  return (
+    <div>
+      <button
+        style={{
+          ...s.stepRow,
+          background: hovered ? 'rgba(99,102,241,0.06)' : 'transparent',
+          borderColor: hovered ? 'rgba(99,102,241,0.18)' : 'transparent',
+        }}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        onClick={() => onSelectNode?.(step.node_id)}
+      >
+        {/* Left: icon + connector */}
+        <div style={s.stepLeft}>
+          <div style={{ ...s.stepIconWrap, background: `${color}12`, border: `1px solid ${color}25`, color }}>
+            {icon}
+          </div>
+          {!isLast && (
+            <div style={{ ...s.connector, background: `${color}25` }} />
+          )}
+        </div>
+
+        {/* Right: content */}
+        <div style={s.stepContent}>
+          <div style={s.stepTopRow}>
+            <span style={s.stepNum}>STEP {step.step}</span>
+            <span style={s.stepLabel}>{step.label}</span>
+            <span style={{ ...s.phaseBadge, background: `${color}12`, color, border: `1px solid ${color}25` }}>
+              {step.phase}
+            </span>
+          </div>
+          <p style={s.stepReason}>{step.reason}</p>
+          {step.docstring && (
+            <p style={s.stepDocstring}>
+              "{step.docstring.length > 100 ? step.docstring.slice(0, 100) + '…' : step.docstring}"
+            </p>
+          )}
+          <div style={{ ...s.exploreRow, opacity: hovered ? 1 : 0 }}>
+            <span>Explore</span>
+            <span style={{ fontSize: 11 }}>→</span>
+          </div>
+        </div>
+      </button>
+    </div>
+  );
+}
+
+/* ─── Main component ────────────────────────────────────────────────────── */
 export default function OnboardingGuide({ onSelectNode }) {
   const { data, loading, error, execute } = useApi(getOnboarding);
 
   useEffect(() => { execute(); }, []);
 
-  if (loading) return (
-    <div className="flex items-center justify-center h-full">
-      <div className="text-center animate-fade-in">
-        <div className="w-8 h-8 border-2 border-prism-border border-t-prism-accent rounded-full animate-spin mx-auto mb-3" />
-        <p className="text-prism-text-dim text-[12px]">Building onboarding guide...</p>
-      </div>
-    </div>
-  );
-  if (error) return <div className="flex items-center justify-center h-full text-prism-rose text-[12px] px-4 text-center">{error}</div>;
-  if (!data) return null;
+  // Uncomment below and remove MOCK_DATA usage to use real API:
+  // const displayData = data;
+  const displayData = data || MOCK_DATA;
 
   return (
-    <div className="h-full flex flex-col">
+    <div style={s.panel}>
       {/* Header */}
-      <div className="px-4 py-4 border-b border-prism-border">
-        <p className="text-[12px] text-prism-text-dim leading-relaxed">
-          Recommended path to explore this codebase ({data.total_files} files).
-        </p>
+      <div style={s.panelHeader}>
+        <div style={s.logoHex}>P</div>
+        <div>
+          <p style={s.headerTitle}>PrismCode</p>
+          <p style={s.headerSub}>// onboarding guide</p>
+        </div>
+        <div style={s.versionBadge}>v0.9.1</div>
       </div>
 
-      {/* Exploration Path */}
-      <div className="flex-1 overflow-y-auto px-4 py-3">
-        <div className="space-y-0">
-          {data.exploration_order?.map((step, i) => {
-            const color = PHASE_COLORS[step.phase] || '#6366f1';
-            return (
-              <div key={i} className="animate-fade-in" style={{ animationDelay: `${i * 60}ms` }}>
-                <button
-                  onClick={() => onSelectNode?.(step.node_id)}
-                  className="w-full flex items-start gap-3 px-3 py-3 rounded-lg hover:bg-prism-surface-2/40 transition-all text-left cursor-pointer group"
-                >
-                  {/* Step indicator */}
-                  <div className="flex flex-col items-center flex-shrink-0">
-                    <div
-                      className="w-8 h-8 rounded-lg flex items-center justify-center text-sm"
-                      style={{ background: `${color}10`, border: `1px solid ${color}20` }}
-                    >
-                      {PHASE_ICONS[step.phase] || '📄'}
-                    </div>
-                    {i < data.exploration_order.length - 1 && (
-                      <div className="w-px h-5 mt-1" style={{ background: `${color}20` }} />
-                    )}
-                  </div>
-
-                  {/* Content */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-                      <span className="text-[12px] font-semibold text-prism-text">Step {step.step}: {step.label}</span>
-                      <span className="badge" style={{ background: `${color}10`, color, border: `1px solid ${color}20` }}>
-                        {step.phase}
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-prism-text-dim leading-relaxed mt-0.5">{step.reason}</p>
-                    {step.docstring && (
-                      <p className="text-[10px] text-prism-text-muted mt-1 italic leading-relaxed">"{step.docstring.slice(0, 100)}"</p>
-                    )}
-                    <div className="flex items-center gap-1 mt-1.5 text-[10px] text-prism-accent opacity-0 group-hover:opacity-100 transition-opacity font-medium">
-                      <span>Explore</span>
-                      <HiOutlineArrowRight className="w-3 h-3" />
-                    </div>
-                  </div>
-                </button>
-              </div>
-            );
-          })}
+      {/* Sub-header */}
+      {displayData && !loading && (
+        <div style={s.subHeader}>
+          <p style={s.subHeaderText}>
+            Recommended exploration path &nbsp;·&nbsp;
+            <span style={{ color: '#6366f1', fontWeight: 700 }}>{displayData.total_files}</span> files indexed
+          </p>
         </div>
+      )}
 
-        {/* Summary cards */}
-        <div className="mt-6 grid grid-cols-3 gap-2">
-          <SummaryCard label="Entry Points" value={data.entry_points?.length || 0} color="#f43f5e" />
-          <SummaryCard label="Core Modules" value={data.core_modules?.length || 0} color="#6366f1" />
-          <SummaryCard label="Utilities" value={data.utility_modules?.length || 0} color="#10b981" />
+      {/* Body */}
+      {loading && (
+        <div style={s.centerBox}>
+          <div style={{ textAlign: 'center' }}>
+            <div style={s.spinner} />
+            <p style={s.loadingText}>Building onboarding guide…</p>
+          </div>
+          <style>{`@keyframes prism-spin { to { transform: rotate(360deg); } }`}</style>
         </div>
-      </div>
-    </div>
-  );
-}
+      )}
 
-function SummaryCard({ label, value, color }) {
-  return (
-    <div className="rounded-lg p-3 text-center border" style={{ background: `${color}06`, borderColor: `${color}18` }}>
-      <p className="text-lg font-bold" style={{ color }}>{value}</p>
-      <p className="text-[10px] text-prism-text-muted font-medium mt-0.5">{label}</p>
+      {error && !loading && (
+        <div style={s.centerBox}>
+          <p style={s.errorText}>{error}</p>
+        </div>
+      )}
+
+      {!loading && displayData && (
+        <div style={s.scrollArea}>
+          <p style={s.sectionLabel}>Exploration order</p>
+
+          <div style={s.stepList}>
+            {displayData.exploration_order?.map((step, i) => (
+              <StepRow
+                key={step.node_id || i}
+                step={step}
+                isLast={i === displayData.exploration_order.length - 1}
+                onSelectNode={onSelectNode}
+              />
+            ))}
+          </div>
+
+          <div style={s.divider} />
+
+          <p style={s.sectionLabel}>Codebase breakdown</p>
+          <div style={s.statsGrid}>
+            <SummaryCard label="Entry Points" value={displayData.entry_points?.length  || 0} color="#f43f5e" />
+            <SummaryCard label="Core Modules" value={displayData.core_modules?.length  || 0} color="#6366f1" />
+            <SummaryCard label="Utilities"    value={displayData.utility_modules?.length || 0} color="#10b981" />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

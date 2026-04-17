@@ -10,6 +10,7 @@ import uuid
 import re
 from pathlib import Path
 from typing import Dict, Any, Optional, List
+import zipfile
 from contextlib import asynccontextmanager
 
 # Prevent Errno 5: Input/output error when running as a daemon
@@ -25,7 +26,7 @@ except OSError:
 from dotenv import load_dotenv
 load_dotenv()
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 import git
@@ -240,6 +241,67 @@ async def analyze_codebase(req: AnalyzeRequest):
         with open("/tmp/error.log", "w") as f:
             traceback.print_exc(file=f)
         raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")
+
+
+@app.post("/api/upload_zip")
+async def upload_zip_codebase(file: UploadFile = File(...)):
+    """Upload a ZIP file, extract it, and analyze the codebase."""
+    if not file.filename.endswith(".zip"):
+        raise HTTPException(status_code=400, detail="Only .zip files are supported.")
+        
+    try:
+        # Create a dedicated directory for uploaded repos if it doesn't exist
+        repos_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "repos")
+        os.makedirs(repos_dir, exist_ok=True)
+        
+        # Create a stable directory name based on the zip name
+        repo_name = file.filename.replace(".zip", "")
+        if not repo_name:
+            repo_name = f"upload_{uuid.uuid4().hex[:8]}"
+            
+        local_path = os.path.join(repos_dir, repo_name)
+        
+        # If it already exists, clear it
+        if os.path.exists(local_path):
+            print(f"🗑️ Removing existing directory at {local_path}")
+            shutil.rmtree(local_path, ignore_errors=True)
+            
+        os.makedirs(local_path, exist_ok=True)
+        
+        # Save zip to a temp file
+        temp_zip_path = os.path.join(repos_dir, f"temp_{uuid.uuid4().hex}.zip")
+        with open(temp_zip_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+            
+        print(f"📦 Extracting zip to {local_path}...")
+        try:
+            with zipfile.ZipFile(temp_zip_path, "r") as zip_ref:
+                zip_ref.extractall(local_path)
+        except zipfile.BadZipFile:
+            os.remove(temp_zip_path)
+            raise HTTPException(status_code=400, detail="Invalid or corrupt ZIP file.")
+            
+        # Clean up the temp zip file
+        os.remove(temp_zip_path)
+        
+        # It's common for zips to have a single root folder (like from GitHub).
+        # We can dynamically detect this to avoid deep nested paths, but for simplicity
+        # we'll just run analysis on the extracted root.
+        
+        stats = _run_analysis(local_path)
+        return {
+            "status": "success",
+            "message": f"Analyzed uploaded codebase {file.filename}",
+            "stats": stats,
+            "local_path": local_path
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        import traceback
+        with open("/tmp/error.log", "w") as f:
+            traceback.print_exc(file=f)
+        raise HTTPException(status_code=500, detail=f"Upload & Analysis failed: {str(e)}")
 
 
 @app.get("/api/graph")

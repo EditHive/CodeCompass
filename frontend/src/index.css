@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 @theme {
   --color-prism-bg: #09090b;
@@ -25,7 +26,7 @@
   --font-family-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', monospace;
 }
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
 
 * {
   margin: 0;

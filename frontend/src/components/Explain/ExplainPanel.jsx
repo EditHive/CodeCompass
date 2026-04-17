@@ -1,179 +1,709 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useApi } from '../../hooks/useApi';
 import { explainCode, getNodes } from '../../services/api';
-import { HiOutlineAcademicCap, HiOutlineLightBulb, HiOutlineChip } from 'react-icons/hi';
+import {
+  HiOutlineAcademicCap,
+  HiOutlineLightBulb,
+  HiOutlineChip,
+  HiOutlineSearch,
+  HiOutlineSparkles,
+  HiOutlineCode,
+  HiOutlineInformationCircle,
+} from 'react-icons/hi';
+
+/* ─── constants ─────────────────────────────────────────────────────── */
 
 const LEVELS = [
-  { id: 'beginner', label: 'Beginner', icon: HiOutlineAcademicCap, color: '#10b981', desc: 'Simple, plain English' },
-  { id: 'intermediate', label: 'Intermediate', icon: HiOutlineLightBulb, color: '#f59e0b', desc: 'Technical details' },
-  { id: 'expert', label: 'Expert', icon: HiOutlineChip, color: '#f43f5e', desc: 'Deep analysis' },
+  {
+    id: 'beginner',
+    label: 'Beginner',
+    icon: HiOutlineAcademicCap,
+    color: '#10b981',
+    glow: 'rgba(16,185,129,0.15)',
+    border: 'rgba(16,185,129,0.28)',
+    bg: 'rgba(16,185,129,0.07)',
+    desc: 'Plain English',
+  },
+  {
+    id: 'intermediate',
+    label: 'Intermediate',
+    icon: HiOutlineLightBulb,
+    color: '#f59e0b',
+    glow: 'rgba(245,158,11,0.15)',
+    border: 'rgba(245,158,11,0.28)',
+    bg: 'rgba(245,158,11,0.07)',
+    desc: 'Technical depth',
+  },
+  {
+    id: 'expert',
+    label: 'Expert',
+    icon: HiOutlineChip,
+    color: '#f43f5e',
+    glow: 'rgba(244,63,94,0.15)',
+    border: 'rgba(244,63,94,0.28)',
+    bg: 'rgba(244,63,94,0.07)',
+    desc: 'Deep analysis',
+  },
 ];
 
+const TYPE_COLORS = {
+  file: { dot: '#6366f1', bg: 'rgba(99,102,241,0.1)', text: '#818cf8' },
+  function: { dot: '#22d3ee', bg: 'rgba(34,211,238,0.1)', text: '#67e8f9' },
+  class: { dot: '#10b981', bg: 'rgba(16,185,129,0.1)', text: '#34d399' },
+};
+
+/* ─── styles (css-in-js object map) ─────────────────────────────────── */
+
+const S = {
+  /* layout */
+  panel: {
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    background: '#111422',
+    fontFamily: "'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Inter', sans-serif",
+    color: '#e2e4f0',
+  },
+
+  /* header */
+  header: {
+    padding: '16px 18px 14px',
+    borderBottom: '1px solid rgba(99,102,241,0.12)',
+    background: 'linear-gradient(180deg,rgba(99,102,241,0.05) 0%,transparent 100%)',
+    flexShrink: 0,
+  },
+  headerTop: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 9,
+    marginBottom: 7,
+  },
+  logoMark: {
+    width: 26,
+    height: 26,
+    background: 'linear-gradient(135deg,#6366f1,#7c3aed)',
+    borderRadius: 7,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: 11,
+    fontWeight: 700,
+    color: '#fff',
+    letterSpacing: '-0.5px',
+    flexShrink: 0,
+  },
+  headerTitle: {
+    fontSize: 13,
+    fontWeight: 600,
+    color: '#e2e4f0',
+    letterSpacing: '0.02em',
+    flex: 1,
+  },
+  headerBadge: {
+    fontSize: 8.5,
+    fontWeight: 700,
+    padding: '2px 7px',
+    borderRadius: 20,
+    background: 'rgba(99,102,241,0.1)',
+    color: '#818cf8',
+    border: '1px solid rgba(99,102,241,0.2)',
+    letterSpacing: '0.06em',
+  },
+  headerDesc: {
+    fontSize: 11,
+    color: '#555870',
+    lineHeight: 1.5,
+  },
+
+  /* controls */
+  controls: {
+    padding: '13px 16px',
+    borderBottom: '1px solid rgba(99,102,241,0.12)',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 10,
+    flexShrink: 0,
+  },
+
+  /* search */
+  searchWrap: { position: 'relative' },
+  searchIcon: {
+    position: 'absolute',
+    left: 10,
+    top: '50%',
+    transform: 'translateY(-50%)',
+    color: '#555870',
+    pointerEvents: 'none',
+    display: 'flex',
+  },
+  searchInput: {
+    width: '100%',
+    padding: '9px 10px 9px 32px',
+    background: '#1a1e35',
+    border: '1px solid rgba(99,102,241,0.13)',
+    borderRadius: 9,
+    fontSize: 11.5,
+    color: '#e2e4f0',
+    outline: 'none',
+    transition: 'border-color 0.2s, box-shadow 0.2s',
+    boxSizing: 'border-box',
+  },
+
+  /* dropdown */
+  dropdown: {
+    position: 'absolute',
+    top: 'calc(100% + 4px)',
+    left: 0,
+    right: 0,
+    zIndex: 50,
+    background: '#131629',
+    border: '1px solid rgba(99,102,241,0.22)',
+    borderRadius: 9,
+    overflow: 'hidden',
+    maxHeight: 140,
+    overflowY: 'auto',
+  },
+  dropItem: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8,
+    padding: '7px 11px',
+    fontSize: 11.5,
+    cursor: 'pointer',
+    transition: 'background 0.12s',
+    borderBottom: '1px solid rgba(99,102,241,0.06)',
+  },
+  dropDot: { width: 6, height: 6, borderRadius: '50%', flexShrink: 0 },
+  dropLabel: { flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: '#c8cae0' },
+  dropTypePill: {
+    fontSize: 9,
+    fontWeight: 600,
+    padding: '1px 5px',
+    borderRadius: 4,
+    letterSpacing: '0.04em',
+  },
+
+  /* levels */
+  levels: { display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 7 },
+  levelBtn: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: 5,
+    padding: '9px 6px',
+    borderRadius: 9,
+    border: '1px solid rgba(99,102,241,0.13)',
+    background: 'rgba(255,255,255,0.015)',
+    fontSize: 10,
+    fontWeight: 600,
+    color: '#555870',
+    cursor: 'pointer',
+    transition: 'all 0.18s',
+    letterSpacing: '0.02em',
+  },
+
+  /* explain button */
+  explainBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 7,
+    padding: '10px 14px',
+    borderRadius: 10,
+    border: 'none',
+    background: 'linear-gradient(135deg,#f59e0b 0%,#d97706 100%)',
+    color: '#1a1000',
+    fontSize: 12,
+    fontWeight: 700,
+    cursor: 'pointer',
+    transition: 'all 0.18s',
+    letterSpacing: '0.03em',
+    width: '100%',
+    boxShadow: '0 4px 20px rgba(245,158,11,0.2)',
+  },
+  explainBtnDisabled: {
+    opacity: 0.35,
+    cursor: 'not-allowed',
+    boxShadow: 'none',
+  },
+
+  /* result area */
+  resultArea: {
+    flex: 1,
+    overflowY: 'auto',
+    padding: '13px 16px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 10,
+  },
+
+  /* empty state */
+  emptyState: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    padding: '40px 16px',
+    color: '#3a3d52',
+    textAlign: 'center',
+    flex: 1,
+  },
+
+  /* result blocks */
+  resultHeader: { display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' },
+  resultName: { fontSize: 13, fontWeight: 600, color: '#e2e4f0' },
+  badge: { fontSize: 9, fontWeight: 700, padding: '2px 7px', borderRadius: 12, letterSpacing: '0.05em' },
+
+  aiBlock: {
+    borderRadius: 10,
+    border: '1px solid rgba(245,158,11,0.16)',
+    background: 'rgba(245,158,11,0.03)',
+    overflow: 'hidden',
+  },
+  aiBlockHead: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 7,
+    padding: '9px 12px',
+    borderBottom: '1px solid rgba(245,158,11,0.1)',
+    background: 'rgba(245,158,11,0.04)',
+  },
+  aiLabel: { fontSize: 10.5, fontWeight: 700, color: '#f59e0b', letterSpacing: '0.06em' },
+  aiBody: {
+    padding: '10px 12px',
+    fontSize: 11,
+    color: '#8b8fa8',
+    lineHeight: 1.65,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 5,
+  },
+
+  codeBlockWrap: { display: 'flex', flexDirection: 'column', gap: 5 },
+  codeLabel: { fontSize: 9, fontWeight: 700, color: '#3a3d52', letterSpacing: '0.1em', textTransform: 'uppercase' },
+  codeBlock: {
+    background: '#1a1e35',
+    border: '1px solid rgba(99,102,241,0.12)',
+    borderRadius: 9,
+    padding: '10px 12px',
+    fontFamily: "'SF Mono','Fira Code',monospace",
+    fontSize: 10.5,
+    color: '#22d3ee',
+    lineHeight: 1.6,
+    maxHeight: 180,
+    overflowY: 'auto',
+    whiteSpace: 'pre',
+  },
+
+  metaBlock: {
+    background: 'rgba(255,255,255,0.015)',
+    border: '1px solid rgba(99,102,241,0.1)',
+    borderRadius: 9,
+    padding: '9px 12px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 5,
+  },
+  metaRow: { display: 'flex', alignItems: 'baseline', gap: 6, fontSize: 11 },
+  metaKey: { color: '#3a3d52', fontWeight: 600, minWidth: 72, fontSize: 10.5 },
+  metaVal: { color: '#8b8fa8', fontFamily: "'SF Mono','Fira Code',monospace", fontSize: 10.5 },
+
+  errorBox: {
+    background: 'rgba(244,63,94,0.07)',
+    border: '1px solid rgba(244,63,94,0.2)',
+    borderRadius: 9,
+    padding: '9px 12px',
+    fontSize: 11,
+    color: '#f43f5e',
+  },
+};
+
+/* ─── markdown renderer ──────────────────────────────────────────────── */
+
+function AiMarkdown({ text }) {
+  const lines = text.split('\n');
+  return (
+    <>
+      {lines.map((line, i) => {
+        if (!line.trim()) return null;
+        if (line.startsWith('### ')) {
+          return (
+            <p key={i} style={{ fontSize: 11.5, fontWeight: 600, color: '#c8cae0', marginTop: 4 }}>
+              {line.slice(4).replace(/\*\*/g, '')}
+            </p>
+          );
+        }
+        if (line.startsWith('## ')) {
+          return (
+            <p key={i} style={{ fontSize: 12, fontWeight: 700, color: '#e2e4f0', marginTop: 6 }}>
+              {line.slice(3).replace(/\*\*/g, '')}
+            </p>
+          );
+        }
+        if (line.startsWith('- ')) {
+          return (
+            <div key={i} style={{ display: 'flex', gap: 6, paddingLeft: 4 }}>
+              <span style={{ color: '#f59e0b', flexShrink: 0 }}>•</span>
+              <span>{renderInline(line.slice(2).replace(/\*\*/g, ''))}</span>
+            </div>
+          );
+        }
+        return <p key={i}>{renderInline(line.replace(/\*\*/g, ''))}</p>;
+      })}
+    </>
+  );
+}
+
+function renderInline(text) {
+  const parts = text.split('`');
+  return parts.map((part, j) =>
+    j % 2 === 1 ? (
+      <code
+        key={j}
+        style={{
+          padding: '1px 5px',
+          borderRadius: 5,
+          background: '#1f2440',
+          color: '#22d3ee',
+          fontFamily: "'SF Mono','Fira Code',monospace",
+          fontSize: 10.5,
+        }}
+      >
+        {part}
+      </code>
+    ) : (
+      part
+    )
+  );
+}
+
+/* ─── main component ─────────────────────────────────────────────────── */
+
 export default function ExplainPanel() {
-  const [selectedNode, setSelectedNode] = useState('');
+  const [selectedNode, setSelectedNode] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [level, setLevel] = useState('intermediate');
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [hoveredItem, setHoveredItem] = useState(null);
+  const [hoveredLevel, setHoveredLevel] = useState(null);
+
   const { data: nodesData, execute: loadNodes } = useApi(getNodes);
   const { data: explainData, loading, error, execute: runExplain } = useApi(explainCode);
 
+  const searchRef = useRef(null);
+  const dropdownRef = useRef(null);
+
+  /* close dropdown on outside click */
+  useEffect(() => {
+    const handler = (e) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target) &&
+        !searchRef.current.contains(e.target)
+      ) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
   const handleExplain = async () => {
     if (!selectedNode) return;
-    await runExplain(selectedNode, level);
+    await runExplain(selectedNode.id, level);
   };
 
-  const filteredNodes = nodesData?.nodes?.filter(n =>
-    n.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    n.id.toLowerCase().includes(searchTerm.toLowerCase())
-  ) || [];
+  const filteredNodes =
+    nodesData?.nodes?.filter(
+      (n) =>
+        n.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        n.id.toLowerCase().includes(searchTerm.toLowerCase())
+    ) || [];
+
+  const activeLevelMeta = LEVELS.find((l) => l.id === level);
+  const explainLevelMeta = explainData
+    ? LEVELS.find((l) => l.id === explainData.level)
+    : null;
 
   return (
-    <div className="h-full flex flex-col">
-      {/* Header */}
-      <div className="px-4 py-4 border-b border-prism-border">
-        <p className="text-[12px] text-prism-text-dim leading-relaxed">
-          Get AI-powered explanations at your preferred expertise level.
+    <div style={S.panel}>
+      {/* ── Header ── */}
+      <div style={S.header}>
+        <div style={S.headerTop}>
+          <div style={S.logoMark}>P</div>
+          <span style={S.headerTitle}>Explain Code</span>
+          <span style={S.headerBadge}>AI POWERED</span>
+        </div>
+        <p style={S.headerDesc}>
+          AI-powered explanations at your preferred expertise level.
         </p>
       </div>
 
-      {/* Controls */}
-      <div className="px-4 py-3 border-b border-prism-border space-y-3">
-        {/* Node search */}
-        <div>
+      {/* ── Controls ── */}
+      <div style={S.controls}>
+        {/* Search */}
+        <div style={S.searchWrap}>
+          <span style={S.searchIcon}>
+            <HiOutlineSearch size={14} />
+          </span>
           <input
+            ref={searchRef}
+            style={{
+              ...S.searchInput,
+              ...(showDropdown
+                ? { borderColor: 'rgba(245,158,11,0.35)', boxShadow: '0 0 0 3px rgba(245,158,11,0.07)' }
+                : {}),
+            }}
             type="text"
-            placeholder="Search for a file, function, or class..."
+            placeholder="Search file, function, or class…"
             value={searchTerm}
-            onFocus={() => { if (!nodesData) loadNodes(); }}
-            onChange={e => setSearchTerm(e.target.value)}
-            className="w-full px-3 py-2 rounded-lg bg-prism-surface-2 border border-prism-border text-[12px] text-prism-text placeholder-prism-text-muted focus:outline-none focus:border-prism-amber focus:ring-2 focus:ring-prism-amber/10 transition-all"
+            autoComplete="off"
+            onFocus={() => {
+              if (!nodesData) loadNodes();
+              if (searchTerm) setShowDropdown(true);
+            }}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setShowDropdown(!!e.target.value);
+            }}
           />
-          {searchTerm && filteredNodes.length > 0 && (
-            <div className="mt-1.5 max-h-[120px] overflow-y-auto rounded-lg bg-prism-surface border border-prism-border">
-              {filteredNodes.slice(0, 15).map(node => (
-                <button
-                  key={node.id}
-                  onClick={() => { setSelectedNode(node.id); setSearchTerm(node.label); }}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-[12px] text-left hover:bg-prism-surface-2 transition-colors cursor-pointer"
-                >
-                  <span className="w-2 h-2 rounded-full flex-shrink-0" style={{
-                    background: node.type === 'file' ? '#6366f1' : node.type === 'function' ? '#22d3ee' : '#10b981'
-                  }} />
-                  <span className="truncate text-prism-text">{node.label}</span>
-                  <span className="ml-auto text-[10px] text-prism-text-muted font-medium">{node.type}</span>
-                </button>
-              ))}
+
+          {showDropdown && filteredNodes.length > 0 && (
+            <div ref={dropdownRef} style={S.dropdown}>
+              {filteredNodes.slice(0, 12).map((node) => {
+                const tc = TYPE_COLORS[node.type] || TYPE_COLORS.file;
+                return (
+                  <div
+                    key={node.id}
+                    style={{
+                      ...S.dropItem,
+                      background: hoveredItem === node.id ? '#1a1e35' : 'transparent',
+                    }}
+                    onMouseEnter={() => setHoveredItem(node.id)}
+                    onMouseLeave={() => setHoveredItem(null)}
+                    onClick={() => {
+                      setSelectedNode(node);
+                      setSearchTerm(node.label);
+                      setShowDropdown(false);
+                    }}
+                  >
+                    <span style={{ ...S.dropDot, background: tc.dot }} />
+                    <span style={S.dropLabel}>{node.label}</span>
+                    <span
+                      style={{
+                        ...S.dropTypePill,
+                        background: tc.bg,
+                        color: tc.text,
+                      }}
+                    >
+                      {node.type}
+                    </span>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
 
         {/* Level selector */}
-        <div className="grid grid-cols-3 gap-2">
-          {LEVELS.map(l => {
+        <div style={S.levels}>
+          {LEVELS.map((l) => {
             const Icon = l.icon;
             const isActive = level === l.id;
+            const isHovered = hoveredLevel === l.id;
             return (
               <button
                 key={l.id}
+                style={{
+                  ...S.levelBtn,
+                  ...(isActive
+                    ? { background: l.bg, borderColor: l.border, color: l.color }
+                    : isHovered
+                    ? { background: '#1a1e35', borderColor: 'rgba(99,102,241,0.22)', color: '#8b8fa8' }
+                    : {}),
+                }}
+                onMouseEnter={() => setHoveredLevel(l.id)}
+                onMouseLeave={() => setHoveredLevel(null)}
                 onClick={() => setLevel(l.id)}
-                className={`flex flex-col items-center gap-1.5 px-2 py-2.5 rounded-lg text-[10px] font-semibold transition-all cursor-pointer border ${
-                  isActive ? '' : 'border-prism-border/50 bg-prism-surface-2/30 text-prism-text-dim hover:bg-prism-surface-2'
-                }`}
-                style={isActive ? { background: `${l.color}10`, borderColor: `${l.color}30`, color: l.color } : {}}
               >
-                <Icon className="w-4 h-4" />
+                <Icon size={15} />
                 {l.label}
               </button>
             );
           })}
         </div>
 
+        {/* Explain button */}
         <button
           onClick={handleExplain}
           disabled={!selectedNode || loading}
-          className="w-full py-2.5 rounded-lg text-[12px] font-semibold transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-          style={{ background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#fff' }}
+          style={{
+            ...S.explainBtn,
+            ...(!selectedNode || loading ? S.explainBtnDisabled : {}),
+          }}
         >
-          <HiOutlineLightBulb className="w-3.5 h-3.5" />
-          {loading ? 'Generating...' : 'Explain'}
+          {loading ? (
+            <>
+              <SpinnerIcon />
+              Generating…
+            </>
+          ) : (
+            <>
+              <HiOutlineSparkles size={14} />
+              {selectedNode ? `Explain ${selectedNode.label}` : 'Select a node first'}
+            </>
+          )}
         </button>
       </div>
 
-      {/* Explanation */}
-      <div className="flex-1 overflow-y-auto px-4 py-3">
-        {error && <div className="text-[12px] text-prism-rose bg-prism-rose/8 border border-prism-rose/20 rounded-lg px-3 py-2.5 mb-3">{error}</div>}
+      {/* ── Result Area ── */}
+      <div style={S.resultArea}>
+        {/* Error */}
+        {error && <div style={S.errorBox}>{error}</div>}
 
+        {/* Explanation */}
         {explainData && !explainData.error && (
-          <div className="animate-fade-in space-y-3">
-            {/* Title */}
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-[13px] font-semibold text-prism-text">{explainData.name}</span>
-              <span className="badge" style={{ background: '#6366f110', color: '#6366f1', border: '1px solid #6366f120' }}>{explainData.type}</span>
-              <span className="badge" style={{
-                background: `${LEVELS.find(l => l.id === explainData.level)?.color}10`,
-                color: LEVELS.find(l => l.id === explainData.level)?.color,
-                border: `1px solid ${LEVELS.find(l => l.id === explainData.level)?.color}20`,
-              }}>
-                {explainData.level}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, animation: 'prism-fade-in 0.3s ease' }}>
+            {/* Title row */}
+            <div style={S.resultHeader}>
+              <span style={S.resultName}>{explainData.name}</span>
+              <span
+                style={{
+                  ...S.badge,
+                  background: 'rgba(99,102,241,0.1)',
+                  color: '#818cf8',
+                  border: '1px solid rgba(99,102,241,0.18)',
+                }}
+              >
+                {explainData.type}
               </span>
+              {explainLevelMeta && (
+                <span
+                  style={{
+                    ...S.badge,
+                    background: explainLevelMeta.bg,
+                    color: explainLevelMeta.color,
+                    border: `1px solid ${explainLevelMeta.border}`,
+                  }}
+                >
+                  {explainLevelMeta.label.toUpperCase()}
+                </span>
+              )}
             </div>
 
-            {/* AI Explanation */}
-            {explainData.ai_explanation ? (
-              <div className="rounded-lg bg-prism-amber/5 border border-prism-amber/15 p-3.5 glow-amber">
-                <div className="flex items-center gap-1.5 mb-2.5 pb-2 border-b border-prism-amber/15">
-                  <span className="text-sm">✨</span>
-                  <span className="text-[12px] font-semibold text-prism-amber">AI Explanation</span>
+            {/* AI explanation */}
+            {explainData.ai_explanation && (
+              <div style={S.aiBlock}>
+                <div style={S.aiBlockHead}>
+                  <HiOutlineSparkles size={12} color="#f59e0b" />
+                  <span style={S.aiLabel}>AI EXPLANATION</span>
                 </div>
-                <div className="text-[11px] text-prism-text-dim space-y-1.5 leading-relaxed">
-                  {explainData.ai_explanation.split('\n').map((line, i) => {
-                    if (line.startsWith('### ')) return <h4 key={i} className="text-[12px] font-semibold text-prism-text mt-2 mb-1">{line.replace('### ', '')}</h4>;
-                    if (line.startsWith('## ')) return <h3 key={i} className="text-[13px] font-bold text-prism-text mt-3 mb-1">{line.replace('## ', '')}</h3>;
-                    if (line.startsWith('**') && line.endsWith('**')) return <p key={i} className="font-semibold text-prism-text">{line.replace(/\*\*/g, '')}</p>;
-                    if (line.startsWith('- ')) return <p key={i} className="pl-3 text-prism-text-dim">• {line.slice(2).replace(/\*\*/g, '')}</p>;
-                    if (line.includes('`')) {
-                      const parts = line.split('`');
-                      return <p key={i} className="text-prism-text-dim">{parts.map((part, j) => j % 2 === 1 ? <code key={j} className="px-1.5 py-0.5 rounded-md bg-prism-surface-2 text-prism-cyan text-[11px] font-mono">{part}</code> : part)}</p>;
-                    }
-                    if (line.trim()) return <p key={i} className="text-prism-text-dim">{line.replace(/\*\*/g, '')}</p>;
-                    return null;
-                  })}
+                <div style={S.aiBody}>
+                  <AiMarkdown text={explainData.ai_explanation} />
                 </div>
               </div>
-            ) : null}
+            )}
 
+            {/* Fallback explanation */}
             {!explainData.ai_explanation && explainData.explanation && (
-              <div className="text-[11px] text-prism-text-dim space-y-1.5 leading-relaxed">
-                {explainData.explanation.split('\n').map((line, i) => {
-                  if (line.startsWith('## ')) return <h3 key={i} className="text-[13px] font-bold text-prism-text mt-3 mb-1">{line.replace('## ', '')}</h3>;
-                  if (line.startsWith('- ')) return <p key={i} className="pl-3">• {line.slice(2)}</p>;
-                  if (line.startsWith('> ')) return <div key={i} className="border-l-2 border-prism-amber/50 pl-3 text-prism-amber/70 py-0.5">{line.slice(2)}</div>;
-                  if (line.trim()) return <p key={i}>{line}</p>;
-                  return null;
-                })}
+              <div style={{ fontSize: 11, color: '#8b8fa8', lineHeight: 1.65, display: 'flex', flexDirection: 'column', gap: 5 }}>
+                <AiMarkdown text={explainData.explanation} />
               </div>
             )}
 
             {/* Code snippet */}
             {explainData.code_snippet && (
-              <div>
-                <p className="text-[11px] font-semibold text-prism-text-dim mb-2 uppercase tracking-wider">Source Code</p>
-                <div className="code-block text-[11px] max-h-[220px] overflow-y-auto">
-                  {explainData.code_snippet}
+              <div style={S.codeBlockWrap}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <HiOutlineCode size={11} color="#3a3d52" />
+                  <span style={S.codeLabel}>Source Code</span>
                 </div>
+                <div style={S.codeBlock}>{explainData.code_snippet}</div>
               </div>
             )}
 
             {/* Metadata */}
             {explainData.metadata && (
-              <div className="rounded-lg bg-prism-surface-2/40 border border-prism-border/50 px-3.5 py-2.5 text-[11px] space-y-1.5">
-                {explainData.metadata.params?.length > 0 && <p><span className="text-prism-text-muted font-medium">Params:</span> <span className="text-prism-cyan font-mono">{explainData.metadata.params.join(', ')}</span></p>}
-                {explainData.metadata.complexity && <p><span className="text-prism-text-muted font-medium">Complexity:</span> <span className={explainData.metadata.complexity > 5 ? 'text-prism-rose' : 'text-prism-emerald'} style={{ fontWeight: 600 }}>{explainData.metadata.complexity}</span></p>}
-                {explainData.metadata.calls?.length > 0 && <p><span className="text-prism-text-muted font-medium">Calls:</span> <span className="text-prism-text-dim">{explainData.metadata.calls.join(', ')}</span></p>}
+              <div style={S.metaBlock}>
+                {explainData.metadata.params?.length > 0 && (
+                  <div style={S.metaRow}>
+                    <span style={S.metaKey}>Params</span>
+                    <span style={{ ...S.metaVal, color: '#22d3ee' }}>
+                      {explainData.metadata.params.join(', ')}
+                    </span>
+                  </div>
+                )}
+                {explainData.metadata.complexity != null && (
+                  <div style={S.metaRow}>
+                    <span style={S.metaKey}>Complexity</span>
+                    <span
+                      style={{
+                        ...S.metaVal,
+                        color: explainData.metadata.complexity > 5 ? '#f43f5e' : '#10b981',
+                        fontWeight: 600,
+                      }}
+                    >
+                      {explainData.metadata.complexity}
+                      <span style={{ color: '#3a3d52', fontWeight: 400 }}> / 10</span>
+                    </span>
+                  </div>
+                )}
+                {explainData.metadata.calls?.length > 0 && (
+                  <div style={S.metaRow}>
+                    <span style={S.metaKey}>Calls</span>
+                    <span style={S.metaVal}>
+                      {explainData.metadata.calls.join(', ')}
+                    </span>
+                  </div>
+                )}
               </div>
             )}
           </div>
         )}
+
+        {/* Empty state */}
+        {!explainData && !error && !loading && (
+          <div style={S.emptyState}>
+            <HiOutlineInformationCircle size={36} color="#2a2d42" />
+            <p style={{ fontSize: 11, color: '#3a3d52', lineHeight: 1.55, maxWidth: 200 }}>
+              Search for a file or function above, then click Explain for an AI analysis.
+            </p>
+          </div>
+        )}
       </div>
+
+      <style>{`
+        @keyframes prism-fade-in {
+          from { opacity: 0; transform: translateY(6px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes prism-spin {
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
+  );
+}
+
+/* ─── spinner ────────────────────────────────────────────────────────── */
+
+function SpinnerIcon() {
+  return (
+    <svg
+      width="13"
+      height="13"
+      viewBox="0 0 13 13"
+      fill="none"
+      style={{ animation: 'prism-spin 0.7s linear infinite', flexShrink: 0 }}
+    >
+      <circle cx="6.5" cy="6.5" r="5.5" stroke="rgba(26,16,0,0.35)" strokeWidth="2" />
+      <path
+        d="M6.5 1A5.5 5.5 0 0 1 12 6.5"
+        stroke="#1a1000"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+    </svg>
   );
 }

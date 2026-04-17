@@ -7,6 +7,13 @@ const api = axios.create({
 });
 
 export const analyzeCodebase = (path) => api.post('/analyze', { path });
+export const uploadZipCodebase = (file) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  return api.post('/upload_zip', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  });
+};
 export const getGraph = () => api.get('/graph');
 export const getGraphStats = () => api.get('/graph/stats');
 export const getNodeDetails = (nodeId) => api.get(`/graph/node/${encodeURIComponent(nodeId)}`);

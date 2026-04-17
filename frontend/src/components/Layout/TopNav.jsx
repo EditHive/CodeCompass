@@ -14,7 +14,6 @@ const NAV_ITEMS = [
   { id: 'flow', label: 'Flow', icon: HiOutlineClock, color: '#22d3ee' },
   { id: 'search', label: 'Search', icon: HiOutlineSearch, color: '#10b981' },
   { id: 'explain', label: 'Explain', icon: HiOutlineCode, color: '#f59e0b' },
-  { id: 'git', label: 'Git Intel', icon: HiOutlineClock, color: '#8b5cf6' },
   { id: 'smells', label: 'Smells', icon: HiOutlineExclamation, color: '#f97316' },
   { id: 'onboarding', label: 'Onboard', icon: HiOutlineMap, color: '#ec4899' },
 ];

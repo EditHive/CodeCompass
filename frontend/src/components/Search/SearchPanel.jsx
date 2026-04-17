@@ -1,7 +1,4 @@
 import React, { useState } from 'react';
-import { useApi } from '../../hooks/useApi';
-import { searchCode } from '../../services/api';
-import { HiOutlineSearch, HiOutlineCode, HiOutlineFolder, HiOutlineCube, HiOutlineStar } from 'react-icons/hi';
 
 const EXAMPLE_QUERIES = [
   "Where is authentication handled?",
@@ -11,127 +8,417 @@ const EXAMPLE_QUERIES = [
   "API endpoint definitions",
 ];
 
+const MOCK_DATA = {
+  'Where is authentication handled?': {
+    ai_summary: 'Authentication is centralized in the middleware layer. JWT verification happens in auth.middleware.ts, with token refresh logic in authService.ts and route guards in router/guards.ts.',
+    query: 'Where is authentication handled?',
+    results: [
+      { id: 'auth-middleware', type: 'file', path: 'src/middleware/auth.middleware.ts', metadata: { name: 'auth.middleware.ts' }, score: 0.97, explanation: 'Core JWT verification and session management middleware.' },
+      { id: 'auth-service', type: 'class', path: 'src/services/authService.ts', metadata: { name: 'AuthService' }, score: 0.91, explanation: 'Token refresh, user lookup, and OAuth integration logic.' },
+      { id: 'router-guards', type: 'function', path: 'src/router/guards.ts', metadata: { name: 'requireAuth()' }, score: 0.84, explanation: 'Route-level authentication guard using session tokens.' },
+    ],
+  },
+  'Database connection setup': {
+    ai_summary: 'Database connections are initialized in db/connection.ts using a connection pool. ORM configuration lives in ormconfig.json with entity mappings auto-loaded from src/entities.',
+    query: 'Database connection setup',
+    results: [
+      { id: 'db-conn', type: 'file', path: 'src/db/connection.ts', metadata: { name: 'connection.ts' }, score: 0.96, explanation: 'PostgreSQL connection pool initialization with retry logic.' },
+      { id: 'orm-config', type: 'file', path: 'ormconfig.json', metadata: { name: 'ormconfig.json' }, score: 0.88, explanation: 'TypeORM configuration, entities path, migrations, and synchronization settings.' },
+    ],
+  },
+  'Payment processing flow': {
+    ai_summary: 'Payments are handled via Stripe integration. The PaymentService class manages charge creation, webhook processing is in webhooks/stripe.ts, and idempotency keys are stored in Redis.',
+    query: 'Payment processing flow',
+    results: [
+      { id: 'payment-svc', type: 'class', path: 'src/services/PaymentService.ts', metadata: { name: 'PaymentService' }, score: 0.98, explanation: 'Core Stripe charge creation, refunds, and subscription management.' },
+      { id: 'stripe-hook', type: 'function', path: 'src/webhooks/stripe.ts', metadata: { name: 'handleStripeWebhook()' }, score: 0.90, explanation: 'Processes payment_intent.succeeded and charge.failed events.' },
+      { id: 'payment-dto', type: 'file', path: 'src/dto/PaymentDto.ts', metadata: { name: 'PaymentDto.ts' }, score: 0.75, explanation: 'Data transfer objects for payment request validation.' },
+    ],
+  },
+  'Input validation logic': {
+    ai_summary: 'Validation uses class-validator decorators on DTOs, with a global ValidationPipe in main.ts. Custom validators live in src/validators for domain-specific rules.',
+    query: 'Input validation logic',
+    results: [
+      { id: 'global-pipe', type: 'function', path: 'src/main.ts', metadata: { name: 'ValidationPipe' }, score: 0.93, explanation: 'Global pipe enforcing class-validator rules on all incoming requests.' },
+      { id: 'custom-validators', type: 'file', path: 'src/validators/index.ts', metadata: { name: 'validators/index.ts' }, score: 0.86, explanation: 'Custom IsStrongPassword, IsSlug, and IsFutureDate decorators.' },
+    ],
+  },
+  'API endpoint definitions': {
+    ai_summary: 'REST endpoints are defined using NestJS controllers. All routes are prefixed with /api/v1. OpenAPI spec is auto-generated and served at /api/docs via Swagger.',
+    query: 'API endpoint definitions',
+    results: [
+      { id: 'user-ctrl', type: 'class', path: 'src/controllers/UserController.ts', metadata: { name: 'UserController' }, score: 0.95, explanation: 'CRUD endpoints for user resource: GET /users, POST /users, PATCH /users/:id.' },
+      { id: 'auth-ctrl', type: 'class', path: 'src/controllers/AuthController.ts', metadata: { name: 'AuthController' }, score: 0.91, explanation: 'Login, logout, refresh-token, and OAuth callback endpoints.' },
+      { id: 'swagger', type: 'file', path: 'src/swagger.ts', metadata: { name: 'swagger.ts' }, score: 0.79, explanation: 'OpenAPI spec builder configuration, served at /api/docs.' },
+    ],
+  },
+};
+
+const typeConfig = {
+  file:     { color: '#6366f1', bg: 'rgba(99,102,241,0.12)',  icon: '◫' },
+  function: { color: '#22d3ee', bg: 'rgba(34,211,238,0.12)',  icon: 'ƒ'  },
+  class:    { color: '#10b981', bg: 'rgba(16,185,129,0.12)',  icon: '◉' },
+};
+
+function generateGenericResult(query) {
+  return {
+    ai_summary: `Semantic search found relevant code for "${query}". Results ranked by vector similarity to your query.`,
+    query,
+    results: [
+      { id: 'r1', type: 'function', path: 'src/utils/helpers.ts', metadata: { name: 'processQuery()' }, score: 0.82, explanation: 'Core utility function most semantically related to your query.' },
+      { id: 'r2', type: 'file',     path: 'src/modules/core/index.ts', metadata: { name: 'index.ts' },     score: 0.71, explanation: 'Module entry point with related configuration and exports.' },
+    ],
+  };
+}
+
+/* ─── Styles ────────────────────────────────────────────────────────────── */
+const styles = {
+  panel: {
+    background: '#0d0e1a',
+    borderRadius: 16,
+    border: '1px solid rgba(99,102,241,0.18)',
+    overflow: 'hidden',
+    fontFamily: "'SF Mono', 'Fira Code', monospace",
+    maxWidth: 560,
+    margin: '0 auto',
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100%',
+  },
+  panelHeader: {
+    padding: '16px 20px 14px',
+    borderBottom: '1px solid rgba(99,102,241,0.18)',
+    display: 'flex',
+    alignItems: 'center',
+    gap: 12,
+    background: '#13152a',
+  },
+  logoHex: {
+    width: 32, height: 32,
+    background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+    borderRadius: 8,
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    fontSize: 13, fontWeight: 700, color: '#fff',
+  },
+  headerTitle: {
+    fontSize: 13, fontWeight: 700, color: '#e2e4f0',
+    letterSpacing: '0.12em', textTransform: 'uppercase', margin: 0,
+  },
+  headerSub: {
+    fontSize: 10, color: '#7b7fa8', letterSpacing: '0.08em', marginTop: 1,
+  },
+  versionBadge: {
+    marginLeft: 'auto',
+    background: '#202440',
+    border: '1px solid rgba(99,102,241,0.18)',
+    borderRadius: 20,
+    padding: '3px 10px',
+    fontSize: 10,
+    color: '#7b7fa8',
+    letterSpacing: '0.06em',
+  },
+  searchSection: {
+    padding: '16px 20px',
+    borderBottom: '1px solid rgba(99,102,241,0.18)',
+  },
+  searchRow: { display: 'flex', gap: 8 },
+  searchWrap: { flex: 1, position: 'relative' },
+  searchIcon: {
+    position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)',
+    color: '#7b7fa8', fontSize: 14, pointerEvents: 'none',
+  },
+  searchInput: {
+    width: '100%', padding: '10px 12px 10px 36px',
+    background: '#1a1d35',
+    border: '1px solid rgba(99,102,241,0.18)',
+    borderRadius: 10,
+    fontFamily: 'inherit',
+    fontSize: 12,
+    color: '#e2e4f0',
+    outline: 'none',
+  },
+  searchBtn: {
+    padding: '10px 16px',
+    borderRadius: 10,
+    background: 'linear-gradient(135deg, #10b981, #059669)',
+    border: 'none', cursor: 'pointer',
+    color: '#fff', fontSize: 13, fontWeight: 700,
+    fontFamily: 'inherit',
+    minWidth: 44,
+    transition: 'opacity 0.2s',
+  },
+  searchBtnDisabled: { opacity: 0.3, cursor: 'not-allowed' },
+  chips: { display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 10 },
+  chip: {
+    padding: '4px 10px',
+    borderRadius: 20,
+    fontSize: 10, fontWeight: 500,
+    background: '#1a1d35',
+    color: '#9396b8',
+    border: '1px solid rgba(99,102,241,0.18)',
+    cursor: 'pointer',
+    fontFamily: 'inherit',
+    transition: 'background 0.15s, color 0.15s',
+  },
+  results: {
+    flex: 1,
+    overflowY: 'auto',
+    padding: '12px 20px 20px',
+  },
+  aiSummary: {
+    borderRadius: 12,
+    background: 'rgba(16,185,129,0.06)',
+    border: '1px solid rgba(16,185,129,0.22)',
+    padding: '12px 14px',
+    marginBottom: 14,
+  },
+  aiLabel: {
+    fontSize: 11, fontWeight: 700, color: '#10b981',
+    letterSpacing: '0.08em', textTransform: 'uppercase',
+    marginBottom: 6, display: 'flex', alignItems: 'center', gap: 6,
+  },
+  aiText: { fontSize: 11, color: '#9396b8', lineHeight: 1.6 },
+  resultsCount: { fontSize: 10, color: '#7b7fa8', marginBottom: 8 },
+  resultCard: {
+    display: 'flex', alignItems: 'flex-start', gap: 10,
+    padding: '11px 12px',
+    borderRadius: 10,
+    background: 'rgba(26,29,53,0.4)',
+    border: '1px solid rgba(99,102,241,0.12)',
+    cursor: 'pointer',
+    marginBottom: 6,
+    width: '100%',
+    textAlign: 'left',
+    fontFamily: 'inherit',
+    transition: 'background 0.15s, border-color 0.15s',
+  },
+  resultIcon: {
+    width: 28, height: 28, borderRadius: 8,
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    fontSize: 14, flexShrink: 0,
+  },
+  resultBody: { flex: 1, minWidth: 0 },
+  resultTop: { display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2, flexWrap: 'wrap' },
+  resultName: { fontSize: 12, fontWeight: 700, color: '#e2e4f0' },
+  typeBadge: {
+    fontSize: 9, fontWeight: 700,
+    padding: '2px 7px', borderRadius: 20,
+    textTransform: 'uppercase', letterSpacing: '0.06em',
+  },
+  score: { marginLeft: 'auto', fontSize: 10, fontWeight: 700, color: '#eab308' },
+  resultPath: { fontSize: 10, color: '#7b7fa8', fontFamily: "'SF Mono', monospace" },
+  resultExplanation: { fontSize: 10, color: '#9396b8', marginTop: 4, lineHeight: 1.5 },
+  emptyState: {
+    textAlign: 'center', padding: '40px 20px',
+    color: '#7b7fa8', fontSize: 11, lineHeight: 1.7,
+  },
+  emptyIcon: { fontSize: 28, marginBottom: 8 },
+  errorBox: {
+    background: 'rgba(239,68,68,0.08)',
+    border: '1px solid rgba(239,68,68,0.22)',
+    borderRadius: 8, padding: '10px 12px',
+    fontSize: 11, color: '#f87171', marginBottom: 10,
+  },
+  loadingRow: {
+    display: 'flex', gap: 6, alignItems: 'center',
+    padding: '24px 0', justifyContent: 'center',
+  },
+};
+
+/* ─── Sub-components ────────────────────────────────────────────────────── */
+function LoadingDots() {
+  return (
+    <div style={styles.loadingRow}>
+      {[0, 1, 2].map(i => (
+        <div
+          key={i}
+          style={{
+            width: 6, height: 6, borderRadius: '50%',
+            background: '#10b981',
+            animation: 'prism-pulse 1s ease-in-out infinite',
+            animationDelay: `${i * 0.2}s`,
+          }}
+        />
+      ))}
+      <style>{`
+        @keyframes prism-pulse {
+          0%,100% { opacity: 0.3; transform: scale(0.8); }
+          50%      { opacity: 1;   transform: scale(1);   }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+function ResultCard({ result, onSelect }) {
+  const cfg = typeConfig[result.type] || typeConfig.function;
+  const [hovered, setHovered] = useState(false);
+  return (
+    <button
+      style={{
+        ...styles.resultCard,
+        background: hovered ? '#1a1d35' : 'rgba(26,29,53,0.4)',
+        borderColor: hovered ? 'rgba(99,102,241,0.35)' : 'rgba(99,102,241,0.12)',
+      }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onClick={() => onSelect?.(result.id)}
+    >
+      <div style={{ ...styles.resultIcon, background: cfg.bg, color: cfg.color }}>
+        {cfg.icon}
+      </div>
+      <div style={styles.resultBody}>
+        <div style={styles.resultTop}>
+          <span style={styles.resultName}>
+            {result.metadata?.name || result.path.split('/').pop()}
+          </span>
+          <span style={{ ...styles.typeBadge, background: cfg.bg, color: cfg.color }}>
+            {result.type}
+          </span>
+          <span style={styles.score}>★ {(result.score * 100).toFixed(0)}%</span>
+        </div>
+        <div style={styles.resultPath}>{result.path}</div>
+        {result.explanation && (
+          <div style={styles.resultExplanation}>{result.explanation}</div>
+        )}
+      </div>
+    </button>
+  );
+}
+
+/* ─── Main component ────────────────────────────────────────────────────── */
 export default function SearchPanel({ onSelectNode }) {
-  const [query, setQuery] = useState('');
-  const { data: searchData, loading, error, execute: runSearch } = useApi(searchCode);
+  const [query, setQuery]       = useState('');
+  const [loading, setLoading]   = useState(false);
+  const [error, setError]       = useState(null);
+  const [searchData, setSearchData] = useState(null);
 
   const handleSearch = async (q) => {
-    const searchQuery = q || query;
-    if (!searchQuery.trim()) return;
+    const searchQuery = (q || query).trim();
+    if (!searchQuery) return;
     setQuery(searchQuery);
-    await runSearch(searchQuery.trim());
+    setLoading(true);
+    setError(null);
+    setSearchData(null);
+
+    try {
+      // ── Replace this block with your real API call ──────────────────────
+      // const data = await searchCode(searchQuery);
+      await new Promise(r => setTimeout(r, 600));
+      const data = MOCK_DATA[searchQuery] || generateGenericResult(searchQuery);
+      // ────────────────────────────────────────────────────────────────────
+      setSearchData(data);
+    } catch (err) {
+      setError(err?.message || 'Search failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const typeIcons = { file: HiOutlineFolder, function: HiOutlineCode, class: HiOutlineCube };
-  const typeColors = { file: '#6366f1', function: '#22d3ee', class: '#10b981' };
-
   return (
-    <div className="h-full flex flex-col">
+    <div style={styles.panel}>
       {/* Header */}
-      <div className="px-4 py-4 border-b border-prism-border">
-        <p className="text-[12px] text-prism-text-dim leading-relaxed">
-          Search your codebase using natural language. Ask questions about your code.
-        </p>
+      <div style={styles.panelHeader}>
+        <div style={styles.logoHex}>P</div>
+        <div>
+          <p style={styles.headerTitle}>PrismCode</p>
+          <p style={styles.headerSub}>// semantic search engine</p>
+        </div>
+        <div style={styles.versionBadge}>v0.9.1</div>
       </div>
 
-      {/* Search Input */}
-      <div className="px-4 py-3 border-b border-prism-border">
-        <div className="flex gap-2">
-          <div className="flex-1 relative">
-            <HiOutlineSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-prism-text-muted" />
+      {/* Search input */}
+      <div style={styles.searchSection}>
+        <div style={styles.searchRow}>
+          <div style={styles.searchWrap}>
+            <span style={styles.searchIcon}>⌕</span>
             <input
+              style={styles.searchInput}
               type="text"
               placeholder="Ask anything about your code..."
               value={query}
               onChange={e => setQuery(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleSearch()}
-              className="w-full pl-9 pr-3 py-2.5 rounded-lg bg-prism-surface-2 border border-prism-border text-[12px] text-prism-text placeholder-prism-text-muted focus:outline-none focus:border-prism-emerald focus:ring-2 focus:ring-prism-emerald/10 transition-all"
             />
           </div>
           <button
+            style={{
+              ...styles.searchBtn,
+              ...((!query.trim() || loading) ? styles.searchBtnDisabled : {}),
+            }}
             onClick={() => handleSearch()}
             disabled={!query.trim() || loading}
-            className="px-4 py-2 rounded-lg text-[12px] font-semibold transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
-            style={{ background: 'linear-gradient(135deg, #10b981, #059669)', color: '#fff' }}
           >
-            {loading ? '...' : '→'}
+            {loading ? '…' : '→'}
           </button>
         </div>
 
-        {/* Example queries */}
-        <div className="flex flex-wrap gap-1.5 mt-3">
+        {/* Example chips */}
+        <div style={styles.chips}>
           {EXAMPLE_QUERIES.map((q, i) => (
-            <button
-              key={i}
-              onClick={() => handleSearch(q)}
-              className="px-2.5 py-1 rounded-full text-[10px] font-medium bg-prism-surface-2 text-prism-text-dim hover:text-prism-text hover:bg-prism-surface-hover border border-prism-border/30 hover:border-prism-border transition-all cursor-pointer"
-            >
-              {q}
-            </button>
+            <ChipButton key={i} label={q} onClick={() => handleSearch(q)} />
           ))}
         </div>
       </div>
 
       {/* Results */}
-      <div className="flex-1 overflow-y-auto px-4 py-3">
-        {error && <div className="text-[12px] text-prism-rose bg-prism-rose/8 border border-prism-rose/20 rounded-lg px-3 py-2.5 mb-3">{error}</div>}
+      <div style={styles.results}>
+        {error && <div style={styles.errorBox}>{error}</div>}
 
-        {searchData?.ai_summary && searchData.results?.length > 0 && (
-          <div className="mb-4 rounded-xl bg-prism-emerald/5 border border-prism-emerald/20 p-3.5 glow-emerald animate-fade-in">
-            <h3 className="text-[12px] font-semibold text-prism-emerald flex items-center gap-1.5 mb-2">
-              <span className="text-sm">✨</span> AI Summary
-            </h3>
-            <p className="text-[11px] text-prism-text-dim leading-relaxed">
-              {searchData.ai_summary}
-            </p>
+        {loading && <LoadingDots />}
+
+        {!loading && searchData?.ai_summary && searchData.results?.length > 0 && (
+          <div style={styles.aiSummary}>
+            <div style={styles.aiLabel}>✦ &nbsp;AI Summary</div>
+            <p style={styles.aiText}>{searchData.ai_summary}</p>
           </div>
         )}
 
-        {searchData?.results?.length > 0 && (
-          <div className="space-y-2 animate-fade-in">
-            <p className="text-[11px] text-prism-text-muted font-medium mb-2">
+        {!loading && searchData?.results?.length > 0 && (
+          <div>
+            <p style={styles.resultsCount}>
               {searchData.results.length} results for "{searchData.query}"
             </p>
-            {searchData.results.map((result, i) => {
-              const Icon = typeIcons[result.type] || HiOutlineCode;
-              const color = typeColors[result.type] || '#6366f1';
-              return (
-                <button
-                  key={i}
-                  onClick={() => onSelectNode?.(result.id)}
-                  className="w-full text-left rounded-lg bg-prism-surface-2/30 hover:bg-prism-surface-2 border border-prism-border/30 hover:border-prism-border transition-all p-3 cursor-pointer group"
-                >
-                  <div className="flex items-start gap-2.5">
-                    <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: `${color}10` }}>
-                      <Icon className="w-3.5 h-3.5" style={{ color }} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-0.5">
-                        <span className="text-[12px] font-semibold text-prism-text group-hover:text-white transition-colors">{result.metadata?.name || result.path.split('/').pop()}</span>
-                        <span className="badge" style={{ background: `${color}10`, color, border: `1px solid ${color}20` }}>
-                          {result.type}
-                        </span>
-                        <div className="ml-auto flex items-center gap-1">
-                          <HiOutlineStar className="w-3 h-3" style={{ color: '#eab308' }} />
-                          <span className="text-[10px] font-semibold" style={{ color: '#eab308' }}>{(result.score * 100).toFixed(0)}%</span>
-                        </div>
-                      </div>
-                      <p className="text-[11px] text-prism-text-muted font-mono">{result.path}</p>
-                      {result.explanation && (
-                        <p className="text-[11px] text-prism-text-dim mt-1 leading-relaxed">{result.explanation}</p>
-                      )}
-                    </div>
-                  </div>
-                </button>
-              );
-            })}
+            {searchData.results.map((result, i) => (
+              <ResultCard key={i} result={result} onSelect={onSelectNode} />
+            ))}
           </div>
         )}
 
-        {searchData?.results?.length === 0 && (
-          <div className="text-center py-10 text-prism-text-muted text-[12px]">No results found. Try a different query.</div>
+        {!loading && searchData?.results?.length === 0 && (
+          <div style={styles.emptyState}>No results found. Try a different query.</div>
+        )}
+
+        {!loading && !searchData && !error && (
+          <div style={styles.emptyState}>
+            <div style={styles.emptyIcon}>◈</div>
+            <div>
+              Search your codebase using natural language.<br />
+              Ask questions about what your code does.
+            </div>
+          </div>
         )}
       </div>
     </div>
+  );
+}
+
+/* ─── Chip button (isolated hover state) ────────────────────────────────── */
+function ChipButton({ label, onClick }) {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <button
+      style={{
+        ...styles.chip,
+        background: hovered ? '#202440' : '#1a1d35',
+        color: hovered ? '#e2e4f0' : '#9396b8',
+        borderColor: hovered ? 'rgba(99,102,241,0.35)' : 'rgba(99,102,241,0.18)',
+      }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onClick={onClick}
+    >
+      {label}
+    </button>
   );
 }

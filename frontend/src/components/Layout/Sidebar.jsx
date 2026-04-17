@@ -8,7 +8,7 @@ const NAV_ITEMS = [
   { id: 'search', label: 'Search', icon: HiOutlineSearch, color: 'emerald-400' },
   { id: 'explain', label: 'Explain', icon: HiOutlineCode, color: 'amber-400' },
   { id: 'onboarding', label: 'Onboard', icon: HiOutlineMap, color: 'pink-400' },
-  { id: 'git', label: 'Git Intel', icon: HiOutlineClock, color: 'blue-400' },
+
   { id: 'smells', label: 'Smells', icon: HiOutlineExclamation, color: 'orange-400' },
 ];
 

@@ -7,7 +7,7 @@ import FlowViewer from './components/Flow/FlowViewer';
 import SearchPanel from './components/Search/SearchPanel';
 import ExplainPanel from './components/Explain/ExplainPanel';
 import OnboardingGuide from './components/Onboarding/OnboardingGuide';
-import GitInsights from './components/Git/GitInsights';
+
 import SmellsPanel from './components/Smells/SmellsPanel';
 import RepoUpload from './components/Upload/RepoUpload';
 import { useApi } from './hooks/useApi';
@@ -92,7 +92,7 @@ export default function App() {
     flow: 'Flow Tracer',
     search: 'Code Search',
     explain: 'Explainer',
-    git: 'Git Intelligence',
+
     smells: 'Code Smells',
     onboarding: 'Onboarding',
   };
@@ -110,8 +110,7 @@ export default function App() {
         return <ExplainPanel />;
       case 'onboarding':
         return <OnboardingGuide onSelectNode={handleNodeSelect} />;
-      case 'git':
-        return <GitInsights />;
+
       case 'smells':
         return <SmellsPanel />;
       default:
@@ -149,15 +148,15 @@ export default function App() {
 
         {/* Floating Tool Panel */}
         {showSidePanel && (
-          <div className="absolute top-3 right-3 bottom-3 w-[380px] glass-panel rounded-xl flex flex-col overflow-hidden z-20 animate-slide-in">
+          <div className="absolute top-2 right-2 bottom-2 w-[370px] rounded-2xl flex flex-col overflow-hidden z-20 animate-slide-in border border-prism-border/60" style={{ background: 'rgba(9, 9, 11, 0.95)', backdropFilter: 'blur(24px)', boxShadow: '0 8px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.03)' }}>
             {/* Panel header */}
-            <div className="h-10 border-b border-prism-border bg-prism-surface-2/50 flex items-center px-4 shrink-0">
-              <span className="text-[11px] font-semibold text-prism-text-dim uppercase tracking-wider">
+            <div className="h-11 border-b border-prism-border/60 flex items-center px-4 shrink-0" style={{ background: 'rgba(15, 15, 18, 0.6)' }}>
+              <span className="text-[12px] font-semibold text-prism-text tracking-wide">
                 {TOOL_LABELS[activeView] || activeView}
               </span>
               <button
                 onClick={() => setActiveView('graph')}
-                className="ml-auto w-6 h-6 rounded-md flex items-center justify-center text-prism-text-dim hover:text-prism-text hover:bg-prism-surface-2 transition-all cursor-pointer"
+                className="ml-auto w-7 h-7 rounded-lg flex items-center justify-center text-prism-text-muted hover:text-prism-text hover:bg-white/5 transition-all cursor-pointer text-[14px]"
               >
                 ✕
               </button>
