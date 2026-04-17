@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   HiOutlineLightningBolt,
   HiOutlineSearch,
@@ -7,281 +7,642 @@ import {
   HiOutlineClock,
   HiOutlineExclamation,
   HiOutlineFolder,
+  HiOutlineUpload,
 } from 'react-icons/hi';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const NAV_ITEMS = [
-  { id: 'impact',     label: 'Impact',   icon: HiOutlineLightningBolt, color: '#f43f5e' },
-  { id: 'flow',       label: 'Flow',     icon: HiOutlineClock,         color: '#22d3ee' },
-  { id: 'search',     label: 'Search',   icon: HiOutlineSearch,        color: '#10b981' },
-  { id: 'explain',    label: 'Explain',  icon: HiOutlineCode,          color: '#f59e0b' },
-  { id: 'smells',     label: 'Smells',   icon: HiOutlineExclamation,   color: '#f97316' },
-  { id: 'onboarding', label: 'Onboard',  icon: HiOutlineMap,           color: '#ec4899' },
+  { id: 'impact', label: 'Impact', icon: HiOutlineLightningBolt, color: '#f43f5e', glow: '244,63,94' },
+  { id: 'flow', label: 'Flow', icon: HiOutlineClock, color: '#22d3ee', glow: '34,211,238' },
+  { id: 'search', label: 'Search', icon: HiOutlineSearch, color: '#10b981', glow: '16,185,129' },
+  { id: 'explain', label: 'Explain', icon: HiOutlineCode, color: '#f59e0b', glow: '245,158,11' },
+  { id: 'smells', label: 'Smells', icon: HiOutlineExclamation, color: '#f97316', glow: '249,115,22' },
+  { id: 'onboarding', label: 'Onboard', icon: HiOutlineMap, color: '#ec4899', glow: '236,72,153' },
 ];
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
 const STYLES = `
+  @keyframes tn-gradient-shift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  @keyframes tn-orbit {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  @keyframes tn-float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-2px); }
+  }
+
+  @keyframes tn-shimmer {
+    0% { left: -100%; }
+    100% { left: 200%; }
+  }
+
+  @keyframes tn-ripple {
+    0% { transform: scale(0.8); opacity: 1; }
+    100% { transform: scale(2.5); opacity: 0; }
+  }
+
+  @keyframes tn-glow-pulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 0.8; }
+  }
+
+  @keyframes tn-border-flow {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 200% 0%; }
+  }
+
+  @keyframes tn-stat-count {
+    from { transform: scale(0.5); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  /* ── Root ── */
   .tn-root {
-    font-family: 'Inter', sans-serif;
-    height: 50px;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    height: 64px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 14px;
-    background: rgba(8, 11, 20, 0.92);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    backdrop-filter: blur(12px);
+    padding: 0 20px;
     position: relative;
     z-index: 50;
     flex-shrink: 0;
+    background: linear-gradient(
+      180deg,
+      rgba(10, 10, 18, 0.95) 0%,
+      rgba(12, 12, 22, 0.88) 100%
+    );
+    backdrop-filter: blur(20px) saturate(1.5);
+    border-bottom: 1px solid transparent;
+    overflow: visible;
   }
 
-  /* subtle top accent line */
+  /* Animated gradient border bottom */
+  .tn-root::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(99, 102, 241, 0.0) 5%,
+      rgba(99, 102, 241, 0.5) 20%,
+      rgba(139, 92, 246, 0.6) 35%,
+      rgba(236, 72, 153, 0.5) 50%,
+      rgba(34, 211, 238, 0.5) 65%,
+      rgba(99, 102, 241, 0.5) 80%,
+      rgba(99, 102, 241, 0.0) 95%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: tn-border-flow 4s linear infinite;
+  }
+
+  /* Top highlight line */
   .tn-root::before {
     content: '';
     position: absolute;
-    top: 0; left: 0; right: 0;
+    top: 0;
+    left: 10%;
+    right: 10%;
     height: 1px;
-    background: linear-gradient(90deg,
-      transparent 0%,
-      rgba(99,102,241,0.4) 30%,
-      rgba(139,92,246,0.4) 50%,
-      rgba(99,102,241,0.4) 70%,
-      transparent 100%
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.06),
+      transparent
     );
   }
 
-  /* ── Left ── */
+  /* ── Left Section ── */
   .tn-left {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 16px;
   }
 
-  .tn-brand {
+  /* ── Logo ── */
+  .tn-logo-group {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding-right: 12px;
-    border-right: 1px solid rgba(255,255,255,0.07);
-    height: 20px;
-    flex-shrink: 0;
+    gap: 10px;
+    position: relative;
+    cursor: default;
+    user-select: none;
+    padding-right: 16px;
   }
 
-  .tn-logo {
-    width: 24px;
-    height: 24px;
-    border-radius: 7px;
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  .tn-logo-group::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 15%;
+    bottom: 15%;
+    width: 1px;
+    background: linear-gradient(
+      180deg,
+      transparent,
+      rgba(99, 102, 241, 0.3),
+      transparent
+    );
+  }
+
+  .tn-logo-container {
+    position: relative;
+    width: 36px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 11px;
-    font-weight: 700;
-    color: #fff;
     flex-shrink: 0;
-    box-shadow: 0 0 10px rgba(99,102,241,0.35);
+  }
+
+  /* Orbiting ring */
+  .tn-logo-orbit {
+    position: absolute;
+    inset: -3px;
+    border-radius: 50%;
+    border: 1.5px solid transparent;
+    border-top-color: rgba(99, 102, 241, 0.5);
+    border-right-color: rgba(139, 92, 246, 0.3);
+    animation: tn-orbit 6s linear infinite;
+  }
+
+  .tn-logo-core {
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a78bfa 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.02em;
+    box-shadow:
+      0 0 20px rgba(99, 102, 241, 0.35),
+      0 0 40px rgba(139, 92, 246, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    position: relative;
+    z-index: 1;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .tn-logo-container:hover .tn-logo-core {
+    transform: scale(1.08) rotate(-5deg);
+    box-shadow:
+      0 0 25px rgba(99, 102, 241, 0.5),
+      0 0 50px rgba(139, 92, 246, 0.25),
+      inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  }
+
+  .tn-logo-container:hover .tn-logo-orbit {
+    animation-duration: 2s;
+  }
+
+  .tn-brand-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0px;
+    line-height: 1;
   }
 
   .tn-brand-name {
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    color: #e2e8f0;
-  }
-  .tn-brand-name span { color: #818cf8; }
-
-  .tn-repo-sep {
-    color: rgba(255,255,255,0.15);
-    font-size: 13px;
-    margin: 0 2px;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 50%, #94a3b8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 
-  .tn-repo-name {
-    font-size: 12px;
+  .tn-brand-name .tn-brand-highlight {
+    background: linear-gradient(135deg, #818cf8 0%, #a78bfa 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .tn-brand-tagline {
+    font-size: 9px;
     font-weight: 500;
-    color: rgba(226,232,240,0.7);
-    font-family: 'Courier New', monospace;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(148, 163, 184, 0.4);
+    margin-top: 2px;
   }
 
-  /* ── Nav ── */
-  .tn-nav {
-    display: flex;
-    align-items: center;
-    gap: 2px;
-  }
-
-  .tn-btn {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    padding: 5px 9px;
-    border-radius: 7px;
-    border: 1px solid transparent;
-    background: transparent;
-    font-size: 11px;
-    font-weight: 500;
-    font-family: inherit;
-    color: rgba(148,163,184,0.6);
-    cursor: pointer;
-    transition: all 0.14s;
-    white-space: nowrap;
-    letter-spacing: 0.02em;
-    position: relative;
-  }
-
-  .tn-btn:hover:not(:disabled) {
-    color: rgba(226,232,240,0.9);
-    background: rgba(255,255,255,0.05);
-    border-color: rgba(255,255,255,0.07);
-  }
-
-  .tn-btn:disabled {
-    opacity: 0.2;
-    cursor: not-allowed;
-  }
-
-  .tn-btn.active {
-    border-color: transparent;
-  }
-
-  /* active bottom indicator */
-  .tn-btn.active::after {
-    content: '';
-    position: absolute;
-    bottom: -1px;
-    left: 20%;
-    right: 20%;
-    height: 2px;
-    border-radius: 2px 2px 0 0;
-  }
-
-  .tn-btn svg {
-    width: 13px;
-    height: 13px;
-    flex-shrink: 0;
-  }
-
-  /* ── Right ── */
-  .tn-right {
+  /* ── Repo Chip ── */
+  .tn-repo-chip {
     display: flex;
     align-items: center;
     gap: 8px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    background: rgba(16, 185, 129, 0.08);
+    border: 1px solid rgba(16, 185, 129, 0.18);
+    transition: all 0.25s ease;
   }
 
+  .tn-repo-chip:hover {
+    background: rgba(16, 185, 129, 0.12);
+    border-color: rgba(16, 185, 129, 0.3);
+  }
+
+  .tn-repo-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #10b981;
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+    position: relative;
+  }
+
+  .tn-repo-dot::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 50%;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    animation: tn-ripple 2s ease-out infinite;
+  }
+
+  .tn-repo-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(16, 185, 129, 0.85);
+    font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace;
+    letter-spacing: 0.02em;
+  }
+
+  /* ── Center Navigation ── */
+  .tn-center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+  }
+
+  .tn-nav {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    padding: 4px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.025);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+  }
+
+  /* ── Nav Button ── */
+  .tn-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    background: transparent;
+    font-size: 12px;
+    font-weight: 550;
+    font-family: inherit;
+    color: rgba(148, 163, 184, 0.55);
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    white-space: nowrap;
+    letter-spacing: 0.01em;
+    overflow: hidden;
+  }
+
+  /* Shimmer effect on hover */
+  .tn-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.05),
+      transparent
+    );
+    transition: none;
+    pointer-events: none;
+  }
+
+  .tn-btn:hover:not(:disabled)::before {
+    animation: tn-shimmer 0.6s ease forwards;
+  }
+
+  .tn-btn:hover:not(:disabled) {
+    color: rgba(226, 232, 240, 0.95);
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.08);
+    transform: translateY(-1px);
+  }
+
+  .tn-btn:active:not(:disabled) {
+    transform: translateY(0) scale(0.98);
+  }
+
+  .tn-btn:disabled {
+    opacity: 0.18;
+    cursor: not-allowed;
+  }
+
+  .tn-btn svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+  }
+
+  .tn-btn:hover:not(:disabled) svg {
+    transform: scale(1.15);
+  }
+
+  /* ── Active Nav Button ── */
+  .tn-btn.active {
+    border-color: transparent;
+    background: transparent;
+    transform: translateY(-1px);
+    animation: tn-float 3s ease-in-out infinite;
+  }
+
+  .tn-btn.active svg {
+    filter: drop-shadow(0 0 4px currentColor);
+  }
+
+  /* Active indicator dot */
+  .tn-active-dot {
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 16px;
+    height: 3px;
+    border-radius: 3px;
+  }
+
+  .tn-active-dot::after {
+    content: '';
+    position: absolute;
+    inset: -3px -6px;
+    border-radius: 6px;
+    animation: tn-glow-pulse 2s ease-in-out infinite;
+  }
+
+  /* ── Right Section ── */
+  .tn-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* ── Stats ── */
   .tn-stats {
     display: flex;
     align-items: center;
-    gap: 0;
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 8px;
-    overflow: hidden;
+    gap: 2px;
+    padding: 3px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
   }
 
   .tn-stat {
     display: flex;
-    align-items: baseline;
-    gap: 3px;
-    padding: 4px 10px;
-    border-right: 1px solid rgba(255,255,255,0.05);
-    font-family: 'Courier New', monospace;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px;
+    border-radius: 9px;
+    transition: all 0.2s ease;
+    cursor: default;
   }
-  .tn-stat:last-child { border-right: none; }
 
-  .tn-stat-num {
-    font-size: 12px;
-    font-weight: 600;
-    color: rgba(226,232,240,0.85);
+  .tn-stat:hover {
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .tn-stat-icon {
+    width: 14px;
+    height: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+
+  .tn-stat-icon svg {
+    width: 10px;
+    height: 10px;
+  }
+
+  .tn-stat-value {
+    font-size: 13px;
+    font-weight: 700;
+    font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace;
     line-height: 1;
+    letter-spacing: -0.02em;
+    animation: tn-stat-count 0.3s ease-out;
   }
 
   .tn-stat-label {
     font-size: 9px;
     font-weight: 500;
-    color: rgba(148,163,184,0.38);
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.07em;
+    color: rgba(148, 163, 184, 0.35);
+    line-height: 1;
   }
 
+  .tn-stat-divider {
+    width: 1px;
+    height: 18px;
+    background: rgba(255, 255, 255, 0.06);
+    margin: 0 2px;
+  }
+
+  /* ── Load Button ── */
   .tn-load-btn {
+    position: relative;
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 5px 11px;
-    border-radius: 7px;
-    border: 1px solid rgba(99,102,241,0.3);
-    background: rgba(99,102,241,0.1);
-    color: #a5b4fc;
-    font-size: 11px;
-    font-weight: 500;
+    gap: 8px;
+    padding: 8px 18px;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(135deg, #6366f1 0%, #7c3aed 50%, #8b5cf6 100%);
+    background-size: 200% 200%;
+    animation: tn-gradient-shift 4s ease infinite;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
     font-family: inherit;
     cursor: pointer;
-    transition: all 0.14s;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     white-space: nowrap;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.03em;
+    overflow: hidden;
+    box-shadow:
+      0 2px 12px rgba(99, 102, 241, 0.25),
+      0 4px 24px rgba(99, 102, 241, 0.1);
+  }
+
+  .tn-load-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    padding: 1px;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.2),
+      transparent 40%,
+      transparent 60%,
+      rgba(255, 255, 255, 0.1)
+    );
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  /* shimmer on load btn */
+  .tn-load-btn::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.15),
+      transparent
+    );
+    pointer-events: none;
+  }
+
+  .tn-load-btn:hover::after {
+    animation: tn-shimmer 0.7s ease forwards;
   }
 
   .tn-load-btn:hover {
-    background: rgba(99,102,241,0.18);
-    border-color: rgba(99,102,241,0.5);
-    color: #c7d2fe;
+    transform: translateY(-2px) scale(1.02);
+    box-shadow:
+      0 4px 20px rgba(99, 102, 241, 0.4),
+      0 8px 32px rgba(99, 102, 241, 0.15);
   }
 
   .tn-load-btn:active {
-    transform: scale(0.97);
+    transform: translateY(0) scale(0.98);
+    box-shadow:
+      0 1px 6px rgba(99, 102, 241, 0.3);
   }
 
   .tn-load-btn svg {
-    width: 13px;
-    height: 13px;
+    width: 14px;
+    height: 14px;
     flex-shrink: 0;
+    transition: transform 0.2s ease;
   }
 
-  /* analyzed dot */
-  .tn-dot {
-    width: 5px;
-    height: 5px;
+  .tn-load-btn:hover svg {
+    transform: rotate(-10deg) scale(1.1);
+  }
+
+  /* ── Waiting state ── */
+  .tn-waiting {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    background: rgba(245, 158, 11, 0.06);
+    border: 1px solid rgba(245, 158, 11, 0.15);
+  }
+
+  .tn-waiting-dot {
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
-    background: #10b981;
-    box-shadow: 0 0 5px rgba(16,185,129,0.6);
-    flex-shrink: 0;
-    animation: tn-pulse 2.5s ease-in-out infinite;
+    background: #f59e0b;
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
+    animation: tn-glow-pulse 1.5s ease-in-out infinite;
   }
 
-  @keyframes tn-pulse {
-    0%, 100% { opacity: 1; }
-    50%       { opacity: 0.4; }
+  .tn-waiting-text {
+    font-size: 11px;
+    font-weight: 500;
+    color: rgba(245, 158, 11, 0.7);
+    letter-spacing: 0.02em;
   }
 `;
 
 // ─── TopNav ───────────────────────────────────────────────────────────────────
 
 export default function TopNav({ activeTab, onTabChange, isAnalyzed, repoPath, stats, onUploadClick }) {
+  const [hoveredBtn, setHoveredBtn] = useState(null);
+
   return (
     <>
       <style>{STYLES}</style>
       <header className="tn-root">
 
-        {/* ── Left: Brand + Nav ── */}
+        {/* ── Left: Logo + Repo ── */}
         <div className="tn-left">
 
-          {/* Brand */}
-          <div className="tn-brand">
-            <div className="tn-logo">P</div>
-            <span className="tn-brand-name">PRISM<span>CODE</span></span>
-            {repoPath && (
-              <>
-                <span className="tn-repo-sep">/</span>
-                <span className="tn-repo-name">{repoPath.split('/').pop()}</span>
-              </>
-            )}
-            {isAnalyzed && <div className="tn-dot" />}
+          {/* Logo */}
+          <div className="tn-logo-group">
+            <div className="tn-logo-container">
+              <div className="tn-logo-orbit" />
+              <div className="tn-logo-core">P</div>
+            </div>
+            <div className="tn-brand-text">
+              <span className="tn-brand-name">
+                PRISM<span className="tn-brand-highlight">CODE</span>
+              </span>
+              <span className="tn-brand-tagline">Code Intelligence</span>
+            </div>
           </div>
 
-          {/* Nav items */}
+          {/* Repo chip or waiting */}
+          {repoPath ? (
+            <div className="tn-repo-chip">
+              <div className="tn-repo-dot" />
+              <span className="tn-repo-label">{repoPath.split('/').pop()}</span>
+            </div>
+          ) : (
+            <div className="tn-waiting">
+              <div className="tn-waiting-dot" />
+              <span className="tn-waiting-text">No repository loaded</span>
+            </div>
+          )}
+        </div>
+
+        {/* ── Center: Navigation ── */}
+        <div className="tn-center">
           <nav className="tn-nav">
             {NAV_ITEMS.map(item => {
               const isActive = activeTab === item.id;
@@ -291,19 +652,30 @@ export default function TopNav({ activeTab, onTabChange, isAnalyzed, repoPath, s
                   key={item.id}
                   disabled={!isAnalyzed}
                   onClick={() => onTabChange(isActive ? 'graph' : item.id)}
+                  onMouseEnter={() => setHoveredBtn(item.id)}
+                  onMouseLeave={() => setHoveredBtn(null)}
                   className={`tn-btn${isActive ? ' active' : ''}`}
                   style={isActive ? {
-                    background:   `${item.color}14`,
-                    color:         item.color,
-                    borderColor:  `${item.color}28`,
+                    color: item.color,
+                    background: `rgba(${item.glow}, 0.1)`,
+                    borderColor: `rgba(${item.glow}, 0.2)`,
+                  } : hoveredBtn === item.id ? {
+                    borderColor: `rgba(${item.glow}, 0.15)`,
                   } : {}}
                 >
-                  {/* active underline dot */}
-                  {isActive && (
-                    <style>{`.tn-btn.active::after { background: ${item.color}; box-shadow: 0 0 6px ${item.color}80; }`}</style>
-                  )}
                   <Icon />
                   {item.label}
+
+                  {/* Active indicator */}
+                  {isActive && (
+                    <span
+                      className="tn-active-dot"
+                      style={{
+                        background: item.color,
+                        boxShadow: `0 0 10px rgba(${item.glow}, 0.6)`,
+                      }}
+                    />
+                  )}
                 </button>
               );
             })}
@@ -312,30 +684,66 @@ export default function TopNav({ activeTab, onTabChange, isAnalyzed, repoPath, s
 
         {/* ── Right: Stats + Load ── */}
         <div className="tn-right">
+
+          {/* Stats */}
           {stats && (
             <div className="tn-stats">
-              <div className="tn-stat">
-                <span className="tn-stat-num">{stats.total_files}</span>
-                <span className="tn-stat-label">files</span>
-              </div>
-              <div className="tn-stat">
-                <span className="tn-stat-num">{stats.total_functions}</span>
-                <span className="tn-stat-label">fn</span>
-              </div>
-              <div className="tn-stat">
-                <span className="tn-stat-num">{stats.total_classes}</span>
-                <span className="tn-stat-label">cls</span>
-              </div>
+              <StatBadge
+                icon={HiOutlineFolder}
+                value={stats.total_files}
+                label="files"
+                color="#6366f1"
+              />
+              <div className="tn-stat-divider" />
+              <StatBadge
+                icon={HiOutlineCode}
+                value={stats.total_functions}
+                label="fn"
+                color="#22d3ee"
+              />
+              <div className="tn-stat-divider" />
+              <StatBadge
+                icon={HiOutlineCode}
+                value={stats.total_classes}
+                label="cls"
+                color="#8b5cf6"
+              />
             </div>
           )}
 
+          {/* Load/Change Button */}
           <button className="tn-load-btn" onClick={onUploadClick}>
-            <HiOutlineFolder />
+            <HiOutlineUpload />
             {repoPath ? 'Change Repo' : 'Load Repo'}
           </button>
         </div>
 
       </header>
     </>
+  );
+}
+
+// ─── StatBadge ────────────────────────────────────────────────────────────────
+
+function StatBadge({ icon: Icon, value, label, color }) {
+  return (
+    <div className="tn-stat">
+      <div
+        className="tn-stat-icon"
+        style={{
+          background: `${color}18`,
+          color: color,
+        }}
+      >
+        <Icon />
+      </div>
+      <span
+        className="tn-stat-value"
+        style={{ color: `${color}dd` }}
+      >
+        {value ?? '–'}
+      </span>
+      <span className="tn-stat-label">{label}</span>
+    </div>
   );
 }

@@ -171,7 +171,7 @@ export default function App() {
         {/* Node Details Floating Modal — shifts left when side panel is open */}
         {selectedNodeData && (
           <div className={`absolute bottom-3 z-40 ${showSidePanel ? 'right-[396px]' : 'right-3'}`}
-               style={{ transition: 'right 0.2s ease' }}>
+            style={{ transition: 'right 0.2s ease' }}>
             <NodeDetail
               nodeId={selectedNode}
               nodeData={selectedNodeData}
