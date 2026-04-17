@@ -1,5 +1,5 @@
 """
-PRISM-CODE — FastAPI Application Entry Point
+CodeCompass — FastAPI Application Entry Point
 Main server that coordinates all analysis engines and serves the API.
 """
 import os
@@ -12,6 +12,20 @@ from pathlib import Path
 from typing import Dict, Any, Optional, List
 import zipfile
 from contextlib import asynccontextmanager
+import stat
+
+def remove_readonly(func, path, excinfo):
+    """Clear the readonly bit and reattempt the removal."""
+    os.chmod(path, stat.S_IWRITE)
+    try:
+        func(path)
+    except Exception:
+        pass
+
+def force_rmtree(path: str):
+    """Forcefully remove a directory tree, overcoming read-only permissions."""
+    if os.path.exists(path):
+        shutil.rmtree(path, onerror=remove_readonly)
 
 # Prevent Errno 5: Input/output error when running as a daemon
 try:
@@ -72,7 +86,7 @@ state = AppState()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Auto-analyze sample repo on startup."""
-    print("🔷 PRISM-CODE starting up...")
+    print("🔷 CodeCompass starting up...")
     # Initialize LLM
     llm = get_llm()
     # Auto-analyze sample repo
@@ -82,11 +96,11 @@ async def lifespan(app: FastAPI):
         _run_analysis(sample_path)
         print("✅ Sample repo analyzed successfully")
     yield
-    print("🔷 PRISM-CODE shutting down...")
+    print("🔷 CodeCompass shutting down...")
 
 
 app = FastAPI(
-    title="PRISM-CODE",
+    title="CodeCompass",
     description="AI-powered codebase analysis and exploration system",
     version="1.0.0",
     lifespan=lifespan,
@@ -212,7 +226,7 @@ async def analyze_codebase(req: AnalyzeRequest):
             # For simplicity, let's delete and re-clone to ensure clean state.
             if os.path.exists(local_path):
                 print(f"🗑️ Removing existing clone at {local_path}")
-                shutil.rmtree(local_path, ignore_errors=True)
+                force_rmtree(local_path)
                 
             # Inject github token if available for private repos
             clone_url = target_path
@@ -264,7 +278,7 @@ async def upload_zip_codebase(file: UploadFile = File(...)):
         # If it already exists, clear it
         if os.path.exists(local_path):
             print(f"🗑️ Removing existing directory at {local_path}")
-            shutil.rmtree(local_path, ignore_errors=True)
+            force_rmtree(local_path)
             
         os.makedirs(local_path, exist_ok=True)
         

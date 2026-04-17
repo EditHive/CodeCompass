@@ -617,11 +617,11 @@ export default function TopNav({ activeTab, onTabChange, isAnalyzed, repoPath, s
           <div className="tn-logo-group">
             <div className="tn-logo-container">
               <div className="tn-logo-orbit" />
-              <div className="tn-logo-core">P</div>
+              <div className="tn-logo-core">C</div>
             </div>
             <div className="tn-brand-text">
               <span className="tn-brand-name">
-                PRISM<span className="tn-brand-highlight">CODE</span>
+                Code<span className="tn-brand-highlight">Compass</span>
               </span>
               <span className="tn-brand-tagline">Code Intelligence</span>
             </div>

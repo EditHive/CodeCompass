@@ -67,7 +67,7 @@ class LLMProvider:
                      dependencies: list = None, dependents: list = None,
                      docstring: str = "", complexity: int = 1) -> Optional[str]:
         """Generate an AI-powered code explanation."""
-        system_prompt = """You are PRISM-CODE, an expert code analysis AI. You explain code clearly and accurately.
+        system_prompt = """You are CodeCompass, an expert code analysis AI. You explain code clearly and accurately.
 Your explanations are ALWAYS grounded in the actual code provided — never hallucinate or assume.
 Use markdown formatting. Be concise but thorough."""
 
@@ -103,7 +103,7 @@ Keep the response under 400 words. Use ## headings and bullet points."""
 
     def explain_impact(self, source_name: str, affected_nodes: list, direct_count: int, total_count: int) -> Optional[str]:
         """Generate AI analysis of impact simulation results."""
-        system_prompt = "You are PRISM-CODE, analyzing the impact of code changes. Be concise and actionable."
+        system_prompt = "You are CodeCompass, analyzing the impact of code changes. Be concise and actionable."
 
         affected_list = "\n".join(f"- {n.get('label', n.get('id', '?'))} ({n.get('type', '?')}, depth: {n.get('depth', '?')})" for n in affected_nodes[:15])
 
@@ -130,7 +130,7 @@ Keep it under 150 words."""
         if not results:
             return None
 
-        system_prompt = "You are PRISM-CODE. Briefly explain search results to help a developer navigate a codebase."
+        system_prompt = "You are CodeCompass. Briefly explain search results to help a developer navigate a codebase."
 
         results_text = "\n".join(f"- {r.get('id', '?')} ({r.get('type', '?')}, score: {r.get('score', 0):.2f})" for r in results[:8])
 

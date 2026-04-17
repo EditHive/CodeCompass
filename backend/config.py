@@ -1,4 +1,4 @@
-"""PRISM-CODE Configuration"""
+"""CodeCompass Configuration"""
 import os
 
 # Server

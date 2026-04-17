@@ -1,114 +1,347 @@
-import React from 'react';
-import { HiOutlineFolder, HiOutlineCode, HiOutlineCube, HiOutlineArrowRight, HiOutlineArrowLeft, HiX } from 'react-icons/hi';
+import React, { useState } from 'react';
+import {
+  HiOutlineFolder,
+  HiOutlineCode,
+  HiOutlineCube,
+  HiOutlineArrowRight,
+  HiOutlineArrowLeft,
+  HiX,
+  HiOutlineDocumentText,
+} from 'react-icons/hi';
+
+/* ─── constants ─────────────────────────────────────────────────────── */
+
+const TYPE_CONFIG = {
+  file:     { color: '#6366f1', bg: 'rgba(99,102,241,0.1)',  border: 'rgba(99,102,241,0.22)',  icon: HiOutlineFolder, label: 'File' },
+  function: { color: '#22d3ee', bg: 'rgba(34,211,238,0.1)',  border: 'rgba(34,211,238,0.22)',  icon: HiOutlineCode,   label: 'Function' },
+  class:    { color: '#10b981', bg: 'rgba(16,185,129,0.1)',  border: 'rgba(16,185,129,0.22)',  icon: HiOutlineCube,   label: 'Class' },
+};
+
+/* ─── styles ─────────────────────────────────────────────────────────── */
+
+const S = {
+  wrap: {
+    width: 380,
+    maxHeight: 520,
+    background: '#111422',
+    border: '1px solid rgba(99,102,241,0.15)',
+    borderRadius: 14,
+    overflow: 'hidden',
+    display: 'flex',
+    flexDirection: 'column',
+    boxShadow: '0 24px 64px rgba(0,0,0,0.7), 0 0 0 1px rgba(99,102,241,0.06)',
+    fontFamily: "'SF Pro Display',-apple-system,BlinkMacSystemFont,'Inter',sans-serif",
+    animation: 'nd-slide 0.22s cubic-bezier(0.16,1,0.3,1)',
+  },
+
+  /* header */
+  header: {
+    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+    padding: '12px 14px',
+    borderBottom: '1px solid rgba(99,102,241,0.12)',
+    background: 'linear-gradient(180deg,rgba(99,102,241,0.05) 0%,transparent 100%)',
+    flexShrink: 0,
+    gap: 10,
+  },
+  headerLeft: { display: 'flex', alignItems: 'center', gap: 10, minWidth: 0, flex: 1 },
+  iconBox: {
+    width: 30, height: 30, borderRadius: 8, flexShrink: 0,
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+  },
+  nodeName: {
+    fontSize: 13, fontWeight: 600, color: '#e2e4f0',
+    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+  },
+  nodeType: { fontSize: 10, color: '#555870', fontWeight: 500, marginTop: 1 },
+  closeBtn: {
+    width: 24, height: 24, borderRadius: 6, border: 'none',
+    background: 'transparent', cursor: 'pointer',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    color: '#555870', transition: 'all 0.15s', flexShrink: 0,
+  },
+
+  /* body */
+  body: {
+    flex: 1, overflowY: 'auto', padding: '14px 16px',
+    display: 'flex', flexDirection: 'column', gap: 12,
+    scrollbarWidth: 'thin', scrollbarColor: 'rgba(99,102,241,0.15) transparent',
+  },
+
+  /* metric grid */
+  metricGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 7 },
+  metricCard: {
+    borderRadius: 9, padding: '9px 8px', textAlign: 'center',
+    border: '1px solid', display: 'flex', flexDirection: 'column', gap: 3,
+  },
+  metricVal: { fontSize: 15, fontWeight: 700, lineHeight: 1 },
+  metricLabel: { fontSize: 9.5, fontWeight: 600, color: '#555870', letterSpacing: '0.04em' },
+
+  /* docstring */
+  section: { display: 'flex', flexDirection: 'column', gap: 6 },
+  sectionLabel: {
+    fontSize: 9.5, fontWeight: 700, color: '#3a3d52',
+    letterSpacing: '0.08em', textTransform: 'uppercase',
+    display: 'flex', alignItems: 'center', gap: 5,
+  },
+  docText: { fontSize: 11.5, color: '#8b8fa8', lineHeight: 1.65 },
+
+  /* file path */
+  filePath: {
+    display: 'flex', alignItems: 'center', gap: 8,
+    padding: '8px 11px', borderRadius: 8,
+    background: '#1a1e35', border: '1px solid rgba(99,102,241,0.12)',
+  },
+  filePathText: {
+    fontSize: 10.5, color: '#818cf8',
+    fontFamily: "'SF Mono','Fira Code',monospace",
+    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+  },
+
+  /* edge section header */
+  edgeSectionHead: {
+    display: 'flex', alignItems: 'center', gap: 6,
+    fontSize: 11, fontWeight: 700, color: '#555870',
+  },
+  edgeCount: {
+    fontSize: 9.5, fontWeight: 600, padding: '1px 6px',
+    borderRadius: 10, background: 'rgba(99,102,241,0.08)',
+    color: '#6366f1', border: '1px solid rgba(99,102,241,0.15)',
+    marginLeft: 2,
+  },
+
+  /* edge item */
+  edgeItem: {
+    display: 'flex', alignItems: 'center', gap: 8,
+    padding: '7px 10px', borderRadius: 8,
+    background: 'rgba(255,255,255,0.015)',
+    border: '1px solid rgba(99,102,241,0.08)',
+    transition: 'all 0.14s', cursor: 'default',
+  },
+  edgeBadge: {
+    fontSize: 9, fontWeight: 700, padding: '2px 6px',
+    borderRadius: 5, letterSpacing: '0.04em', flexShrink: 0,
+  },
+  edgeLabel: {
+    fontSize: 11, color: '#c8cae0', flex: 1,
+    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+  },
+};
+
+/* ─── sub-components ─────────────────────────────────────────────────── */
+
+function MetricCard({ label, value, color = '#555870', bg, border, highlight }) {
+  return (
+    <div style={{
+      ...S.metricCard,
+      background: highlight ? 'rgba(244,63,94,0.06)' : (bg || 'rgba(255,255,255,0.02)'),
+      borderColor: highlight ? 'rgba(244,63,94,0.22)' : (border || 'rgba(99,102,241,0.1)'),
+    }}>
+      <span style={{ ...S.metricVal, color }}>{value ?? '—'}</span>
+      <span style={S.metricLabel}>{label}</span>
+    </div>
+  );
+}
+
+function EdgeItem({ edge, color, bg, isHovered, onEnter, onLeave }) {
+  const label = (edge.source || edge.target || '')
+    .split('::').pop().split('/').pop();
+  return (
+    <div
+      style={{
+        ...S.edgeItem,
+        background: isHovered ? '#1a1e35' : 'rgba(255,255,255,0.015)',
+        borderColor: isHovered ? `rgba(${color === '#22d3ee' ? '34,211,238' : '16,185,129'},0.2)` : 'rgba(99,102,241,0.08)',
+      }}
+      onMouseEnter={onEnter}
+      onMouseLeave={onLeave}
+    >
+      <span style={{
+        ...S.edgeBadge,
+        background: `${bg}15`,
+        color,
+        border: `1px solid ${bg}30`,
+      }}>
+        {edge.type}
+      </span>
+      <span style={S.edgeLabel}>{label}</span>
+    </div>
+  );
+}
+
+/* ─── main component ─────────────────────────────────────────────────── */
 
 export default function NodeDetail({ nodeId, nodeData, onClose }) {
+  const [hoveredEdge, setHoveredEdge] = useState(null);
+  const [hoveredClose, setHoveredClose] = useState(false);
+
   if (!nodeData) return null;
 
-  const type = nodeData.type;
-  const typeConfig = {
-    file: { color: '#6366f1', icon: HiOutlineFolder, label: 'File' },
-    function: { color: '#22d3ee', icon: HiOutlineCode, label: 'Function' },
-    class: { color: '#10b981', icon: HiOutlineCube, label: 'Class' },
-  };
-  const config = typeConfig[type] || typeConfig.file;
-  const Icon = config.icon;
+  const cfg = TYPE_CONFIG[nodeData.type] || TYPE_CONFIG.file;
+  const Icon = cfg.icon;
 
   return (
-    <div className="w-[340px] max-h-[420px] glass-panel rounded-xl overflow-hidden flex flex-col animate-slide-in">
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-prism-border bg-prism-surface-2/50">
-        <div className="flex items-center gap-2.5 min-w-0">
-          <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: `${config.color}15` }}>
-            <Icon className="w-3.5 h-3.5" style={{ color: config.color }} />
+    <div style={S.wrap}>
+      {/* ── Header ── */}
+      <div style={S.header}>
+        <div style={S.headerLeft}>
+          <div style={{ ...S.iconBox, background: cfg.bg, border: `1px solid ${cfg.border}` }}>
+            <Icon size={14} color={cfg.color} />
           </div>
-          <div className="min-w-0">
-            <p className="text-[13px] font-semibold truncate text-prism-text">{nodeData.label || nodeData.name || nodeId}</p>
-            <p className="text-[10px] text-prism-text-dim font-medium">{config.label}</p>
+          <div style={{ minWidth: 0 }}>
+            <p style={S.nodeName}>{nodeData.label || nodeData.name || nodeId}</p>
+            <p style={{ ...S.nodeType, color: cfg.color }}>{cfg.label}</p>
           </div>
         </div>
-        <button onClick={onClose} className="w-6 h-6 rounded-md flex items-center justify-center text-prism-text-dim hover:text-prism-text hover:bg-prism-surface-2 transition-colors cursor-pointer">
-          <HiX className="w-3.5 h-3.5" />
+        <button
+          style={{
+            ...S.closeBtn,
+            background: hoveredClose ? 'rgba(244,63,94,0.08)' : 'transparent',
+            color: hoveredClose ? '#f43f5e' : '#555870',
+          }}
+          onMouseEnter={() => setHoveredClose(true)}
+          onMouseLeave={() => setHoveredClose(false)}
+          onClick={onClose}
+        >
+          <HiX size={13} />
         </button>
       </div>
 
-      {/* Body */}
-      <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3 text-xs">
-        {/* Metrics */}
-        {type === 'file' && (
-          <div className="grid grid-cols-3 gap-2">
-            <MetricCard label="LOC" value={nodeData.loc} color="#6366f1" />
-            <MetricCard label="Functions" value={nodeData.num_functions} color="#22d3ee" />
-            <MetricCard label="Classes" value={nodeData.num_classes} color="#10b981" />
+      {/* ── Body ── */}
+      <div style={S.body}>
+
+        {/* Metrics — File */}
+        {nodeData.type === 'file' && (
+          <div style={S.metricGrid}>
+            <MetricCard label="LOC" value={nodeData.loc} color="#6366f1" bg="rgba(99,102,241,0.06)" border="rgba(99,102,241,0.15)" />
+            <MetricCard label="Functions" value={nodeData.num_functions} color="#22d3ee" bg="rgba(34,211,238,0.06)" border="rgba(34,211,238,0.15)" />
+            <MetricCard label="Classes" value={nodeData.num_classes} color="#10b981" bg="rgba(16,185,129,0.06)" border="rgba(16,185,129,0.15)" />
           </div>
         )}
-        {type === 'function' && (
-          <div className="grid grid-cols-3 gap-2">
-            <MetricCard label="Lines" value={`${nodeData.line_start}–${nodeData.line_end}`} />
-            <MetricCard label="Params" value={nodeData.params?.length || 0} color="#22d3ee" />
-            <MetricCard label="Complexity" value={nodeData.complexity} color={nodeData.complexity > 5 ? '#f43f5e' : '#10b981'} highlight={nodeData.complexity > 5} />
+
+        {/* Metrics — Function */}
+        {nodeData.type === 'function' && (
+          <div style={S.metricGrid}>
+            <MetricCard
+              label="Lines"
+              value={nodeData.line_start != null ? `${nodeData.line_start}–${nodeData.line_end}` : '—'}
+              color="#818cf8"
+              bg="rgba(99,102,241,0.06)"
+              border="rgba(99,102,241,0.15)"
+            />
+            <MetricCard label="Params" value={nodeData.params?.length ?? 0} color="#22d3ee" bg="rgba(34,211,238,0.06)" border="rgba(34,211,238,0.15)" />
+            <MetricCard
+              label="Complexity"
+              value={nodeData.complexity}
+              color={nodeData.complexity > 5 ? '#f43f5e' : '#10b981'}
+              highlight={nodeData.complexity > 5}
+            />
           </div>
         )}
 
         {/* Docstring */}
         {nodeData.docstring && (
-          <div>
-            <p className="text-[11px] text-prism-text-dim mb-1 font-semibold uppercase tracking-wider">Description</p>
-            <p className="text-prism-text leading-relaxed text-[12px]">{nodeData.docstring}</p>
+          <div style={S.section}>
+            <span style={S.sectionLabel}>
+              <HiOutlineDocumentText size={11} />
+              Description
+            </span>
+            <p style={S.docText}>{nodeData.docstring}</p>
           </div>
         )}
 
         {/* File path */}
         {nodeData.file && (
-          <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-prism-surface-2/50 border border-prism-border/50">
-            <HiOutlineFolder className="w-3 h-3 text-prism-text-dim flex-shrink-0" />
-            <span className="text-prism-accent text-[11px] font-mono truncate">{nodeData.file}</span>
+          <div style={S.filePath}>
+            <HiOutlineFolder size={11} color="#555870" style={{ flexShrink: 0 }} />
+            <span style={S.filePathText}>{nodeData.file}</span>
           </div>
         )}
 
-        {/* Edges */}
-        {nodeData.incoming_edges?.length > 0 && (
-          <div>
-            <p className="text-[11px] text-prism-text-dim mb-1.5 font-semibold flex items-center gap-1.5">
-              <HiOutlineArrowLeft className="w-3 h-3 text-prism-accent" /> Incoming
-              <span className="text-prism-text-muted">({nodeData.incoming_edges.length})</span>
-            </p>
-            <div className="space-y-1">
-              {nodeData.incoming_edges.slice(0, 6).map((e, i) => (
-                <div key={i} className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-prism-surface-2/40 border border-prism-border/30">
-                  <span className="badge" style={{ background: `${config.color}12`, color: config.color, border: `1px solid ${config.color}25` }}>{e.type}</span>
-                  <span className="truncate text-prism-text text-[11px]">{e.source.split('::').pop().split('/').pop()}</span>
-                </div>
+        {/* Params list */}
+        {nodeData.params?.length > 0 && (
+          <div style={S.section}>
+            <span style={S.sectionLabel}>
+              <HiOutlineCode size={11} />
+              Parameters
+            </span>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
+              {nodeData.params.map((p, i) => (
+                <span key={i} style={{
+                  fontSize: 10.5, padding: '2px 8px', borderRadius: 5,
+                  background: 'rgba(34,211,238,0.08)', color: '#22d3ee',
+                  border: '1px solid rgba(34,211,238,0.15)',
+                  fontFamily: "'SF Mono','Fira Code',monospace",
+                }}>
+                  {p}
+                </span>
               ))}
             </div>
           </div>
         )}
 
-        {nodeData.outgoing_edges?.length > 0 && (
-          <div>
-            <p className="text-[11px] text-prism-text-dim mb-1.5 font-semibold flex items-center gap-1.5">
-              <HiOutlineArrowRight className="w-3 h-3 text-prism-emerald" /> Outgoing
-              <span className="text-prism-text-muted">({nodeData.outgoing_edges.length})</span>
-            </p>
-            <div className="space-y-1">
-              {nodeData.outgoing_edges.slice(0, 6).map((e, i) => (
-                <div key={i} className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-prism-surface-2/40 border border-prism-border/30">
-                  <span className="badge" style={{ background: '#10b98112', color: '#10b981', border: '1px solid #10b98125' }}>{e.type}</span>
-                  <span className="truncate text-prism-text text-[11px]">{e.target.split('::').pop().split('/').pop()}</span>
-                </div>
+        {/* Incoming edges */}
+        {nodeData.incoming_edges?.length > 0 && (
+          <div style={S.section}>
+            <div style={S.edgeSectionHead}>
+              <HiOutlineArrowLeft size={12} color="#818cf8" />
+              <span>Incoming</span>
+              <span style={S.edgeCount}>{nodeData.incoming_edges.length}</span>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              {nodeData.incoming_edges.slice(0, 6).map((e, i) => (
+                <EdgeItem
+                  key={i} edge={{ ...e, source: e.source }}
+                  color="#818cf8" bg="#6366f1"
+                  isHovered={hoveredEdge === `in-${i}`}
+                  onEnter={() => setHoveredEdge(`in-${i}`)}
+                  onLeave={() => setHoveredEdge(null)}
+                />
               ))}
+              {nodeData.incoming_edges.length > 6 && (
+                <p style={{ fontSize: 10, color: '#3a3d52', textAlign: 'center', paddingTop: 2 }}>
+                  +{nodeData.incoming_edges.length - 6} more
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Outgoing edges */}
+        {nodeData.outgoing_edges?.length > 0 && (
+          <div style={S.section}>
+            <div style={S.edgeSectionHead}>
+              <HiOutlineArrowRight size={12} color="#10b981" />
+              <span>Outgoing</span>
+              <span style={{ ...S.edgeCount, background: 'rgba(16,185,129,0.08)', color: '#10b981', borderColor: 'rgba(16,185,129,0.15)' }}>
+                {nodeData.outgoing_edges.length}
+              </span>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              {nodeData.outgoing_edges.slice(0, 6).map((e, i) => (
+                <EdgeItem
+                  key={i} edge={{ ...e, target: e.target }}
+                  color="#10b981" bg="#10b981"
+                  isHovered={hoveredEdge === `out-${i}`}
+                  onEnter={() => setHoveredEdge(`out-${i}`)}
+                  onLeave={() => setHoveredEdge(null)}
+                />
+              ))}
+              {nodeData.outgoing_edges.length > 6 && (
+                <p style={{ fontSize: 10, color: '#3a3d52', textAlign: 'center', paddingTop: 2 }}>
+                  +{nodeData.outgoing_edges.length - 6} more
+                </p>
+              )}
             </div>
           </div>
         )}
       </div>
-    </div>
-  );
-}
 
-function MetricCard({ label, value, color = '#71717a', highlight }) {
-  return (
-    <div className={`rounded-lg px-2.5 py-2.5 text-center border ${highlight ? 'border-prism-rose/30 bg-prism-rose/5' : 'border-prism-border/50 bg-prism-surface-2/40'}`}>
-      <p className="font-bold text-sm" style={{ color }}>{value ?? '—'}</p>
-      <p className="text-[10px] text-prism-text-muted mt-0.5 font-medium">{label}</p>
+      <style>{`
+        @keyframes nd-slide {
+          from { opacity: 0; transform: scale(0.97) translateY(6px); }
+          to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+      `}</style>
     </div>
   );
 }

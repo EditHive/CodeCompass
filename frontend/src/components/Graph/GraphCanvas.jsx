@@ -15,7 +15,7 @@ export default function GraphCanvas({
   const mmRef = useRef(null);
   const wrapRef = useRef(null);
 
-  const [panelNode, setPanelNode] = useState(null);
+
 
   // All mutable animation state lives in a ref to avoid React re‐render overhead.
   const S = useRef({
@@ -376,10 +376,8 @@ export default function GraphCanvas({
       const b = s.hoveredBuilding;
       if (b) {
         onNodeSelect?.(b.id);
-        setPanelNode(b);
       } else {
         onNodeSelect?.(null);
-        setPanelNode(null);
       }
     };
 
@@ -778,88 +776,133 @@ export default function GraphCanvas({
     >
       <canvas ref={canvasRef} className="block" />
 
-      {/* HUD: Title */}
-      <div className="absolute top-4 left-4 pointer-events-none select-none">
-        <div className="text-white font-bold text-xs tracking-[0.2em] bg-black/50 px-3 py-1 rounded backdrop-blur-sm">PRISMCODE</div>
-        <div className="text-[#4b5072] text-[9px] font-mono bg-black/40 px-3 py-0.5 rounded backdrop-blur-sm border border-white/5 mt-1">
-          {'// CODEBASE CITY \u00b7 LIVE DEPENDENCY MAP'}
-        </div>
-      </div>
 
       {/* HUD: Legend */}
-      <div className="absolute bottom-4 left-4 bg-black/60 border border-white/10 p-3 rounded-lg backdrop-blur-md flex flex-col gap-1.5 min-w-[160px] select-none">
-        <div className="text-[8px] text-slate-500 uppercase tracking-wider font-bold mb-1">Legend</div>
-        <div className="flex items-center gap-2 text-[9px] text-slate-400 font-mono">
-          <div className="w-2.5 h-2.5 rounded-sm" style={{ background: '#6366f1' }} /> District (Directory)
+      <div style={{
+        position: 'absolute', bottom: 16, left: 16,
+        background: 'rgba(13,15,26,0.92)',
+        border: '1px solid rgba(99,102,241,0.18)',
+        borderRadius: 12,
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+        padding: '10px 12px',
+        display: 'flex', flexDirection: 'column', gap: 0,
+        minWidth: 172,
+        boxShadow: '0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(99,102,241,0.06)',
+        userSelect: 'none',
+        fontFamily: "'SF Pro Display',-apple-system,BlinkMacSystemFont,sans-serif",
+      }}>
+        {/* Header */}
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 6,
+          marginBottom: 8, paddingBottom: 8,
+          borderBottom: '1px solid rgba(99,102,241,0.1)',
+        }}>
+          <div style={{
+            width: 14, height: 14, borderRadius: 4,
+            background: 'linear-gradient(135deg,#6366f1,#7c3aed)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 7, color: '#fff', fontWeight: 700,
+          }}>P</div>
+          <span style={{ fontSize: 9, fontWeight: 700, color: '#555870', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+            City Legend
+          </span>
         </div>
-        <div className="flex items-center gap-2 text-[9px] text-slate-400 font-mono">
-          <div className="w-2.5 h-2.5 bg-[#111422] border border-white/20 rounded-sm" /> File (Building)
+
+        {/* Nodes section */}
+        <div style={{ fontSize: 8.5, fontWeight: 600, color: '#3a3d52', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 5 }}>
+          Nodes
         </div>
-        <div className="flex items-center gap-2 text-[9px] text-slate-400 font-mono">
-          <div className="w-2.5 h-2.5 bg-amber-500 rounded-full" /> Critical Landmark
+        {[
+          { swatch: { background: 'linear-gradient(135deg,#6366f1,#4f46e5)', borderRadius: 4 }, label: 'District (Directory)' },
+          { swatch: { background: '#111422', border: '1px solid rgba(255,255,255,0.18)', borderRadius: 4 }, label: 'File (Building)' },
+          { swatch: { background: '#f59e0b', borderRadius: '50%', boxShadow: '0 0 6px rgba(245,158,11,0.5)' }, label: 'Critical Landmark' },
+        ].map(({ swatch, label }) => (
+          <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+            <div style={{ width: 10, height: 10, flexShrink: 0, ...swatch }} />
+            <span style={{ fontSize: 9.5, color: '#8b8fa8', fontFamily: "'SF Mono','Fira Code',monospace" }}>{label}</span>
+          </div>
+        ))}
+
+        {/* Divider */}
+        <div style={{ height: 1, background: 'rgba(99,102,241,0.08)', margin: '6px 0' }} />
+
+        {/* Traffic section */}
+        <div style={{ fontSize: 8.5, fontWeight: 600, color: '#3a3d52', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 5 }}>
+          Traffic
         </div>
-        <div className="flex items-center gap-2 text-[9px] text-slate-400 font-mono">
-          <div className="w-2.5 h-2.5 bg-rose-500 rounded-sm" /> Database Traffic
-        </div>
-        <div className="flex items-center gap-2 text-[9px] text-slate-400 font-mono">
-          <div className="w-2.5 h-2.5 bg-cyan-400 rounded-sm" /> API Traffic
-        </div>
-        <div className="flex items-center gap-2 text-[9px] text-slate-400 font-mono">
-          <div className="w-2.5 h-2.5 bg-amber-400 rounded-sm" /> Call Traffic
-        </div>
-        <div className="flex items-center gap-2 text-[9px] text-slate-400 font-mono">
-          <div className="w-2.5 h-2.5 bg-indigo-400 rounded-sm" /> Import Traffic
-        </div>
+        {[
+          { color: '#f43f5e', glow: 'rgba(244,63,94,0.4)', label: 'Database', shape: 4 },
+          { color: '#22d3ee', glow: 'rgba(34,211,238,0.4)', label: 'API', shape: 4 },
+          { color: '#f59e0b', glow: 'rgba(245,158,11,0.4)', label: 'Call', shape: 4 },
+          { color: '#818cf8', glow: 'rgba(129,140,248,0.4)', label: 'Import', shape: 4 },
+        ].map(({ color, glow, label, shape }) => (
+          <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+            <div style={{
+              width: 10, height: 10, flexShrink: 0, borderRadius: shape,
+              background: color, boxShadow: `0 0 5px ${glow}`,
+            }} />
+            <span style={{ fontSize: 9.5, color: '#8b8fa8', fontFamily: "'SF Mono','Fira Code',monospace" }}>
+              {label} Traffic
+            </span>
+          </div>
+        ))}
       </div>
 
-      {/* HUD: Minimap */}
-      <div className="absolute bottom-4 right-4 w-[140px] h-[100px] bg-black/80 border border-white/10 rounded-lg overflow-hidden ring-1 ring-white/5">
-        <canvas ref={mmRef} width={140} height={100} />
-      </div>
-
-      {/* HUD: Selection Panel */}
-      {panelNode && (
-        <div className="absolute top-4 right-4 w-64 bg-[#0c0f18]/95 border border-white/10 rounded-xl shadow-2xl backdrop-blur-xl">
-          <div className="p-3 border-b border-white/5 flex justify-between items-center bg-white/[0.03]">
-            <div className="text-[9px] font-bold text-slate-400 tracking-widest uppercase">Building Inspector</div>
-            <button onClick={() => setPanelNode(null)} className="text-slate-500 hover:text-white transition-colors text-xs">✕</button>
-          </div>
-          <div className="p-4">
-            <div className="text-white font-bold text-sm mb-0.5 truncate">{panelNode.label}</div>
-            <div className="text-[10px] text-slate-500 font-mono mb-3 truncate">{panelNode.id}</div>
-
-            <div className="flex gap-1.5 mb-4">
-              <span className="px-2 py-0.5 bg-indigo-500/20 border border-indigo-500/30 text-indigo-400 text-[8px] rounded uppercase font-bold">
-                {panelNode.language}
-              </span>
-              {panelNode.score > 3 && (
-                <span className="px-2 py-0.5 bg-amber-500/20 border border-amber-500/30 text-amber-400 text-[8px] rounded uppercase font-bold">hub</span>
-              )}
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              {[
-                ['Lines of Code', panelNode.loc],
-                ['Functions', panelNode.funcs],
-                ['Classes', panelNode.classes],
-                ['Imports', panelNode.imports],
-                ['Connections', panelNode.score],
-              ].map(([k, v]) => (
-                <div key={k} className="flex justify-between text-[11px] py-1 border-b border-white/5">
-                  <span className="text-slate-500">{k}</span>
-                  <span className="text-slate-200 font-mono font-bold">{v}</span>
-                </div>
-              ))}
-            </div>
-
-            {panelNode.docstring && (
-              <div className="mt-3 text-[10px] text-slate-400 italic border-t border-white/5 pt-2">
-                {panelNode.docstring.slice(0, 120)}
-              </div>
-            )}
+      {/* ── Minimap HUD ── */}
+      <div style={{
+        position: 'absolute', bottom: 16, right: 16,
+        width: 148,
+        background: 'rgba(13,15,26,0.92)',
+        border: '1px solid rgba(99,102,241,0.18)',
+        borderRadius: 12,
+        overflow: 'hidden',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(99,102,241,0.06)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+        fontFamily: "'SF Pro Display',-apple-system,BlinkMacSystemFont,sans-serif",
+      }}>
+        {/* Minimap header bar */}
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '6px 9px',
+          borderBottom: '1px solid rgba(99,102,241,0.1)',
+          background: 'rgba(99,102,241,0.04)',
+        }}>
+          <span style={{ fontSize: 8.5, fontWeight: 700, color: '#555870', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+            Minimap
+          </span>
+          <div style={{ display: 'flex', gap: 3 }}>
+            <div style={{ width: 5, height: 5, borderRadius: '50%', background: 'rgba(99,102,241,0.3)' }} />
+            <div style={{ width: 5, height: 5, borderRadius: '50%', background: 'rgba(34,211,238,0.3)' }} />
           </div>
         </div>
-      )}
+
+        {/* Canvas */}
+        <div style={{ position: 'relative' }}>
+          <canvas ref={mmRef} width={148} height={100} style={{ display: 'block' }} />
+          {/* corner accent lines */}
+          <div style={{ position: 'absolute', top: 4, left: 4, width: 8, height: 8, borderTop: '1px solid rgba(99,102,241,0.4)', borderLeft: '1px solid rgba(99,102,241,0.4)' }} />
+          <div style={{ position: 'absolute', top: 4, right: 4, width: 8, height: 8, borderTop: '1px solid rgba(99,102,241,0.4)', borderRight: '1px solid rgba(99,102,241,0.4)' }} />
+          <div style={{ position: 'absolute', bottom: 4, left: 4, width: 8, height: 8, borderBottom: '1px solid rgba(99,102,241,0.4)', borderLeft: '1px solid rgba(99,102,241,0.4)' }} />
+          <div style={{ position: 'absolute', bottom: 4, right: 4, width: 8, height: 8, borderBottom: '1px solid rgba(99,102,241,0.4)', borderRight: '1px solid rgba(99,102,241,0.4)' }} />
+        </div>
+
+        {/* Footer coordinates */}
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          padding: '4px 9px',
+          borderTop: '1px solid rgba(99,102,241,0.08)',
+          background: 'rgba(99,102,241,0.02)',
+        }}>
+          <span style={{
+            fontSize: 8.5, color: '#3a3d52', fontFamily: "'SF Mono','Fira Code',monospace",
+            letterSpacing: '0.04em',
+          }}>
+            CITY VIEW v0.9
+          </span>
+        </div>
+      </div>
     </div>
   );
 }

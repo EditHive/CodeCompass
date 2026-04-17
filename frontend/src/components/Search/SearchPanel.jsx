@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { searchCode } from '../../services/api';
 
 const EXAMPLE_QUERIES = [
   "Where is authentication handled?",
@@ -8,68 +9,11 @@ const EXAMPLE_QUERIES = [
   "API endpoint definitions",
 ];
 
-const MOCK_DATA = {
-  'Where is authentication handled?': {
-    ai_summary: 'Authentication is centralized in the middleware layer. JWT verification happens in auth.middleware.ts, with token refresh logic in authService.ts and route guards in router/guards.ts.',
-    query: 'Where is authentication handled?',
-    results: [
-      { id: 'auth-middleware', type: 'file', path: 'src/middleware/auth.middleware.ts', metadata: { name: 'auth.middleware.ts' }, score: 0.97, explanation: 'Core JWT verification and session management middleware.' },
-      { id: 'auth-service', type: 'class', path: 'src/services/authService.ts', metadata: { name: 'AuthService' }, score: 0.91, explanation: 'Token refresh, user lookup, and OAuth integration logic.' },
-      { id: 'router-guards', type: 'function', path: 'src/router/guards.ts', metadata: { name: 'requireAuth()' }, score: 0.84, explanation: 'Route-level authentication guard using session tokens.' },
-    ],
-  },
-  'Database connection setup': {
-    ai_summary: 'Database connections are initialized in db/connection.ts using a connection pool. ORM configuration lives in ormconfig.json with entity mappings auto-loaded from src/entities.',
-    query: 'Database connection setup',
-    results: [
-      { id: 'db-conn', type: 'file', path: 'src/db/connection.ts', metadata: { name: 'connection.ts' }, score: 0.96, explanation: 'PostgreSQL connection pool initialization with retry logic.' },
-      { id: 'orm-config', type: 'file', path: 'ormconfig.json', metadata: { name: 'ormconfig.json' }, score: 0.88, explanation: 'TypeORM configuration, entities path, migrations, and synchronization settings.' },
-    ],
-  },
-  'Payment processing flow': {
-    ai_summary: 'Payments are handled via Stripe integration. The PaymentService class manages charge creation, webhook processing is in webhooks/stripe.ts, and idempotency keys are stored in Redis.',
-    query: 'Payment processing flow',
-    results: [
-      { id: 'payment-svc', type: 'class', path: 'src/services/PaymentService.ts', metadata: { name: 'PaymentService' }, score: 0.98, explanation: 'Core Stripe charge creation, refunds, and subscription management.' },
-      { id: 'stripe-hook', type: 'function', path: 'src/webhooks/stripe.ts', metadata: { name: 'handleStripeWebhook()' }, score: 0.90, explanation: 'Processes payment_intent.succeeded and charge.failed events.' },
-      { id: 'payment-dto', type: 'file', path: 'src/dto/PaymentDto.ts', metadata: { name: 'PaymentDto.ts' }, score: 0.75, explanation: 'Data transfer objects for payment request validation.' },
-    ],
-  },
-  'Input validation logic': {
-    ai_summary: 'Validation uses class-validator decorators on DTOs, with a global ValidationPipe in main.ts. Custom validators live in src/validators for domain-specific rules.',
-    query: 'Input validation logic',
-    results: [
-      { id: 'global-pipe', type: 'function', path: 'src/main.ts', metadata: { name: 'ValidationPipe' }, score: 0.93, explanation: 'Global pipe enforcing class-validator rules on all incoming requests.' },
-      { id: 'custom-validators', type: 'file', path: 'src/validators/index.ts', metadata: { name: 'validators/index.ts' }, score: 0.86, explanation: 'Custom IsStrongPassword, IsSlug, and IsFutureDate decorators.' },
-    ],
-  },
-  'API endpoint definitions': {
-    ai_summary: 'REST endpoints are defined using NestJS controllers. All routes are prefixed with /api/v1. OpenAPI spec is auto-generated and served at /api/docs via Swagger.',
-    query: 'API endpoint definitions',
-    results: [
-      { id: 'user-ctrl', type: 'class', path: 'src/controllers/UserController.ts', metadata: { name: 'UserController' }, score: 0.95, explanation: 'CRUD endpoints for user resource: GET /users, POST /users, PATCH /users/:id.' },
-      { id: 'auth-ctrl', type: 'class', path: 'src/controllers/AuthController.ts', metadata: { name: 'AuthController' }, score: 0.91, explanation: 'Login, logout, refresh-token, and OAuth callback endpoints.' },
-      { id: 'swagger', type: 'file', path: 'src/swagger.ts', metadata: { name: 'swagger.ts' }, score: 0.79, explanation: 'OpenAPI spec builder configuration, served at /api/docs.' },
-    ],
-  },
-};
-
 const typeConfig = {
   file:     { color: '#6366f1', bg: 'rgba(99,102,241,0.12)',  icon: '◫' },
   function: { color: '#22d3ee', bg: 'rgba(34,211,238,0.12)',  icon: 'ƒ'  },
   class:    { color: '#10b981', bg: 'rgba(16,185,129,0.12)',  icon: '◉' },
 };
-
-function generateGenericResult(query) {
-  return {
-    ai_summary: `Semantic search found relevant code for "${query}". Results ranked by vector similarity to your query.`,
-    query,
-    results: [
-      { id: 'r1', type: 'function', path: 'src/utils/helpers.ts', metadata: { name: 'processQuery()' }, score: 0.82, explanation: 'Core utility function most semantically related to your query.' },
-      { id: 'r2', type: 'file',     path: 'src/modules/core/index.ts', metadata: { name: 'index.ts' },     score: 0.71, explanation: 'Module entry point with related configuration and exports.' },
-    ],
-  };
-}
 
 /* ─── Styles ────────────────────────────────────────────────────────────── */
 const styles = {
@@ -246,7 +190,9 @@ function ResultCard({ result, onSelect }) {
           </span>
           <span style={styles.score}>★ {(result.score * 100).toFixed(0)}%</span>
         </div>
-        <div style={styles.resultPath}>{result.path}</div>
+        <div style={styles.resultPath}>
+          {result.path}{result.metadata?.line ? ` : line ${result.metadata.line}` : ''}
+        </div>
         {result.explanation && (
           <div style={styles.resultExplanation}>{result.explanation}</div>
         )}
@@ -271,12 +217,8 @@ export default function SearchPanel({ onSelectNode }) {
     setSearchData(null);
 
     try {
-      // ── Replace this block with your real API call ──────────────────────
-      // const data = await searchCode(searchQuery);
-      await new Promise(r => setTimeout(r, 600));
-      const data = MOCK_DATA[searchQuery] || generateGenericResult(searchQuery);
-      // ────────────────────────────────────────────────────────────────────
-      setSearchData(data);
+      const res = await searchCode(searchQuery);
+      setSearchData(res.data);
     } catch (err) {
       setError(err?.message || 'Search failed. Please try again.');
     } finally {
