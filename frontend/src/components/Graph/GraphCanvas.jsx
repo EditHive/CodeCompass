@@ -1,309 +1,8 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
-import * as d3 from 'd3';
 
-// ─── Constants ────────────────────────────────────────────────────────────────
-
-const NODE_COLORS = {
-  file:     '#6366f1',
-  function: '#22d3ee',
-  class:    '#10b981',
-};
-
-const NODE_GLOW = {
-  file:     'rgba(99,102,241,0.55)',
-  function: 'rgba(34,211,238,0.45)',
-  class:    'rgba(16,185,129,0.45)',
-};
-
-const NODE_SIZES = {
-  file:     10,
-  function: 5,
-  class:    7,
-};
-
-const EDGE_COLORS = {
-  imports: 'rgba(99,102,241,0.28)',
-  calls:   'rgba(34,211,238,0.15)',
-};
-
-const RISK_COLORS = {
-  High:   '#f87171',
-  Medium: '#f59e0b',
-  Low:    '#34d399',
-};
-
-// ─── Styles ───────────────────────────────────────────────────────────────────
-
-const STYLES = `
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
-
-  .prism-root {
-    font-family: 'Inter', sans-serif;
-    background: #080b14;
-    color: #e2e8f0;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    overflow: hidden;
-    border-radius: 12px;
-    width: 100%;
-    height: 100%;
-  }
-
-  /* Starfield */
-  .prism-root::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image:
-      radial-gradient(1px 1px at 12% 18%, rgba(255,255,255,0.35) 0%, transparent 100%),
-      radial-gradient(1px 1px at 33% 58%, rgba(255,255,255,0.2)  0%, transparent 100%),
-      radial-gradient(1px 1px at 54% 13%, rgba(255,255,255,0.25) 0%, transparent 100%),
-      radial-gradient(1px 1px at 74% 44%, rgba(255,255,255,0.3)  0%, transparent 100%),
-      radial-gradient(1px 1px at 88% 78%, rgba(255,255,255,0.2)  0%, transparent 100%),
-      radial-gradient(1px 1px at 7%  73%, rgba(255,255,255,0.15) 0%, transparent 100%),
-      radial-gradient(1px 1px at 63% 86%, rgba(255,255,255,0.2)  0%, transparent 100%),
-      radial-gradient(90px 90px at 20% 30%, rgba(99,102,241,0.05)  0%, transparent 100%),
-      radial-gradient(130px 130px at 80% 70%, rgba(34,211,238,0.035) 0%, transparent 100%);
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  /* ── Canvas ── */
-  .prism-canvas-wrap {
-    position: relative;
-    flex: 1;
-    overflow: hidden;
-  }
-
-  .prism-svg {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    inset: 0;
-    display: block;
-  }
-
-  /* ── Stats bar ── */
-  .prism-stats {
-    position: absolute;
-    top: 12px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 20;
-    display: flex;
-    gap: 1px;
-    background: rgba(255,255,255,0.06);
-    border-radius: 8px;
-    overflow: hidden;
-    border: 1px solid rgba(255,255,255,0.07);
-    white-space: nowrap;
-  }
-
-  .prism-stat-pill {
-    padding: 5px 14px;
-    font-size: 11px;
-    background: rgba(8,11,20,0.75);
-    color: rgba(148,163,184,0.75);
-    display: flex;
-    align-items: center;
-    gap: 5px;
-  }
-
-  .prism-stat-num {
-    font-weight: 600;
-    color: #e2e8f0;
-    font-size: 12px;
-  }
-
-  /* ── Info Panel ── */
-  .prism-panel {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    z-index: 20;
-    width: 204px;
-    background: rgba(8,11,20,0.9);
-    border: 1px solid rgba(255,255,255,0.09);
-    border-radius: 10px;
-    backdrop-filter: blur(14px);
-    overflow: hidden;
-    animation: prism-fade-in 0.18s ease;
-  }
-
-  @keyframes prism-fade-in {
-    from { opacity: 0; transform: translateY(-6px) scale(0.97); }
-    to   { opacity: 1; transform: translateY(0)    scale(1);    }
-  }
-
-  .prism-panel-header {
-    padding: 10px 12px 9px;
-    border-bottom: 1px solid rgba(255,255,255,0.06);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .prism-panel-title {
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 0.09em;
-    color: rgba(148,163,184,0.8);
-    text-transform: uppercase;
-  }
-
-  .prism-panel-close {
-    width: 18px; height: 18px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.08);
-    cursor: pointer;
-    font-size: 9px;
-    color: rgba(148,163,184,0.5);
-    display: flex; align-items: center; justify-content: center;
-    transition: all 0.12s;
-    font-family: inherit;
-  }
-  .prism-panel-close:hover {
-    background: rgba(255,255,255,0.1);
-    color: #e2e8f0;
-  }
-
-  .prism-panel-body { padding: 11px 12px; }
-
-  .prism-node-name {
-    font-size: 13px;
-    font-weight: 600;
-    color: #e2e8f0;
-    margin-bottom: 5px;
-    word-break: break-all;
-    line-height: 1.3;
-  }
-
-  .prism-type-badge {
-    display: inline-flex;
-    align-items: center;
-    font-size: 10px;
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-weight: 500;
-    margin-bottom: 11px;
-    letter-spacing: 0.04em;
-    border: 1px solid;
-  }
-  .prism-badge-file     { background: rgba(99,102,241,0.18); color: #a5b4fc; border-color: rgba(99,102,241,0.28); }
-  .prism-badge-function { background: rgba(34,211,238,0.12); color: #67e8f9; border-color: rgba(34,211,238,0.22); }
-  .prism-badge-class    { background: rgba(16,185,129,0.13); color: #6ee7b7; border-color: rgba(16,185,129,0.22); }
-
-  .prism-panel-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 11px;
-    padding: 4px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.04);
-  }
-  .prism-panel-row:last-child { border-bottom: none; }
-  .prism-row-label { color: rgba(148,163,184,0.55); }
-  .prism-row-val   { color: #e2e8f0; font-weight: 500; }
-
-  /* ── Legend ── */
-  .prism-legend {
-    position: absolute;
-    bottom: 12px;
-    left: 12px;
-    z-index: 20;
-    background: rgba(8,11,20,0.88);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 10px;
-    backdrop-filter: blur(12px);
-    padding: 8px 14px;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-  }
-
-  .prism-leg-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    cursor: pointer;
-    transition: opacity 0.15s;
-    user-select: none;
-  }
-  .prism-leg-item.hidden { opacity: 0.28; }
-
-  .prism-leg-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-
-  .prism-leg-label {
-    font-size: 10px;
-    font-weight: 500;
-    color: rgba(148,163,184,0.75);
-    letter-spacing: 0.05em;
-    text-transform: capitalize;
-  }
-
-  .prism-leg-sep {
-    width: 1px; height: 14px;
-    background: rgba(255,255,255,0.08);
-    flex-shrink: 0;
-  }
-
-  .prism-leg-edge {
-    display: flex; align-items: center; gap: 6px;
-  }
-
-  .prism-edge-solid {
-    width: 18px; height: 1.5px;
-    border-radius: 2px;
-    background: rgba(99,102,241,0.65);
-    flex-shrink: 0;
-  }
-
-  .prism-edge-dash {
-    width: 18px; height: 0;
-    border-top: 1.5px dashed rgba(34,211,238,0.55);
-    flex-shrink: 0;
-  }
-
-  /* ── Empty State ── */
-  .prism-empty {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    z-index: 5;
-    gap: 10px;
-  }
-
-  .prism-empty-icon {
-    width: 56px; height: 56px;
-    border-radius: 14px;
-    border: 1px solid rgba(99,102,241,0.22);
-    background: rgba(99,102,241,0.08);
-    display: flex; align-items: center; justify-content: center;
-    margin-bottom: 2px;
-  }
-
-  .prism-empty-title {
-    font-size: 13px;
-    font-weight: 500;
-    color: rgba(148,163,184,0.75);
-  }
-
-  .prism-empty-sub {
-    font-size: 11px;
-    color: rgba(148,163,184,0.38);
-  }
-`;
-
-// ─── GraphCanvas Component ─────────────────────────────────────────────────────
+// ─── Codebase City: Data-Driven Digital Twin ──────────────────────────────────
+// Every element on this canvas is derived from real repo analysis data.
+// Districts = actual directories, Buildings = actual files, Cars = actual edges.
 
 export default function GraphCanvas({
   graphData,
@@ -312,365 +11,814 @@ export default function GraphCanvas({
   impactNodes,
   flowNodes,
 }) {
-  const svgRef       = useRef(null);
-  const containerRef = useRef(null);
-  const simRef       = useRef(null);
+  const canvasRef = useRef(null);
+  const mmRef     = useRef(null);
+  const wrapRef   = useRef(null);
 
-  const [dimensions,   setDimensions]   = useState({ width: 800, height: 600 });
-  const [hiddenTypes,  setHiddenTypes]  = useState(new Set());
-  const [panelNode,    setPanelNode]    = useState(null); // { id, label, type }
-  const [panelStats,   setPanelStats]   = useState({});
+  const [panelNode, setPanelNode] = useState(null);
 
-  // ── Resize observer ──
-  useEffect(() => {
-    let timeoutId;
-    const obs = new ResizeObserver(entries => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => {
-        for (const e of entries) {
-          const { width, height } = e.contentRect;
-          setDimensions({ width, height });
-        }
-      }, 150);
-    });
-    if (containerRef.current) obs.observe(containerRef.current);
-    return () => {
-      obs.disconnect();
-      clearTimeout(timeoutId);
-    };
-  }, []);
+  // All mutable animation state lives in a ref to avoid React re‐render overhead.
+  const S = useRef({
+    W: 0, H: 0,
+    cam: { x: 0, y: 0, scale: 1 },
+    drag: false, lastMouse: null,
+    hoveredBuilding: null,
+    animId: null,
 
-  // ── Toggle legend filter ──
-  const toggleType = useCallback(type => {
-    setHiddenTypes(prev => {
-      const next = new Set(prev);
-      next.has(type) ? next.delete(type) : next.add(type);
-      return next;
-    });
-  }, []);
+    // Processed world data (populated once from graphData)
+    districts: [],   // { id, label, x, y, w, h, color, files:[] }
+    buildings: [],   // { id, label, district, gx, gy, loc, funcs, classes, imports, score }
+    roads: [],       // { srcId, tgtId, type, names, ax, ay, bx, by }
+    cars: [],        // { road, t, speed, color }
+    landmarks: [],   // { id, label, x, y }
 
-  // ── D3 simulation ──
-  useEffect(() => {
-    if (!graphData || !svgRef.current) return;
-
-    const svg = d3.select(svgRef.current);
-    svg.selectAll('*').remove();
-
-    const { width: W, height: H } = dimensions;
-
-    // Filter nodes/edges
-    let nodes = graphData.nodes
-      .filter(n => !hiddenTypes.has(n.type))
-      .map(n => ({ ...n }));
-    const keepIds = new Set(nodes.map(n => n.id));
-    let edges = graphData.edges
-      .filter(e => {
-        const s = e.source?.id ?? e.source;
-        const t = e.target?.id ?? e.target;
-        return keepIds.has(s) && keepIds.has(t) && e.type !== 'contains';
-      })
-      .map(e => ({ ...e }));
-
-    // ── Defs ──
-    const defs = svg.append('defs');
-
-    // ── Grid ──
-    const pattern = defs.append('pattern')
-      .attr('id', 'pr-grid')
-      .attr('width', 60)
-      .attr('height', 60)
-      .attr('patternUnits', 'userSpaceOnUse');
-    pattern.append('path')
-      .attr('d', 'M 60 0 L 0 0 0 60')
-      .attr('fill', 'none')
-      .attr('stroke', '#fff')
-      .attr('stroke-width', 1)
-      .attr('opacity', 0.025);
-    
-    svg.append('rect')
-      .attr('width', '100%')
-      .attr('height', '100%')
-      .attr('fill', 'url(#pr-grid)');
-
-    // ── Zoom container ──
-    const g = svg.append('g');
-    const zoom = d3.zoom()
-      .scaleExtent([0.1, 6])
-      .on('zoom', ev => g.attr('transform', ev.transform));
-    svg.call(zoom);
-
-    // Deselect on canvas click
-    svg.on('click', () => {
-      onNodeSelect?.(null);
-      setPanelNode(null);
-      nodeG.selectAll('circle.prism-node-main')
-        .attr('stroke', 'rgba(255,255,255,0.12)')
-        .attr('stroke-width', 0.5);
-      nodeG.selectAll('circle.prism-node-ring')
-        .attr('stroke', 'transparent');
-    });
-
-    // ── Simulation ──
-    const simulation = d3.forceSimulation(nodes)
-      .force('link',      d3.forceLink(edges).id(d => d.id).distance(85).strength(0.45))
-      .force('charge',    d3.forceManyBody().strength(-220).distanceMax(300))
-      .force('center',    d3.forceCenter(W / 2, H / 2))
-      .force('x',         d3.forceX(W / 2).strength(0.05))
-      .force('y',         d3.forceY(H / 2).strength(0.05))
-      .force('collision', d3.forceCollide().radius(d => (NODE_SIZES[d.type] || 5) + 12));
-
-    simRef.current = simulation;
-
-    // ── Edges ──
-    const linkG = g.append('g');
-    const link = linkG.selectAll('line')
-      .data(edges).join('line')
-      .attr('stroke',           d => EDGE_COLORS[d.type] || 'rgba(255,255,255,0.05)')
-      .attr('stroke-width',     d => d.type === 'imports' ? 1.5 : 0.8)
-      .attr('stroke-dasharray', d => d.type === 'calls' ? '4,6' : 'none')
-      .attr('stroke-linecap', 'round');
-
-    // ── Nodes ──
-    const nodeG = g.append('g');
-    const node = nodeG.selectAll('g')
-      .data(nodes).join('g')
-      .style('cursor', 'pointer')
-      .call(
-        d3.drag()
-          .on('start', (ev, d) => { if (!ev.active) simulation.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; })
-          .on('drag',  (ev, d) => { d.fx = ev.x; d.fy = ev.y; })
-          .on('end',   (ev, d) => { if (!ev.active) simulation.alphaTarget(0); d.fx = null; d.fy = null; })
-      );
-
-    // Glow ring (replaces SVG filter)
-    node.append('circle')
-      .attr('class', 'prism-node-ring')
-      .attr('r',  d => (NODE_SIZES[d.type] || 5) + 5)
-      .attr('fill', 'none')
-      .attr('stroke-width', 1.5)
-      .attr('stroke', 'transparent');
-
-    // Static base glow instead of expensive svg filter
-    node.append('circle')
-      .attr('r', d => (NODE_SIZES[d.type] || 5) + 3)
-      .attr('fill', d => NODE_COLORS[d.type] || '#6366f1')
-      .attr('opacity', 0.15)
-      .style('pointer-events', 'none');
-
-    // Main circle
-    node.append('circle')
-      .attr('class', 'prism-node-main')
-      .attr('r',           d => NODE_SIZES[d.type] || 5)
-      .attr('fill',        d => NODE_COLORS[d.type] || '#6366f1')
-      .attr('opacity',     0.88)
-      .attr('stroke',      'rgba(255,255,255,0.12)')
-      .attr('stroke-width', 0.5)
-      .on('click', function (ev, d) {
-        ev.stopPropagation();
-        onNodeSelect?.(d.id);
-        
-        // Panel data
-        setPanelNode({ id: d.id, label: d.label || d.id, type: d.type });
-        setPanelStats({
-          imports:    Math.floor(Math.random() * 5) + 1,
-          calls:      Math.floor(Math.random() * 10) + 1,
-          dependents: Math.floor(Math.random() * 4),
-          risk:       ['Low', 'Medium', 'High'][Math.floor(Math.random() * 3)],
-        });
-      })
-      .on('mouseover', function (ev, d) {
-        d3.select(this).transition().duration(120)
-          .attr('opacity', 1)
-          .attr('r', (NODE_SIZES[d.type] || 5) + 2);
-      })
-      .on('mouseout', function (ev, d) {
-        d3.select(this).transition().duration(120)
-          .attr('opacity', 0.88)
-          .attr('r', NODE_SIZES[d.type] || 5);
-      });
-
-    // Labels
-    node.append('text')
-      .text(d => d.label || d.id.split('::').pop().split('/').pop())
-      .attr('x', d => (NODE_SIZES[d.type] || 5) + 7)
-      .attr('y', 3)
-      .attr('font-size', 10)
-      .attr('fill', 'rgba(148,163,184,0.65)')
-      .attr('font-family', "'Inter',sans-serif")
-      .attr('font-weight', 500)
-      .attr('pointer-events', 'none');
-
-    // Tick
-    simulation.on('tick', () => {
-      try {
-        link
-          .attr('x1', d => d.source.x).attr('y1', d => d.source.y)
-          .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
-        node.attr('transform', d => `translate(${d.x},${d.y})`);
-      } catch (err) { /* ignore mid-transition errors */ }
-    });
-
-    return () => simulation.stop();
-  }, [graphData, hiddenTypes]);
-
-  // ── Highlighting Updates ──
-  useEffect(() => {
-    if (!svgRef.current) return;
-    const svg = d3.select(svgRef.current);
-    
-    svg.selectAll('circle.prism-node-ring')
-      .attr('stroke', d => {
-        if (selectedNode === d.id)                 return NODE_GLOW[d.type] || 'transparent';
-        if (impactNodes?.some(n => n.id === d.id)) return '#f43f5e';
-        if (flowNodes?.includes(d.id))             return '#10b981';
-        return 'transparent';
-      });
-
-    svg.selectAll('circle.prism-node-main')
-      .attr('stroke', d => selectedNode === d.id ? '#fff' : 'rgba(255,255,255,0.12)')
-      .attr('stroke-width', d => selectedNode === d.id ? 2 : 0.5);
-
-  }, [selectedNode, impactNodes, flowNodes]);
-
-  // ── Resize Simulation Center ──
-  useEffect(() => {
-    if (simRef.current && dimensions.width > 0) {
-       simRef.current.force('center', d3.forceCenter(dimensions.width / 2, dimensions.height / 2));
-       simRef.current.force('x', d3.forceX(dimensions.width / 2).strength(0.05));
-       simRef.current.force('y', d3.forceY(dimensions.height / 2).strength(0.05));
-       simRef.current.alpha(0.3).restart();
-    }
-  }, [dimensions]);
-
-  // ── Node counts ──
-  const visibleNodes = graphData?.nodes.filter(n => !hiddenTypes.has(n.type)) ?? [];
-  const visibleEdges = (graphData?.edges ?? []).filter(e => {
-    const s = e.source?.id ?? e.source;
-    const t = e.target?.id ?? e.target;
-    const ids = new Set(visibleNodes.map(n => n.id));
-    return ids.has(s) && ids.has(t) && e.type !== 'contains';
+    // Lookup helpers
+    buildingById: new Map(),
   });
 
-  // ── Render ──
+  // ── STEP 1: Transform graphData into city geometry ──────────────────────────
+
+  useEffect(() => {
+    if (!graphData?.nodes?.length) return;
+    const s = S.current;
+    const { nodes, edges } = graphData;
+
+    // ─── A. Collect only file nodes, group by directory ───────────────────
+    const fileNodes = nodes.filter(n => n.type === 'file');
+    const folderMap = new Map(); // folderPath -> [node, ...]
+
+    fileNodes.forEach(n => {
+      const lastSlash = n.id.lastIndexOf('/');
+      const folder = lastSlash > 0 ? n.id.substring(0, lastSlash) : 'root';
+      if (!folderMap.has(folder)) folderMap.set(folder, []);
+      folderMap.get(folder).push(n);
+    });
+
+    // ─── B. Compute degree scores for every file ─────────────────────────
+    const inDeg  = new Map();
+    const outDeg = new Map();
+    edges.forEach(e => {
+      if (e.type === 'contains') return;
+      const src = e.source?.id || e.source;
+      const tgt = e.target?.id || e.target;
+      outDeg.set(src, (outDeg.get(src) || 0) + 1);
+      inDeg.set(tgt,  (inDeg.get(tgt)  || 0) + 1);
+    });
+    const score = id => (inDeg.get(id) || 0) + (outDeg.get(id) || 0);
+
+    // Landmark threshold = top 10%
+    const scores = fileNodes.map(n => score(n.id)).sort((a, b) => b - a);
+    const lmThresh = scores[Math.max(0, Math.floor(scores.length * 0.1))] || 999;
+
+    // ─── C. Layout districts in a grid ───────────────────────────────────
+    const folders = Array.from(folderMap.entries())
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .map(([path, files]) => ({ path, files }));
+
+    const COLS = Math.min(5, Math.ceil(Math.sqrt(folders.length)));
+    const FILE_W = 110, FILE_H = 60, FILE_GAP = 16;
+    const FILES_PER_ROW = 3;
+    const HEADER = 36, PAD = 20;
+    const DIST_W = PAD * 2 + FILES_PER_ROW * FILE_W + (FILES_PER_ROW - 1) * FILE_GAP;
+    const DIST_PAD_X = 50;
+
+    // Slot sizing: each row slot must fit roof + max height + label
+    const ROOF_H = 16;                         // roof triangle above building
+    const MAX_H_MUL = 1.5;                     // max LOC height multiplier
+    const MAX_BLDG_H = FILE_H * MAX_H_MUL;     // tallest possible building = 90px
+    const LABEL_H = 22;                        // file name label below building
+    const ROW_SLOT = ROOF_H + MAX_BLDG_H + LABEL_H + FILE_GAP; // = 144px per row
+    const CONTENT_TOP = HEADER + PAD + 10;     // top of first row inside district
+
+    const COLORS = ['#6366f1','#f43f5e','#22d3ee','#10b981','#f59e0b','#a78bfa','#64748b','#ec4899','#14b8a6','#8b5cf6'];
+
+    s.districts = [];
+    s.buildings = [];
+    s.landmarks = [];
+    s.buildingById = new Map();
+
+    // Pre-calculate district heights
+    const distHeights = folders.map(f => {
+      const rowsNeeded = Math.ceil(f.files.length / FILES_PER_ROW);
+      return CONTENT_TOP + rowsNeeded * ROW_SLOT + PAD;
+    });
+
+    // Compute max height per grid row for uniform alignment
+    const rowMaxH = [];
+    for (let i = 0; i < folders.length; i++) {
+      const row = Math.floor(i / COLS);
+      rowMaxH[row] = Math.max(rowMaxH[row] || 0, Math.max(distHeights[i], 180));
+    }
+
+    // Compute cumulative Y offsets for each grid row
+    const rowY = [60];
+    for (let r = 1; r < rowMaxH.length; r++) {
+      rowY[r] = rowY[r - 1] + rowMaxH[r - 1] + DIST_PAD_X;
+    }
+
+    folders.forEach((f, idx) => {
+      const col = idx % COLS;
+      const row = Math.floor(idx / COLS);
+
+      const rowsNeeded = Math.ceil(f.files.length / FILES_PER_ROW);
+      const distH = Math.max(CONTENT_TOP + rowsNeeded * ROW_SLOT + PAD, 180);
+
+      const dx = 60 + col * (DIST_W + DIST_PAD_X);
+      const dy = rowY[row];
+      const color = COLORS[idx % COLORS.length];
+
+      const parts = f.path.split('/');
+      const label = parts[parts.length - 1] || f.path;
+
+      const district = {
+        id: f.path,
+        label,
+        fullPath: f.path,
+        x: dx, y: dy,
+        w: DIST_W, h: distH,
+        color,
+        files: [],
+      };
+
+      // Place files inside district
+      f.files.forEach((node, fi) => {
+        const gx = fi % FILES_PER_ROW;
+        const gy = Math.floor(fi / FILES_PER_ROW);
+
+        const b = {
+          id: node.id,
+          label: node.label,
+          district: f.path,
+          gx, gy,
+          loc: node.loc || 0,
+          funcs: node.num_functions || 0,
+          classes: node.num_classes || 0,
+          imports: node.num_imports || 0,
+          score: score(node.id),
+          language: node.language || '',
+          docstring: node.docstring || '',
+        };
+        s.buildings.push(b);
+        s.buildingById.set(b.id, b);
+        district.files.push(b);
+
+        // Landmark?
+        if (b.score >= lmThresh && lmThresh > 0) {
+          const pos = bldgPos(b, [district]);
+          s.landmarks.push({
+            id: b.id,
+            label: b.label,
+            x: pos.cx,
+            y: pos.y - 8,
+          });
+        }
+      });
+
+      s.districts.push(district);
+    });
+
+    // ─── D. Build roads from real import/call edges between files ─────────
+    const depEdges = edges.filter(e => e.type === 'imports' || e.type === 'calls');
+    s.roads = [];
+
+    depEdges.forEach(e => {
+      const srcId = e.source?.id || e.source;
+      const tgtId = e.target?.id || e.target;
+      const srcB = s.buildingById.get(srcId);
+      const tgtB = s.buildingById.get(tgtId);
+      if (!srcB || !tgtB) return;
+
+      const srcD = s.districts.find(d => d.id === srcB.district);
+      const tgtD = s.districts.find(d => d.id === tgtB.district);
+      if (!srcD || !tgtD) return;
+
+      const sp = bldgPos(srcB, [srcD]);
+      const tp = bldgPos(tgtB, [tgtD]);
+
+      s.roads.push({
+        srcId, tgtId,
+        type: e.type,
+        names: e.names || [],
+        ax: sp.cx, ay: sp.cy,
+        bx: tp.cx, by: tp.cy,
+      });
+    });
+
+    // ─── E. Spawn cars: one per road, actual direction ───────────────────
+    s.cars = s.roads.map((road, i) => ({
+      road,
+      t: Math.random(),
+      speed: 0.0015 + Math.random() * 0.001,
+      color: road.type === 'imports' ? '#818cf8' : '#fbbf24',
+    }));
+
+    // ─── F. Auto-fit camera ──────────────────────────────────────────────
+    if (s.districts.length && s.W > 0) fitCamera(s);
+
+  }, [graphData]);
+
+  // ── Geometry helpers ────────────────────────────────────────────────────────
+
+  function bldgPos(b, districts) {
+    const d = districts.find(dd => dd.id === b.district) || S.current.districts.find(dd => dd.id === b.district);
+    if (!d) return { x: 0, y: 0, w: 110, h: 60, cx: 55, cy: 30 };
+
+    const FILE_W = 110, FILE_H = 60;
+    const ROOF_H = 16;
+    const MAX_H_MUL = 1.5;
+    const MAX_BLDG_H = FILE_H * MAX_H_MUL;
+    const LABEL_H = 22;
+    const FILE_GAP = 16;
+    const ROW_SLOT = ROOF_H + MAX_BLDG_H + LABEL_H + FILE_GAP;
+    const HEADER = 36, PAD = 20;
+    const CONTENT_TOP = HEADER + PAD + 10;
+
+    const x = d.x + PAD + b.gx * (FILE_W + FILE_GAP);
+
+    // Each row slot: [ROOF_H | building (variable) | LABEL_H | FILE_GAP]
+    // Building bottom is anchored at a fixed position in the slot
+    const slotTop = d.y + CONTENT_TOP + b.gy * ROW_SLOT;
+    const buildingBottom = slotTop + ROOF_H + MAX_BLDG_H; // fixed bottom line
+
+    // Scale height by LOC (log scale, clamped)
+    const hMul = Math.min(MAX_H_MUL, 0.9 + Math.log10(Math.max(b.loc, 1)) * 0.3);
+    const h = FILE_H * hMul;
+
+    // Building top = bottom - height (grows upward from fixed bottom)
+    const y = buildingBottom - h;
+
+    return { x, y, w: FILE_W, h, cx: x + FILE_W / 2, cy: y + h / 2, d, buildingBottom };
+  }
+
+  function fitCamera(s) {
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    s.districts.forEach(d => {
+      minX = Math.min(minX, d.x);       minY = Math.min(minY, d.y);
+      maxX = Math.max(maxX, d.x + d.w); maxY = Math.max(maxY, d.y + d.h);
+    });
+    const pad = 60;
+    const bW = (maxX - minX) + pad * 2;
+    const bH = (maxY - minY) + pad * 2;
+    // Zoom in more — show ~60% of the city so it's readable
+    const sc = Math.min(s.W / bW, s.H / bH) * 1.35;
+    // Center on the top-left quadrant so user sees detail immediately
+    const cx = minX + (maxX - minX) * 0.35;
+    const cy = minY + (maxY - minY) * 0.35;
+    s.cam = {
+      x: s.W / 2 - cx * sc,
+      y: s.H / 2 - cy * sc,
+      scale: sc,
+    };
+  }
+
+  function quadBezier(ax, ay, bx, by, t) {
+    const mx = (ax + bx) / 2, my = (ay + by) / 2;
+    const dx = bx - ax, dy = by - ay;
+    const len = Math.sqrt(dx * dx + dy * dy) || 1;
+    const off = Math.min(30, len * 0.12);
+    const nx = (-dy / len) * off, ny = (dx / len) * off;
+    const cxp = mx + nx, cyp = my + ny;
+    const u = 1 - t;
+    return {
+      x: u * u * ax + 2 * u * t * cxp + t * t * bx,
+      y: u * u * ay + 2 * u * t * cyp + t * t * by,
+      angle: Math.atan2(
+        2 * u * (cyp - ay) + 2 * t * (by - cyp),
+        2 * u * (cxp - ax) + 2 * t * (bx - cxp)
+      ),
+    };
+  }
+
+  function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y); ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r); ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h); ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+  }
+
+  // ── Canvas render loop ──────────────────────────────────────────────────────
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const mm     = mmRef.current;
+    const wrap   = wrapRef.current;
+    if (!canvas || !mm || !wrap) return;
+
+    const ctx  = canvas.getContext('2d');
+    const mctx = mm.getContext('2d');
+    const s    = S.current;
+
+    function resize() {
+      s.W = wrap.clientWidth;
+      s.H = wrap.clientHeight;
+      canvas.width  = s.W;
+      canvas.height = s.H;
+      if (s.districts.length) fitCamera(s);
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    // ─── Interaction ─────────────────────────────────────────────────────
+    const onWheel = (ev) => {
+      ev.preventDefault();
+      const r = wrap.getBoundingClientRect();
+      const mx = ev.clientX - r.left, my = ev.clientY - r.top;
+      const d = ev.deltaY < 0 ? 1.10 : 0.91;
+      const ns = Math.max(0.08, Math.min(8, s.cam.scale * d));
+      s.cam.x = mx - (mx - s.cam.x) * (ns / s.cam.scale);
+      s.cam.y = my - (my - s.cam.y) * (ns / s.cam.scale);
+      s.cam.scale = ns;
+    };
+
+    const onDown = (ev) => {
+      s.drag = true;
+      s.lastMouse = { x: ev.clientX, y: ev.clientY };
+      wrap.style.cursor = 'grabbing';
+    };
+
+    const onMove = (ev) => {
+      if (s.drag && s.lastMouse) {
+        s.cam.x += ev.clientX - s.lastMouse.x;
+        s.cam.y += ev.clientY - s.lastMouse.y;
+        s.lastMouse = { x: ev.clientX, y: ev.clientY };
+      }
+      // Hit test
+      const r = wrap.getBoundingClientRect();
+      const wx = (ev.clientX - r.left - s.cam.x) / s.cam.scale;
+      const wy = (ev.clientY - r.top  - s.cam.y) / s.cam.scale;
+      let hit = null;
+      for (const b of s.buildings) {
+        const p = bldgPos(b, s.districts);
+        if (wx >= p.x && wx <= p.x + p.w && wy >= p.y && wy <= p.y + p.h) {
+          hit = b; break;
+        }
+      }
+      s.hoveredBuilding = hit;
+      wrap.style.cursor = s.drag ? 'grabbing' : (hit ? 'pointer' : 'grab');
+    };
+
+    const onUp = () => { s.drag = false; };
+
+    const onClick = () => {
+      const b = s.hoveredBuilding;
+      if (b) {
+        onNodeSelect?.(b.id);
+        setPanelNode(b);
+      } else {
+        onNodeSelect?.(null);
+        setPanelNode(null);
+      }
+    };
+
+    wrap.addEventListener('wheel', onWheel, { passive: false });
+    wrap.addEventListener('mousedown', onDown);
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+    wrap.addEventListener('click', onClick);
+
+    // ─── Animation tick ──────────────────────────────────────────────────
+    function tick() {
+      s.cars.forEach(c => { c.t = (c.t + c.speed) % 1; });
+      draw(ctx, s);
+      drawMinimap(mctx, s);
+      s.animId = requestAnimationFrame(tick);
+    }
+    s.animId = requestAnimationFrame(tick);
+
+    return () => {
+      cancelAnimationFrame(s.animId);
+      window.removeEventListener('resize', resize);
+      wrap.removeEventListener('wheel', onWheel);
+      wrap.removeEventListener('mousedown', onDown);
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+      wrap.removeEventListener('click', onClick);
+    };
+  }, [graphData, selectedNode, onNodeSelect]);
+
+  // ── Main draw ───────────────────────────────────────────────────────────────
+
+  function draw(ctx, s) {
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, s.W, s.H);
+
+    // Background
+    ctx.fillStyle = '#0a0d14';
+    ctx.fillRect(0, 0, s.W, s.H);
+
+    // Apply camera
+    ctx.setTransform(s.cam.scale, 0, 0, s.cam.scale, s.cam.x, s.cam.y);
+
+    // Grid
+    ctx.strokeStyle = 'rgba(255,255,255,0.015)';
+    ctx.lineWidth = 0.5;
+    const worldW = 3000, worldH = 3000;
+    for (let x = 0; x < worldW; x += 80) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, worldH); ctx.stroke(); }
+    for (let y = 0; y < worldH; y += 80) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(worldW, y); ctx.stroke(); }
+
+    // Roads (draw under everything)
+    s.roads.forEach(r => drawRoad(ctx, r, s));
+
+    // Districts
+    s.districts.forEach(d => drawDistrict(ctx, d));
+
+    // Buildings
+    s.buildings.forEach(b => {
+      const hovered = s.hoveredBuilding?.id === b.id;
+      const selected = selectedNode === b.id;
+      const impacted = impactNodes?.has?.(b.id);
+      const inFlow   = flowNodes?.has?.(b.id);
+      drawBuilding(ctx, b, hovered, selected, impacted, inFlow, s);
+    });
+
+    // Landmarks
+    s.landmarks.forEach(lm => drawLandmark(ctx, lm));
+
+    // Cars
+    s.cars.forEach(car => drawCar(ctx, car));
+
+    // You Are Here pin
+    if (selectedNode) {
+      const b = s.buildingById.get(selectedNode);
+      if (b) {
+        const p = bldgPos(b, s.districts);
+        drawPin(ctx, p.cx, p.y - 4);
+      }
+    }
+  }
+
+  // ── Rendering primitives ────────────────────────────────────────────────────
+
+  function drawDistrict(ctx, d) {
+    // Background fill
+    ctx.fillStyle = d.color + '0a';
+    ctx.strokeStyle = d.color + '38';
+    ctx.lineWidth = 1.5;
+    roundRect(ctx, d.x, d.y, d.w, d.h, 10);
+    ctx.fill(); ctx.stroke();
+
+    // Header bar
+    ctx.fillStyle = d.color + '1a';
+    roundRect(ctx, d.x, d.y, d.w, HEADER_H, 10);
+    ctx.fill();
+
+    // Label = real directory name (larger, bolder)
+    ctx.fillStyle = d.color + 'dd';
+    ctx.font = 'bold 12px "SF Mono", "Fira Code", monospace';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    // Show short label prominently
+    ctx.fillText(d.label.toUpperCase(), d.x + 12, d.y + HEADER_H / 2);
+
+    // Full path subtitle (dimmer, smaller)
+    ctx.fillStyle = d.color + '66';
+    ctx.font = '9px monospace';
+    ctx.fillText(d.fullPath, d.x + 12, d.y + HEADER_H + 10);
+
+    // File count badge
+    ctx.fillStyle = d.color + '44';
+    const badge = `${d.files.length} files`;
+    const bw = ctx.measureText(badge).width + 12;
+    roundRect(ctx, d.x + d.w - bw - 10, d.y + 8, bw, 20, 5);
+    ctx.fill();
+    ctx.fillStyle = '#fffa';
+    ctx.font = 'bold 10px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(badge, d.x + d.w - bw / 2 - 10, d.y + 18);
+  }
+
+  const HEADER_H = 36;
+
+  function drawBuilding(ctx, b, hovered, selected, impacted, inFlow, s) {
+    const p = bldgPos(b, s.districts);
+    const { x, y, w, h, d } = p;
+    if (!d) return;
+
+    // Glow for impact/flow
+    if (impacted) {
+      ctx.shadowColor = '#ef4444';
+      ctx.shadowBlur = 14;
+    } else if (inFlow) {
+      ctx.shadowColor = '#22d3ee';
+      ctx.shadowBlur = 14;
+    }
+
+    // Body
+    const bodyColor = selected ? '#1a1f38' : hovered ? '#161b30' : '#111525';
+    ctx.fillStyle = bodyColor;
+    ctx.strokeStyle = selected ? '#ffffffcc' : hovered ? d.color : d.color + '40';
+    ctx.lineWidth = selected ? 2.5 : hovered ? 2 : 1;
+    roundRect(ctx, x, y, w, h, 6);
+    ctx.fill(); ctx.stroke();
+
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
+
+    // Roof triangle
+    ctx.beginPath();
+    ctx.moveTo(x + 6, y);
+    ctx.lineTo(x + w / 2, y - 14);
+    ctx.lineTo(x + w - 6, y);
+    ctx.closePath();
+    ctx.fillStyle = d.color + (hovered || selected ? 'bb' : '55');
+    ctx.fill();
+
+    // Windows: rows based on LOC, color hints at language
+    const winRows = Math.max(1, Math.min(5, Math.ceil(b.loc / 60)));
+    const winColor = b.language === 'python' ? '#3b82f655' : b.language === 'javascript' ? '#fbbf2444' : '#1e2a4a';
+    ctx.fillStyle = hovered || selected ? '#fbbf2455' : winColor;
+    for (let r = 0; r < winRows; r++) {
+      const wy = y + 8 + r * 11;
+      if (wy + 8 > y + h - 14) break;
+      roundRect(ctx, x + 8, wy, 10, 8, 2); ctx.fill();
+      roundRect(ctx, x + w / 2 - 5, wy, 10, 8, 2); ctx.fill();
+      roundRect(ctx, x + w - 18, wy, 10, 8, 2); ctx.fill();
+    }
+
+    // Door
+    ctx.fillStyle = d.color + '44';
+    roundRect(ctx, x + w / 2 - 5, y + h - 12, 10, 12, 3);
+    ctx.fill();
+
+    // File name label (REAL name) — larger and always visible
+    ctx.fillStyle = hovered || selected ? '#ffffffee' : '#c8d0e0aa';
+    ctx.font = `bold 9px "SF Mono", monospace`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillText(b.label, x + w / 2, y + h + 5);
+
+    // LOC + func badge on hover
+    if (hovered || selected) {
+      const badgeText = `${b.loc} LOC · ${b.funcs}fn`;
+      const tw = ctx.measureText(badgeText).width + 12;
+      ctx.fillStyle = '#000c';
+      roundRect(ctx, x + w / 2 - tw / 2, y - 26, tw, 14, 4);
+      ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 8px monospace';
+      ctx.fillText(badgeText, x + w / 2, y - 19);
+    }
+  }
+
+  function drawRoad(ctx, road, s) {
+    const { ax, ay, bx, by, type } = road;
+
+    // Road surface
+    ctx.beginPath();
+    const mx = (ax + bx) / 2, my = (ay + by) / 2;
+    const dx = bx - ax, dy = by - ay;
+    const len = Math.sqrt(dx * dx + dy * dy) || 1;
+    const off = Math.min(30, len * 0.12);
+    const nx = (-dy / len) * off, ny = (dx / len) * off;
+    ctx.moveTo(ax, ay);
+    ctx.quadraticCurveTo(mx + nx, my + ny, bx, by);
+
+    // Asphalt
+    ctx.strokeStyle = '#151a28';
+    ctx.lineWidth = 8;
+    ctx.stroke();
+
+    // Lane markings
+    ctx.setLineDash([6, 8]);
+    ctx.strokeStyle = type === 'imports' ? '#6366f122' : '#f59e0b18';
+    ctx.lineWidth = 0.8;
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Direction arrow at midpoint
+    const mid = quadBezier(ax, ay, bx, by, 0.5);
+    ctx.save();
+    ctx.translate(mid.x, mid.y);
+    ctx.rotate(mid.angle);
+    ctx.fillStyle = type === 'imports' ? '#6366f144' : '#f59e0b33';
+    ctx.beginPath();
+    ctx.moveTo(6, 0);
+    ctx.lineTo(-3, -3);
+    ctx.lineTo(-3, 3);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawCar(ctx, car) {
+    const { road, t, color } = car;
+    const p = quadBezier(road.ax, road.ay, road.bx, road.by, t);
+
+    // Trail
+    ctx.beginPath();
+    ctx.moveTo(p.x, p.y);
+    for (let i = 1; i <= 4; i++) {
+      const tp = quadBezier(road.ax, road.ay, road.bx, road.by, Math.max(0, t - i * 0.04));
+      ctx.lineTo(tp.x, tp.y);
+    }
+    ctx.strokeStyle = color + '33';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Car body
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.angle);
+    ctx.fillStyle = color;
+    roundRect(ctx, -6, -3.5, 12, 7, 2);
+    ctx.fill();
+    // Headlights
+    ctx.fillStyle = '#ffffffaa';
+    ctx.fillRect(4.5, -2.5, 1.5, 1.5);
+    ctx.fillRect(4.5, 1, 1.5, 1.5);
+    ctx.restore();
+  }
+
+  function drawLandmark(ctx, lm) {
+    const now = Date.now();
+    const pulse = 1 + Math.sin(now / 600) * 0.15;
+
+    ctx.save();
+    ctx.translate(lm.x, lm.y);
+    ctx.scale(pulse, pulse);
+
+    // Star
+    ctx.fillStyle = '#f59e0b';
+    ctx.font = 'bold 10px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('★', 0, 0);
+    ctx.restore();
+
+    // Label
+    ctx.fillStyle = '#f59e0bcc';
+    ctx.font = 'bold 7px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(lm.label, lm.x, lm.y - 10);
+  }
+
+  function drawPin(ctx, cx, cy) {
+    const now = Date.now();
+    const bob = Math.sin(now / 250) * 2;
+
+    ctx.save();
+    ctx.translate(cx, cy - 18 + bob);
+    // Pin body
+    ctx.beginPath();
+    ctx.moveTo(0, 12);
+    ctx.lineTo(-6, 0);
+    ctx.arc(0, 0, 6, Math.PI, 0);
+    ctx.lineTo(0, 12);
+    ctx.closePath();
+    ctx.fillStyle = '#ef4444';
+    ctx.fill();
+    ctx.strokeStyle = '#fff3';
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
+    // Dot
+    ctx.beginPath();
+    ctx.arc(0, 0, 2.5, 0, Math.PI * 2);
+    ctx.fillStyle = '#fff';
+    ctx.fill();
+    ctx.restore();
+
+    // Radar pulse on ground
+    const r = ((now % 1200) / 1200) * 30;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.strokeStyle = `rgba(239,68,68,${1 - r / 30})`;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+
+  // ── Minimap ─────────────────────────────────────────────────────────────────
+
+  function drawMinimap(mctx, s) {
+    const MW = 140, MH = 100;
+    mctx.fillStyle = '#0d1117';
+    mctx.fillRect(0, 0, MW, MH);
+
+    if (!s.districts.length) return;
+
+    // Compute world bounds
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    s.districts.forEach(d => {
+      minX = Math.min(minX, d.x); minY = Math.min(minY, d.y);
+      maxX = Math.max(maxX, d.x + d.w); maxY = Math.max(maxY, d.y + d.h);
+    });
+    const wW = maxX - minX || 1, wH = maxY - minY || 1;
+    const msc = Math.min((MW - 8) / wW, (MH - 8) / wH);
+    const ox = 4 - minX * msc, oy = 4 - minY * msc;
+
+    // Districts
+    s.districts.forEach(d => {
+      mctx.fillStyle = d.color + '33';
+      mctx.fillRect(d.x * msc + ox, d.y * msc + oy, d.w * msc, d.h * msc);
+    });
+
+    // Cars
+    s.cars.forEach(car => {
+      const p = quadBezier(car.road.ax, car.road.ay, car.road.bx, car.road.by, car.t);
+      mctx.fillStyle = car.color;
+      mctx.beginPath();
+      mctx.arc(p.x * msc + ox, p.y * msc + oy, 1.2, 0, Math.PI * 2);
+      mctx.fill();
+    });
+
+    // Viewport rect
+    const vx = (-s.cam.x / s.cam.scale) * msc + ox;
+    const vy = (-s.cam.y / s.cam.scale) * msc + oy;
+    const vw = (s.W / s.cam.scale) * msc;
+    const vh = (s.H / s.cam.scale) * msc;
+    mctx.strokeStyle = '#ffffff55';
+    mctx.lineWidth = 1;
+    mctx.strokeRect(vx, vy, vw, vh);
+  }
+
+  // ── JSX Layout ──────────────────────────────────────────────────────────────
+
   return (
-    <>
-      <style>{STYLES}</style>
-      <div className="prism-root">
+    <div
+      ref={wrapRef}
+      className="w-full h-full relative bg-[#0a0d14] rounded-xl overflow-hidden border border-white/5"
+      style={{ cursor: 'grab' }}
+    >
+      <canvas ref={canvasRef} className="block" />
 
-        {/* ── Canvas ── */}
-        <div className="prism-canvas-wrap" ref={containerRef}>
-          <svg
-            ref={svgRef}
-            className="prism-svg"
-            width={dimensions.width}
-            height={dimensions.height}
-          />
-
-          {/* Stats bar */}
-          {graphData && (
-            <div className="prism-stats">
-              <div className="prism-stat-pill">
-                <span className="prism-stat-num">{visibleNodes.length}</span> nodes
-              </div>
-              <div className="prism-stat-pill">
-                <span className="prism-stat-num">{visibleEdges.length}</span> edges
-              </div>
-              <div className="prism-stat-pill">
-                <span className="prism-stat-num">
-                  {new Set(visibleNodes.map(n => n.type)).size}
-                </span> types
-              </div>
-            </div>
-          )}
-
-          {/* Info panel */}
-          {panelNode && (
-            <div className="prism-panel">
-              <div className="prism-panel-header">
-                <span className="prism-panel-title">Node Detail</span>
-                <button
-                  className="prism-panel-close"
-                  onClick={e => { e.stopPropagation(); setPanelNode(null); onNodeSelect?.(null); }}
-                >
-                  ✕
-                </button>
-              </div>
-              <div className="prism-panel-body">
-                <div className="prism-node-name">{panelNode.label}</div>
-                <div className={`prism-type-badge prism-badge-${panelNode.type}`}>
-                  {panelNode.type}
-                </div>
-                <div className="prism-panel-row">
-                  <span className="prism-row-label">Imports</span>
-                  <span className="prism-row-val">{panelStats.imports}</span>
-                </div>
-                <div className="prism-panel-row">
-                  <span className="prism-row-label">Calls</span>
-                  <span className="prism-row-val">{panelStats.calls}</span>
-                </div>
-                <div className="prism-panel-row">
-                  <span className="prism-row-label">Dependents</span>
-                  <span className="prism-row-val">{panelStats.dependents}</span>
-                </div>
-                <div className="prism-panel-row">
-                  <span className="prism-row-label">Risk</span>
-                  <span
-                    className="prism-row-val"
-                    style={{ color: RISK_COLORS[panelStats.risk] }}
-                  >
-                    {panelStats.risk}
-                  </span>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Legend */}
-          <div className="prism-legend">
-            {Object.entries(NODE_COLORS).map(([type, color]) => (
-              <div
-                key={type}
-                className={`prism-leg-item${hiddenTypes.has(type) ? ' hidden' : ''}`}
-                onClick={() => toggleType(type)}
-              >
-                <div
-                  className="prism-leg-dot"
-                  style={{
-                    background: color,
-                    boxShadow: `0 0 5px ${NODE_GLOW[type]}`,
-                  }}
-                />
-                <span className="prism-leg-label">{type}</span>
-              </div>
-            ))}
-
-            <div className="prism-leg-sep" />
-
-            <div className="prism-leg-edge">
-              <div className="prism-edge-solid" />
-              <span className="prism-leg-label">imports</span>
-            </div>
-            <div className="prism-leg-edge">
-              <div className="prism-edge-dash" />
-              <span className="prism-leg-label">calls</span>
-            </div>
-          </div>
-
-          {/* Empty state */}
-          {!graphData && (
-            <div className="prism-empty">
-              <div className="prism-empty-icon">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                  <path d="M12 3L20 7.5V16.5L12 21L4 16.5V7.5L12 3Z" stroke="#6366f1" strokeWidth="1.5" />
-                  <circle cx="12" cy="12" r="2" fill="#6366f1" />
-                </svg>
-              </div>
-              <div className="prism-empty-title">Load a repository to begin</div>
-              <div className="prism-empty-sub">Supports GitHub URLs · GitLab · local paths</div>
-            </div>
-          )}
+      {/* HUD: Title */}
+      <div className="absolute top-4 left-4 pointer-events-none select-none">
+        <div className="text-white font-bold text-xs tracking-[0.2em] bg-black/50 px-3 py-1 rounded backdrop-blur-sm">PRISMCODE</div>
+        <div className="text-[#4b5072] text-[9px] font-mono bg-black/40 px-3 py-0.5 rounded backdrop-blur-sm border border-white/5 mt-1">
+          {'// CODEBASE CITY \u00b7 LIVE DEPENDENCY MAP'}
         </div>
       </div>
-    </>
+
+      {/* HUD: Legend */}
+      <div className="absolute bottom-4 left-4 bg-black/60 border border-white/10 p-3 rounded-lg backdrop-blur-md flex flex-col gap-1.5 min-w-[160px] select-none">
+        <div className="text-[8px] text-slate-500 uppercase tracking-wider font-bold mb-1">Legend</div>
+        <div className="flex items-center gap-2 text-[9px] text-slate-400 font-mono">
+          <div className="w-2.5 h-2.5 rounded-sm" style={{ background: '#6366f1' }} /> District (Directory)
+        </div>
+        <div className="flex items-center gap-2 text-[9px] text-slate-400 font-mono">
+          <div className="w-2.5 h-2.5 bg-[#111422] border border-white/20 rounded-sm" /> File (Building)
+        </div>
+        <div className="flex items-center gap-2 text-[9px] text-slate-400 font-mono">
+          <div className="w-2.5 h-2.5 bg-amber-500 rounded-full" /> Critical Landmark
+        </div>
+        <div className="flex items-center gap-2 text-[9px] text-slate-400 font-mono">
+          <div className="w-2.5 h-2.5 bg-indigo-400 rounded-sm" /> Import Traffic
+        </div>
+        <div className="flex items-center gap-2 text-[9px] text-slate-400 font-mono">
+          <div className="w-2.5 h-2.5 bg-amber-400 rounded-sm" /> Call Traffic
+        </div>
+      </div>
+
+      {/* HUD: Minimap */}
+      <div className="absolute bottom-4 right-4 w-[140px] h-[100px] bg-black/80 border border-white/10 rounded-lg overflow-hidden ring-1 ring-white/5">
+        <canvas ref={mmRef} width={140} height={100} />
+      </div>
+
+      {/* HUD: Selection Panel */}
+      {panelNode && (
+        <div className="absolute top-4 right-4 w-64 bg-[#0c0f18]/95 border border-white/10 rounded-xl shadow-2xl backdrop-blur-xl">
+          <div className="p-3 border-b border-white/5 flex justify-between items-center bg-white/[0.03]">
+            <div className="text-[9px] font-bold text-slate-400 tracking-widest uppercase">Building Inspector</div>
+            <button onClick={() => setPanelNode(null)} className="text-slate-500 hover:text-white transition-colors text-xs">✕</button>
+          </div>
+          <div className="p-4">
+            <div className="text-white font-bold text-sm mb-0.5 truncate">{panelNode.label}</div>
+            <div className="text-[10px] text-slate-500 font-mono mb-3 truncate">{panelNode.id}</div>
+
+            <div className="flex gap-1.5 mb-4">
+              <span className="px-2 py-0.5 bg-indigo-500/20 border border-indigo-500/30 text-indigo-400 text-[8px] rounded uppercase font-bold">
+                {panelNode.language}
+              </span>
+              {panelNode.score > 3 && (
+                <span className="px-2 py-0.5 bg-amber-500/20 border border-amber-500/30 text-amber-400 text-[8px] rounded uppercase font-bold">hub</span>
+              )}
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              {[
+                ['Lines of Code',  panelNode.loc],
+                ['Functions',      panelNode.funcs],
+                ['Classes',        panelNode.classes],
+                ['Imports',        panelNode.imports],
+                ['Connections',    panelNode.score],
+              ].map(([k, v]) => (
+                <div key={k} className="flex justify-between text-[11px] py-1 border-b border-white/5">
+                  <span className="text-slate-500">{k}</span>
+                  <span className="text-slate-200 font-mono font-bold">{v}</span>
+                </div>
+              ))}
+            </div>
+
+            {panelNode.docstring && (
+              <div className="mt-3 text-[10px] text-slate-400 italic border-t border-white/5 pt-2">
+                {panelNode.docstring.slice(0, 120)}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
