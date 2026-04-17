@@ -1,0 +1,16 @@
+# Local development environment
+backend/venv/
+backend/__pycache__/
+frontend/node_modules/
+**/node_modules/
+
+# Local data / cloned repos
+backend/data/repos/
+
+# Local build artifacts
+frontend/dist/
+
+# OS / Secrets
+.env
+backend/.env
+.DS_Store
