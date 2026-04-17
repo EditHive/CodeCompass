@@ -1,0 +1,143 @@
+@import "tailwindcss";
+
+@theme {
+  --color-prism-bg: #000000;
+  --color-prism-surface: #0a0a0a;
+  --color-prism-surface-2: #111111;
+  --color-prism-surface-hover: #1a1a1a;
+  --color-prism-border: #222222;
+  --color-prism-border-2: #333333;
+  --color-prism-text: #ffffff;
+  --color-prism-text-dim: #888888;
+  
+  /* Minimalist accent colors (used sparingly) */
+  --color-prism-accent: #3b82f6;     /* Sharp Blue */
+  --color-prism-cyan: #d4d4d4;       /* Actually rendering silver/grey for pure minimalist mode */
+  --color-prism-rose: #ef4444;       
+  --color-prism-amber: #f59e0b;      
+  --color-prism-emerald: #10b981;    
+
+  --font-family-sans: 'Geist', 'Inter', system-ui, -apple-system, sans-serif;
+  --font-family-mono: 'Geist Mono', 'JetBrains Mono', monospace;
+}
+
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('https://cdn.jsdelivr.net/fontsource/fonts/geist-sans@latest/latin-400-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('https://cdn.jsdelivr.net/fontsource/fonts/geist-mono@latest/latin-400-normal.woff2') format('woff2');
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--font-family-sans);
+  background-color: var(--color-prism-bg);
+  color: var(--color-prism-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-prism-border-2);
+  border-radius: 0px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-prism-text-dim);
+}
+
+/* Linear/Vercel inspired sharp panel */
+.glass-strong, .glass, .glass-panel {
+  background: var(--color-prism-surface);
+  border: 1px solid var(--color-prism-border);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* Strip out all glows for a flat, technical aesthetic */
+.glow-accent, .glow-cyan, .glow-rose, .glow-amber, .glow-emerald {
+  box-shadow: none !important;
+}
+
+/* Animations */
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in { animation: slide-up 0.2s ease-out forwards; }
+.animate-slide-in { animation: slide-up 0.2s ease-out forwards; }
+
+/* Flat terminal-like code blocks */
+.code-block {
+  background: #050505;
+  border: 1px solid #222222;
+  border-radius: 4px;
+  padding: 12px 16px;
+  font-family: var(--font-family-mono);
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-x: auto;
+  white-space: pre;
+  color: #d4d4d4;
+}
+
+/* Flat minimalist inputs */
+.premium-input {
+  background: #000000;
+  border: 1px solid var(--color-prism-border-2);
+  color: var(--color-prism-text);
+  transition: all 0.1s ease;
+  border-radius: 4px;
+}
+
+.premium-input:focus {
+  outline: none;
+  border-color: #555555;
+  background: #050505;
+}
+
+/* Flat sharp buttons */
+.btn-primary {
+  background: #ffffff;
+  color: #000000;
+  border: 1px solid #ffffff;
+  border-radius: 4px;
+  font-weight: 600;
+  transition: all 0.1s ease;
+}
+.btn-primary:hover:not(:disabled) {
+  background: #e5e5e5;
+  border-color: #e5e5e5;
+}
+.btn-primary:active:not(:disabled) {
+  transform: scale(0.98);
+}
