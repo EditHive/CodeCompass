@@ -12,6 +12,16 @@ from pathlib import Path
 from typing import Dict, Any, Optional, List
 from contextlib import asynccontextmanager
 
+# Prevent Errno 5: Input/output error when running as a daemon
+try:
+    sys.stdout.fileno()
+except OSError:
+    sys.stdout = open('/tmp/prism_stdout.log', 'a')
+try:
+    sys.stderr.fileno()
+except OSError:
+    sys.stderr = open('/tmp/prism_stderr.log', 'a')
+
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -226,6 +236,9 @@ async def analyze_codebase(req: AnalyzeRequest):
     except git.exc.GitCommandError as e:
         raise HTTPException(status_code=400, detail=f"Failed to clone repository: {e}")
     except Exception as e:
+        import traceback
+        with open("/tmp/error.log", "w") as f:
+            traceback.print_exc(file=f)
         raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")
 
 

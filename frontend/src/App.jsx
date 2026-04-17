@@ -24,7 +24,7 @@ export default function App() {
 
   const { data: graphData, execute: loadGraph } = useApi(getGraph);
   const { data: statsData, execute: loadStats } = useApi(getGraphStats);
-  const { loading: analyzeLoading, execute: runAnalyze } = useApi(analyzeCodebase);
+  const { loading: analyzeLoading, error: analyzeError, execute: runAnalyze } = useApi(analyzeCodebase);
   const { data: healthData, execute: checkHealth } = useApi(healthCheck);
 
   // Check if backend is ready and has pre-analyzed data
@@ -86,6 +86,17 @@ export default function App() {
 
   const isAnalyzed = !!graphData;
 
+  // Tool panel names for header
+  const TOOL_LABELS = {
+    impact: 'Impact Analysis',
+    flow: 'Flow Tracer',
+    search: 'Code Search',
+    explain: 'Explainer',
+    git: 'Git Intelligence',
+    smells: 'Code Smells',
+    onboarding: 'Onboarding',
+  };
+
   // Determine which side panel to show
   const renderSidePanel = () => {
     switch (activeView) {
@@ -112,20 +123,20 @@ export default function App() {
   const showSidePanel = activeView !== 'graph' && sidePanel;
 
   return (
-    <div className="w-screen h-screen flex flex-col overflow-hidden bg-[#000] font-sans">
-      <TopNav 
-        activeTab={activeView} 
-        onTabChange={setActiveView} 
+    <div className="w-screen h-screen flex flex-col overflow-hidden bg-prism-bg font-sans">
+      <TopNav
+        activeTab={activeView}
+        onTabChange={setActiveView}
         isAnalyzed={isAnalyzed}
         stats={statsData}
         repoPath={repoPath}
         onUploadClick={() => setShowUpload(true)}
       />
 
-      {/* Main Studio Area */}
-      <main className="flex-1 relative z-0">
-        
-        {/* Full-bleed Graph Viewer */}
+      {/* Main Studio */}
+      <main className="flex-1 relative z-0 overflow-hidden">
+
+        {/* Graph Canvas (always full bleed) */}
         <div className="absolute inset-0">
           <GraphCanvas
             graphData={graphData}
@@ -136,22 +147,32 @@ export default function App() {
           />
         </div>
 
-        {/* Floating Tool Window (Replaces Sidebar contents) */}
+        {/* Floating Tool Panel */}
         {showSidePanel && (
-          <div className="absolute top-4 right-4 bottom-4 w-[380px] bg-[#0a0a0a] border border-[#222] rounded-[6px] shadow-2xl flex flex-col overflow-hidden z-20">
-            <div className="h-8 border-b border-[#222] bg-[#111] flex items-center px-3 shrink-0">
-               <span className="text-[10px] font-mono text-[#888] uppercase tracking-wider">{activeView.replace('graph', '')} TOOL</span>
-               <button onClick={() => setActiveView('graph')} className="ml-auto text-[#888] hover:text-white px-1">✕</button>
+          <div className="absolute top-3 right-3 bottom-3 w-[380px] glass-panel rounded-xl flex flex-col overflow-hidden z-20 animate-slide-in">
+            {/* Panel header */}
+            <div className="h-10 border-b border-prism-border bg-prism-surface-2/50 flex items-center px-4 shrink-0">
+              <span className="text-[11px] font-semibold text-prism-text-dim uppercase tracking-wider">
+                {TOOL_LABELS[activeView] || activeView}
+              </span>
+              <button
+                onClick={() => setActiveView('graph')}
+                className="ml-auto w-6 h-6 rounded-md flex items-center justify-center text-prism-text-dim hover:text-prism-text hover:bg-prism-surface-2 transition-all cursor-pointer"
+              >
+                ✕
+              </button>
             </div>
-            <div className="flex-1 overflow-auto bg-[#000]">
+            {/* Panel content */}
+            <div className="flex-1 overflow-auto">
               {sidePanel}
             </div>
           </div>
         )}
 
-        {/* Node Details Floating Modal */}
+        {/* Node Details Floating Modal — shifts left when side panel is open */}
         {selectedNodeData && (
-          <div className="absolute bottom-4 right-4 z-40 shadow-2xl rounded-[6px] overflow-hidden border border-[#222]">
+          <div className={`absolute bottom-3 z-40 ${showSidePanel ? 'right-[396px]' : 'right-3'}`}
+               style={{ transition: 'right 0.2s ease' }}>
             <NodeDetail
               nodeId={selectedNode}
               nodeData={selectedNodeData}
@@ -162,9 +183,11 @@ export default function App() {
 
       </main>
 
-      {/* Upload Modal */}
+      {/* Upload Overlay — fixed to cover entire screen */}
       {showUpload && (
-        <RepoUpload onAnalyze={handleAnalyze} loading={analyzeLoading} />
+        <div className="fixed inset-0 z-50">
+          <RepoUpload onAnalyze={handleAnalyze} loading={analyzeLoading} error={analyzeError} />
+        </div>
       )}
     </div>
   );

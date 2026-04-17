@@ -1,0 +1,85 @@
+INFO:     Started server process [72118]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+🔷 PRISM-CODE starting up...
+🤖 Groq LLM connected successfully
+📂 Auto-analyzing sample repo: /Users/Anurag/Documents/Zero/backend/sample_repo
+✅ Sample repo analyzed successfully
+📥 Cloning remote repo https://github.com/EditHive/Visual-Vortex-Prototype into /Users/Anurag/Documents/Zero/backend/data/repos/Visual-Vortex-Prototype...
+INFO:     127.0.0.1:60199 - "POST /api/analyze HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60338 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60339 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60340 - "GET /api/graph HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60341 - "GET /api/graph HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60342 - "GET /api/graph/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60343 - "GET /api/graph/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60364 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60365 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60366 - "GET /api/graph HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60367 - "GET /api/graph HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60368 - "GET /api/graph/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60369 - "GET /api/graph/stats HTTP/1.1" 200 OK
+🗑️ Removing existing clone at /Users/Anurag/Documents/Zero/backend/data/repos/Visual-Vortex-Prototype
+📥 Cloning remote repo https://github.com/EditHive/Visual-Vortex-Prototype into /Users/Anurag/Documents/Zero/backend/data/repos/Visual-Vortex-Prototype...
+INFO:     127.0.0.1:60384 - "POST /api/analyze HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60388 - "GET /api/graph HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60391 - "GET /api/graph/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60394 - "GET /api/git/analysis HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60397 - "GET /api/git/analysis HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60400 - "GET /api/smells HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60403 - "GET /api/smells HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60406 - "GET /api/onboarding HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60409 - "GET /api/onboarding HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60478 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60479 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60480 - "GET /api/graph HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60481 - "GET /api/graph HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60482 - "GET /api/graph/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60484 - "GET /api/graph/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60507 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60509 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60510 - "GET /api/graph HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60511 - "GET /api/graph HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60512 - "GET /api/graph/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60513 - "GET /api/graph/stats HTTP/1.1" 200 OK
+🗑️ Removing existing clone at /Users/Anurag/Documents/Zero/backend/data/repos/Visual-Vortex-Prototype
+📥 Cloning remote repo https://github.com/EditHive/Visual-Vortex-Prototype into /Users/Anurag/Documents/Zero/backend/data/repos/Visual-Vortex-Prototype...
+INFO:     127.0.0.1:60577 - "POST /api/analyze HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60581 - "GET /api/graph HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60584 - "GET /api/graph/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60593 - "GET /api/nodes HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60596 - "GET /api/graph/node/app/page.tsx HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60599 - "POST /api/flow HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60607 - "POST /api/flow HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60992 - "GET /docs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60992 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61030 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61030 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61032 - "GET /docs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61032 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61035 - "GET /static/index.html HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61104 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61105 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61106 - "GET /api/graph HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61107 - "GET /api/graph HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61108 - "GET /api/graph/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61109 - "GET /api/graph/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61231 - "GET /api/graph/node/app/components/layout/GameShell.tsx HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61234 - "GET /api/graph/node/app/page.tsx HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61238 - "GET /api/graph/node/next.config.ts HTTP/1.1" 200 OK
+📥 Cloning remote repo https://github.com/EditHive/Voke_AWS into /Users/Anurag/Documents/Zero/backend/data/repos/Voke_AWS...
+INFO:     127.0.0.1:61260 - "POST /api/analyze HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61268 - "GET /api/graph HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61271 - "GET /api/graph/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61279 - "GET /api/graph/node/src/pages/Leaderboard.tsx%3A%3ALeaderboard HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61284 - "GET /api/graph/node/src/pages/Privacy.tsx HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61297 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61324 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61326 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61327 - "GET /api/graph HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61328 - "GET /api/graph HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61329 - "GET /api/graph/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61330 - "GET /api/graph/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61333 - "GET /api/smells HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61336 - "GET /api/smells HTTP/1.1" 200 OK
