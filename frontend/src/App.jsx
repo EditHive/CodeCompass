@@ -149,18 +149,14 @@ export default function App() {
         {/* Floating Tool Panel */}
         {showSidePanel && (
           <div className="absolute top-2 right-2 bottom-2 w-[370px] rounded-2xl flex flex-col overflow-hidden z-20 animate-slide-in border border-prism-border/60" style={{ background: 'rgba(9, 9, 11, 0.95)', backdropFilter: 'blur(24px)', boxShadow: '0 8px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.03)' }}>
-            {/* Panel header */}
-            <div className="h-11 border-b border-prism-border/60 flex items-center px-4 shrink-0" style={{ background: 'rgba(15, 15, 18, 0.6)' }}>
-              <span className="text-[12px] font-semibold text-prism-text tracking-wide">
-                {TOOL_LABELS[activeView] || activeView}
-              </span>
-              <button
-                onClick={() => setActiveView('graph')}
-                className="ml-auto w-7 h-7 rounded-lg flex items-center justify-center text-prism-text-muted hover:text-prism-text hover:bg-white/5 transition-all cursor-pointer text-[14px]"
-              >
-                ✕
-              </button>
-            </div>
+            {/* Floating Close Button */}
+            <button
+              onClick={() => setActiveView('graph')}
+              className="absolute top-3 right-3 z-50 w-7 h-7 rounded-lg flex items-center justify-center text-prism-text-muted hover:text-prism-text hover:bg-white/10 transition-all cursor-pointer text-[14px]"
+              style={{ background: 'rgba(15,15,18,0.4)', backdropFilter: 'blur(8px)' }}
+            >
+              ✕
+            </button>
             {/* Panel content */}
             <div className="flex-1 overflow-auto">
               {sidePanel}

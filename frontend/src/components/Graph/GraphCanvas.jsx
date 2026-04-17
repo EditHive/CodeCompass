@@ -12,8 +12,8 @@ export default function GraphCanvas({
   flowNodes,
 }) {
   const canvasRef = useRef(null);
-  const mmRef     = useRef(null);
-  const wrapRef   = useRef(null);
+  const mmRef = useRef(null);
+  const wrapRef = useRef(null);
 
   const [panelNode, setPanelNode] = useState(null);
 
@@ -55,14 +55,14 @@ export default function GraphCanvas({
     });
 
     // ─── B. Compute degree scores for every file ─────────────────────────
-    const inDeg  = new Map();
+    const inDeg = new Map();
     const outDeg = new Map();
     edges.forEach(e => {
       if (e.type === 'contains') return;
       const src = e.source?.id || e.source;
       const tgt = e.target?.id || e.target;
       outDeg.set(src, (outDeg.get(src) || 0) + 1);
-      inDeg.set(tgt,  (inDeg.get(tgt)  || 0) + 1);
+      inDeg.set(tgt, (inDeg.get(tgt) || 0) + 1);
     });
     const score = id => (inDeg.get(id) || 0) + (outDeg.get(id) || 0);
 
@@ -90,7 +90,7 @@ export default function GraphCanvas({
     const ROW_SLOT = ROOF_H + MAX_BLDG_H + LABEL_H + FILE_GAP; // = 144px per row
     const CONTENT_TOP = HEADER + PAD + 10;     // top of first row inside district
 
-    const COLORS = ['#6366f1','#f43f5e','#22d3ee','#10b981','#f59e0b','#a78bfa','#64748b','#ec4899','#14b8a6','#8b5cf6'];
+    const COLORS = ['#6366f1', '#f43f5e', '#22d3ee', '#10b981', '#f59e0b', '#a78bfa', '#64748b', '#ec4899', '#14b8a6', '#8b5cf6'];
 
     s.districts = [];
     s.buildings = [];
@@ -204,12 +204,22 @@ export default function GraphCanvas({
       });
     });
 
-    // ─── E. Spawn cars: one per road, actual direction ───────────────────
+    // ─── E. Spawn cars with semantic coloring ────────────────────────────────
+    function getCarColor(road) {
+      const tgt = road.tgtId.toLowerCase();
+      const isDb = tgt.includes('db') || tgt.includes('database') || tgt.includes('model') || tgt.includes('schema') || tgt.includes('repository');
+      const isApi = tgt.includes('api') || tgt.includes('route') || tgt.includes('controller');
+
+      if (isDb) return '#f43f5e'; // rose/red for database traffic
+      if (isApi) return '#22d3ee'; // cyan for api traffic
+      return road.type === 'imports' ? '#818cf8' : '#fbbf24'; // indigo for imports, yellow for standard func calls
+    }
+
     s.cars = s.roads.map((road, i) => ({
       road,
       t: Math.random(),
       speed: 0.0015 + Math.random() * 0.001,
-      color: road.type === 'imports' ? '#818cf8' : '#fbbf24',
+      color: getCarColor(road),
     }));
 
     // ─── F. Auto-fit camera ──────────────────────────────────────────────
@@ -253,7 +263,7 @@ export default function GraphCanvas({
   function fitCamera(s) {
     let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
     s.districts.forEach(d => {
-      minX = Math.min(minX, d.x);       minY = Math.min(minY, d.y);
+      minX = Math.min(minX, d.x); minY = Math.min(minY, d.y);
       maxX = Math.max(maxX, d.x + d.w); maxY = Math.max(maxY, d.y + d.h);
     });
     const pad = 60;
@@ -303,18 +313,18 @@ export default function GraphCanvas({
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    const mm     = mmRef.current;
-    const wrap   = wrapRef.current;
+    const mm = mmRef.current;
+    const wrap = wrapRef.current;
     if (!canvas || !mm || !wrap) return;
 
-    const ctx  = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d');
     const mctx = mm.getContext('2d');
-    const s    = S.current;
+    const s = S.current;
 
     function resize() {
       s.W = wrap.clientWidth;
       s.H = wrap.clientHeight;
-      canvas.width  = s.W;
+      canvas.width = s.W;
       canvas.height = s.H;
       if (s.districts.length) fitCamera(s);
     }
@@ -348,7 +358,7 @@ export default function GraphCanvas({
       // Hit test
       const r = wrap.getBoundingClientRect();
       const wx = (ev.clientX - r.left - s.cam.x) / s.cam.scale;
-      const wy = (ev.clientY - r.top  - s.cam.y) / s.cam.scale;
+      const wy = (ev.clientY - r.top - s.cam.y) / s.cam.scale;
       let hit = null;
       for (const b of s.buildings) {
         const p = bldgPos(b, s.districts);
@@ -430,7 +440,7 @@ export default function GraphCanvas({
       const hovered = s.hoveredBuilding?.id === b.id;
       const selected = selectedNode === b.id;
       const impacted = impactNodes?.has?.(b.id);
-      const inFlow   = flowNodes?.has?.(b.id);
+      const inFlow = flowNodes?.has?.(b.id);
       drawBuilding(ctx, b, hovered, selected, impacted, inFlow, s);
     });
 
@@ -526,12 +536,37 @@ export default function GraphCanvas({
     ctx.fillStyle = d.color + (hovered || selected ? 'bb' : '55');
     ctx.fill();
 
+    // Indicators for functions and classes
+    if (b.funcs > 0 || b.classes > 0) {
+      ctx.font = 'bold 7px "SF Mono", monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+
+      const fnText = b.funcs > 0 ? `fn:${b.funcs}` : '';
+      const clsText = b.classes > 0 ? `cls:${b.classes}` : '';
+      const fnW = fnText ? ctx.measureText(fnText).width : 0;
+      const clsW = clsText ? ctx.measureText(clsText).width : 0;
+      const gap = (fnW > 0 && clsW > 0) ? 6 : 0;
+      const totalW = fnW + clsW + gap;
+
+      let dX = x + w / 2 - totalW / 2;
+      if (fnText) {
+        ctx.fillStyle = '#22d3eeaa'; // cyan
+        ctx.fillText(fnText, dX + fnW / 2, y + 2.5);
+        dX += fnW + gap;
+      }
+      if (clsText) {
+        ctx.fillStyle = '#10b981aa'; // emerald
+        ctx.fillText(clsText, dX + clsW / 2, y + 2.5);
+      }
+    }
+
     // Windows: rows based on LOC, color hints at language
     const winRows = Math.max(1, Math.min(5, Math.ceil(b.loc / 60)));
     const winColor = b.language === 'python' ? '#3b82f655' : b.language === 'javascript' ? '#fbbf2444' : '#1e2a4a';
     ctx.fillStyle = hovered || selected ? '#fbbf2455' : winColor;
     for (let r = 0; r < winRows; r++) {
-      const wy = y + 8 + r * 11;
+      const wy = y + 13 + r * 11;
       if (wy + 8 > y + h - 14) break;
       roundRect(ctx, x + 8, wy, 10, 8, 2); ctx.fill();
       roundRect(ctx, x + w / 2 - 5, wy, 10, 8, 2); ctx.fill();
@@ -764,10 +799,16 @@ export default function GraphCanvas({
           <div className="w-2.5 h-2.5 bg-amber-500 rounded-full" /> Critical Landmark
         </div>
         <div className="flex items-center gap-2 text-[9px] text-slate-400 font-mono">
-          <div className="w-2.5 h-2.5 bg-indigo-400 rounded-sm" /> Import Traffic
+          <div className="w-2.5 h-2.5 bg-rose-500 rounded-sm" /> Database Traffic
+        </div>
+        <div className="flex items-center gap-2 text-[9px] text-slate-400 font-mono">
+          <div className="w-2.5 h-2.5 bg-cyan-400 rounded-sm" /> API Traffic
         </div>
         <div className="flex items-center gap-2 text-[9px] text-slate-400 font-mono">
           <div className="w-2.5 h-2.5 bg-amber-400 rounded-sm" /> Call Traffic
+        </div>
+        <div className="flex items-center gap-2 text-[9px] text-slate-400 font-mono">
+          <div className="w-2.5 h-2.5 bg-indigo-400 rounded-sm" /> Import Traffic
         </div>
       </div>
 
@@ -798,11 +839,11 @@ export default function GraphCanvas({
 
             <div className="flex flex-col gap-1.5">
               {[
-                ['Lines of Code',  panelNode.loc],
-                ['Functions',      panelNode.funcs],
-                ['Classes',        panelNode.classes],
-                ['Imports',        panelNode.imports],
-                ['Connections',    panelNode.score],
+                ['Lines of Code', panelNode.loc],
+                ['Functions', panelNode.funcs],
+                ['Classes', panelNode.classes],
+                ['Imports', panelNode.imports],
+                ['Connections', panelNode.score],
               ].map(([k, v]) => (
                 <div key={k} className="flex justify-between text-[11px] py-1 border-b border-white/5">
                   <span className="text-slate-500">{k}</span>

@@ -28,44 +28,10 @@ const s = {
     flexDirection: 'column',
     height: '100%',
   },
-  panelHeader: {
-    padding: '16px 20px 14px',
-    borderBottom: '1px solid rgba(99,102,241,0.18)',
-    display: 'flex',
-    alignItems: 'center',
-    gap: 12,
-    background: '#13152a',
-  },
-  logoHex: {
-    width: 32, height: 32,
-    background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-    borderRadius: 8,
-    display: 'flex', alignItems: 'center', justifyContent: 'center',
-    fontSize: 13, fontWeight: 700, color: '#fff',
-    flexShrink: 0,
-  },
-  headerTitle: {
-    fontSize: 13, fontWeight: 700, color: '#e2e4f0',
-    letterSpacing: '0.12em', textTransform: 'uppercase', margin: 0,
-  },
-  headerSub: {
-    fontSize: 10, color: '#7b7fa8', letterSpacing: '0.08em', marginTop: 1,
-  },
-  versionBadge: {
-    marginLeft: 'auto',
-    background: '#202440',
-    border: '1px solid rgba(99,102,241,0.18)',
-    borderRadius: 20,
-    padding: '3px 10px',
-    fontSize: 10,
-    color: '#7b7fa8',
-    letterSpacing: '0.06em',
-    whiteSpace: 'nowrap',
-  },
+  /* ── header removed ── */
   subHeader: {
-    padding: '12px 20px',
-    borderBottom: '1px solid rgba(99,102,241,0.18)',
-    background: '#0f1120',
+    padding: '24px 20px 16px',
+    background: '#0d0e1a',
   },
   subHeaderText: {
     fontSize: 11, color: '#7b7fa8', lineHeight: 1.6,
@@ -260,23 +226,32 @@ export default function OnboardingGuide({ onSelectNode }) {
 
   return (
     <div style={s.panel}>
-      {/* Header */}
-      <div style={s.panelHeader}>
-        <div style={s.logoHex}>P</div>
-        <div>
-          <p style={s.headerTitle}>PrismCode</p>
-          <p style={s.headerSub}>// onboarding guide</p>
-        </div>
-        <div style={s.versionBadge}>v0.9.1</div>
-      </div>
 
-      {/* Sub-header */}
+
+      {/* Sub-header / Title */}
       {displayData && !loading && (
         <div style={s.subHeader}>
-          <p style={s.subHeaderText}>
-            Recommended exploration path &nbsp;·&nbsp;
-            <span style={{ color: '#6366f1', fontWeight: 700 }}>{displayData.total_files}</span> files indexed
-          </p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+            <div style={{
+              width: 38, height: 38,
+              background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
+              borderRadius: 10,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: '0 4px 16px rgba(139,92,246,0.25)',
+              fontSize: 18, color: '#fff',
+            }}>
+              🗺️
+            </div>
+            <div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: '#f0f1f7', letterSpacing: '-0.01em', fontFamily: 'Inter, sans-serif' }}>
+                Onboarding Guide
+              </div>
+              <p style={s.subHeaderText} style={{ fontSize: 11, color: '#64748b', marginTop: 2 }}>
+                Recommended exploration path &nbsp;·&nbsp;
+                <span style={{ color: '#8b5cf6', fontWeight: 700 }}>{displayData.total_files}</span> files
+              </p>
+            </div>
+          </div>
         </div>
       )}
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 
 // ─── Inline styles & keyframes injected once ───────────────────────────────
 const STYLES = `
-  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;600&display=swap');
+  
 
   :root {
     --bg: #070810;

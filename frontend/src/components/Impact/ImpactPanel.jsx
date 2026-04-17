@@ -13,168 +13,80 @@ import {
 /* ─── constants ─────────────────────────────────────────────────────── */
 
 const SEVERITY = {
-  direct:   { color: '#f43f5e', border: 'rgba(244,63,94,0.25)',  bg: 'rgba(244,63,94,0.06)',  label: 'Direct',   icon: '⬤' },
-  indirect: { color: '#f97316', border: 'rgba(249,115,22,0.25)', bg: 'rgba(249,115,22,0.06)', label: 'Indirect', icon: '⬤' },
-  potential:{ color: '#eab308', border: 'rgba(234,179,8,0.25)',  bg: 'rgba(234,179,8,0.06)',  label: 'Potential',icon: '⬤' },
+  direct:   { color: '#f43f5e', glow: 'rgba(244,63,94,0.35)', bg: 'rgba(244,63,94,0.08)', label: 'Direct',   gradient: 'linear-gradient(135deg, #f43f5e, #e11d48)' },
+  indirect: { color: '#f97316', glow: 'rgba(249,115,22,0.35)', bg: 'rgba(249,115,22,0.08)', label: 'Indirect', gradient: 'linear-gradient(135deg, #f97316, #ea580c)' },
+  potential:{ color: '#eab308', glow: 'rgba(234,179,8,0.35)',  bg: 'rgba(234,179,8,0.08)',  label: 'Potential', gradient: 'linear-gradient(135deg, #eab308, #ca8a04)' },
 };
 
 const TYPE_COLORS = {
-  file:     { dot: '#6366f1', bg: 'rgba(99,102,241,0.1)',  text: '#818cf8' },
-  function: { dot: '#22d3ee', bg: 'rgba(34,211,238,0.1)',  text: '#67e8f9' },
-  class:    { dot: '#10b981', bg: 'rgba(16,185,129,0.1)',  text: '#34d399' },
+  file:     { dot: '#6366f1', bg: 'rgba(99,102,241,0.12)',  text: '#818cf8' },
+  function: { dot: '#22d3ee', bg: 'rgba(34,211,238,0.12)',  text: '#67e8f9' },
+  class:    { dot: '#10b981', bg: 'rgba(16,185,129,0.12)',  text: '#34d399' },
 };
 
-/* ─── style map ─────────────────────────────────────────────────────── */
+/* ─── CSS-in-JS styles (we inject a <style> block for animations / pseudo-elements) ─── */
 
-const S = {
-  panel: {
-    height: '100%',
-    display: 'flex',
-    flexDirection: 'column',
-    background: '#111422',
-    fontFamily: "'SF Pro Display',-apple-system,BlinkMacSystemFont,'Inter',sans-serif",
-    color: '#e2e4f0',
-  },
+const panelCSS = `
+  
 
-  /* header */
-  header: {
-    padding: '16px 18px 14px',
-    borderBottom: '1px solid rgba(99,102,241,0.12)',
-    background: 'linear-gradient(180deg,rgba(244,63,94,0.04) 0%,transparent 100%)',
-    flexShrink: 0,
-  },
-  headerTop: { display: 'flex', alignItems: 'center', gap: 9, marginBottom: 7 },
-  logoMark: {
-    width: 26, height: 26,
-    background: 'linear-gradient(135deg,#f43f5e,#e11d48)',
-    borderRadius: 7,
-    display: 'flex', alignItems: 'center', justifyContent: 'center',
-    fontSize: 12, fontWeight: 700, color: '#fff', flexShrink: 0,
-  },
-  headerTitle: { fontSize: 13, fontWeight: 600, color: '#e2e4f0', letterSpacing: '0.02em', flex: 1 },
-  headerBadge: {
-    fontSize: 8.5, fontWeight: 700, padding: '2px 7px', borderRadius: 20,
-    background: 'rgba(244,63,94,0.1)', color: '#fb7185',
-    border: '1px solid rgba(244,63,94,0.22)', letterSpacing: '0.06em',
-  },
-  headerDesc: { fontSize: 11, color: '#555870', lineHeight: 1.5 },
+  @keyframes ip-fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes ip-spin {
+    to { transform: rotate(360deg); }
+  }
+  @keyframes ip-pulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+  }
+  @keyframes ip-shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  @keyframes ip-glow {
+    0%, 100% { box-shadow: 0 0 12px rgba(244,63,94,0.15); }
+    50% { box-shadow: 0 0 24px rgba(244,63,94,0.3); }
+  }
+  @keyframes ip-countUp {
+    from { opacity: 0; transform: scale(0.5); }
+    to   { opacity: 1; transform: scale(1); }
+  }
 
-  /* controls */
-  controls: {
-    padding: '13px 16px',
-    borderBottom: '1px solid rgba(99,102,241,0.12)',
-    display: 'flex', flexDirection: 'column', gap: 10, flexShrink: 0,
-  },
+  .ip-panel { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+  .ip-panel * { box-sizing: border-box; }
 
-  /* search */
-  searchWrap: { position: 'relative' },
-  searchIcon: {
-    position: 'absolute', left: 10, top: '50%',
-    transform: 'translateY(-50%)', color: '#555870',
-    pointerEvents: 'none', display: 'flex',
-  },
-  searchInput: {
-    width: '100%', padding: '9px 10px 9px 32px',
-    background: '#1a1e35',
-    border: '1px solid rgba(99,102,241,0.13)',
-    borderRadius: 9, fontSize: 11.5, color: '#e2e4f0',
-    outline: 'none', transition: 'border-color 0.2s, box-shadow 0.2s',
-    boxSizing: 'border-box',
-  },
-  dropdown: {
-    position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0, zIndex: 50,
-    background: '#131629', border: '1px solid rgba(99,102,241,0.22)',
-    borderRadius: 9, overflow: 'hidden', maxHeight: 150, overflowY: 'auto',
-  },
-  dropItem: {
-    display: 'flex', alignItems: 'center', gap: 8,
-    padding: '7px 11px', fontSize: 11.5, cursor: 'pointer',
-    transition: 'background 0.12s',
-    borderBottom: '1px solid rgba(99,102,241,0.06)',
-  },
-  dropDot: { width: 6, height: 6, borderRadius: '50%', flexShrink: 0 },
-  dropLabel: { flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: '#c8cae0' },
-  dropTypePill: { fontSize: 9, fontWeight: 600, padding: '1px 5px', borderRadius: 4, letterSpacing: '0.04em' },
+  .ip-search-input:focus {
+    border-color: rgba(244,63,94,0.4) !important;
+    box-shadow: 0 0 0 3px rgba(244,63,94,0.08), 0 1px 3px rgba(0,0,0,0.2) !important;
+  }
+  .ip-search-input::placeholder {
+    color: #484b6a;
+  }
 
-  /* analyze button */
-  analyzeBtn: {
-    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
-    padding: '10px 14px', borderRadius: 10, border: 'none',
-    background: 'linear-gradient(135deg,#f43f5e 0%,#e11d48 100%)',
-    color: '#fff', fontSize: 12, fontWeight: 700, cursor: 'pointer',
-    transition: 'all 0.18s', letterSpacing: '0.03em', width: '100%',
-    boxShadow: '0 4px 20px rgba(244,63,94,0.22)',
-  },
-  analyzeBtnDisabled: { opacity: 0.35, cursor: 'not-allowed', boxShadow: 'none' },
+  .ip-btn-hover:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 28px rgba(244,63,94,0.35) !important;
+  }
+  .ip-btn-hover:active:not(:disabled) {
+    transform: translateY(0);
+  }
 
-  /* result area */
-  resultArea: {
-    flex: 1, overflowY: 'auto', padding: '13px 16px',
-    display: 'flex', flexDirection: 'column', gap: 10,
-  },
+  .ip-item:hover {
+    background: rgba(255,255,255,0.04) !important;
+    border-color: rgba(99,102,241,0.2) !important;
+    transform: translateX(2px);
+  }
 
-  /* summary cards */
-  summaryGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 7 },
-  summaryCard: {
-    borderRadius: 10, padding: '10px 8px', textAlign: 'center',
-    border: '1px solid', display: 'flex', flexDirection: 'column', gap: 3,
-  },
-  summaryNum: { fontSize: 20, fontWeight: 700, lineHeight: 1 },
-  summaryLabel: { fontSize: 9.5, fontWeight: 600, color: '#555870', letterSpacing: '0.05em' },
+  .ip-drop-item:hover {
+    background: rgba(244,63,94,0.06) !important;
+  }
 
-  /* source node card */
-  sourceCard: {
-    borderRadius: 10, border: '1px solid rgba(99,102,241,0.2)',
-    background: 'rgba(99,102,241,0.05)', padding: '10px 12px',
-    display: 'flex', flexDirection: 'column', gap: 2,
-  },
-  sourceLabel: { fontSize: 9.5, fontWeight: 600, color: '#555870', letterSpacing: '0.06em', textTransform: 'uppercase' },
-  sourceName: { fontSize: 13, fontWeight: 600, color: '#818cf8' },
-  sourceType: { fontSize: 10, color: '#555870' },
-
-  /* AI assessment */
-  aiBlock: {
-    borderRadius: 10, border: '1px solid rgba(139,92,246,0.18)',
-    background: 'rgba(139,92,246,0.04)', overflow: 'hidden',
-  },
-  aiHead: {
-    display: 'flex', alignItems: 'center', gap: 7, padding: '9px 12px',
-    borderBottom: '1px solid rgba(139,92,246,0.1)',
-    background: 'rgba(139,92,246,0.05)',
-  },
-  aiLabel: { fontSize: 10.5, fontWeight: 700, color: '#a78bfa', letterSpacing: '0.06em' },
-  aiBody: {
-    padding: '10px 12px', fontSize: 11, color: '#8b8fa8',
-    lineHeight: 1.65, display: 'flex', flexDirection: 'column', gap: 5,
-  },
-
-  /* section header */
-  sectionHead: { display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, fontWeight: 700, marginBottom: 6, letterSpacing: '0.02em' },
-
-  /* impact item */
-  impactItem: {
-    display: 'flex', alignItems: 'center', gap: 8,
-    padding: '8px 10px', borderRadius: 8, cursor: 'pointer',
-    border: '1px solid rgba(99,102,241,0.08)',
-    background: 'rgba(255,255,255,0.015)',
-    transition: 'all 0.15s', marginBottom: 4,
-  },
-  impactLabel: { fontSize: 11.5, color: '#c8cae0', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
-  impactType: { fontSize: 9.5, fontWeight: 600, color: '#555870' },
-
-  /* empty */
-  emptyState: {
-    display: 'flex', flexDirection: 'column', alignItems: 'center',
-    justifyContent: 'center', gap: 10, padding: '40px 16px',
-    color: '#2a2d42', textAlign: 'center', flex: 1,
-  },
-
-  /* error */
-  errorBox: {
-    background: 'rgba(244,63,94,0.07)', border: '1px solid rgba(244,63,94,0.2)',
-    borderRadius: 9, padding: '9px 12px', fontSize: 11, color: '#f43f5e',
-  },
-};
+  .ip-scroll::-webkit-scrollbar { width: 4px; }
+  .ip-scroll::-webkit-scrollbar-track { background: transparent; }
+  .ip-scroll::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.15); border-radius: 4px; }
+  .ip-scroll::-webkit-scrollbar-thumb:hover { background: rgba(99,102,241,0.3); }
+`;
 
 /* ─── markdown renderer ──────────────────────────────────────────────── */
 
@@ -186,14 +98,14 @@ function AiMarkdown({ text }) {
         if (!l.trim()) return null;
         if (l.trim().startsWith('-'))
           return (
-            <div key={i} style={{ display: 'flex', gap: 6, paddingLeft: 4 }}>
-              <span style={{ color: '#a78bfa', flexShrink: 0 }}>•</span>
-              <span>{l.substring(l.indexOf('-') + 1).trim()}</span>
+            <div key={i} style={{ display: 'flex', gap: 8, paddingLeft: 2, marginBottom: 4 }}>
+              <span style={{ color: '#a78bfa', flexShrink: 0, fontSize: 10, lineHeight: '18px' }}>●</span>
+              <span style={{ lineHeight: 1.6 }}>{l.substring(l.indexOf('-') + 1).trim()}</span>
             </div>
           );
         if (/^\d+\./.test(l.trim()))
-          return <p key={i} style={{ fontWeight: 600, color: '#c8cae0', marginTop: 4 }}>{l.trim()}</p>;
-        return <p key={i}>{l.trim()}</p>;
+          return <p key={i} style={{ fontWeight: 600, color: '#c8cae0', marginTop: 6, marginBottom: 2, fontSize: 11.5 }}>{l.trim()}</p>;
+        return <p key={i} style={{ marginBottom: 4, lineHeight: 1.65 }}>{l.trim()}</p>;
       })}
     </>
   );
@@ -207,6 +119,7 @@ export default function ImpactPanel({ onHighlightNodes, onSelectNode }) {
   const [showDropdown, setShowDropdown] = useState(false);
   const [hoveredItem, setHoveredItem] = useState(null);
   const [hoveredImpact, setHoveredImpact] = useState(null);
+  const [expandedSection, setExpandedSection] = useState({ direct: true, indirect: true, potential: true });
 
   const { data: nodesData, execute: loadNodes } = useApi(getNodes);
   const { data: impactData, loading, error, execute: runImpact } = useApi(analyzeImpact);
@@ -244,33 +157,45 @@ export default function ImpactPanel({ onHighlightNodes, onSelectNode }) {
   ) || [];
 
   const isDisabled = !selectedNode || loading;
+  const totalImpacted = impactData ? (impactData.summary?.direct ?? 0) + (impactData.summary?.indirect ?? 0) + (impactData.summary?.potential ?? 0) : 0;
 
   return (
-    <div style={S.panel}>
-      {/* ── Header ── */}
-      <div style={S.header}>
-        <div style={S.headerTop}>
-          <div style={S.logoMark}>⚡</div>
-          <span style={S.headerTitle}>Impact Simulator</span>
-          <span style={S.headerBadge}>RISK ANALYSIS</span>
-        </div>
-        <p style={S.headerDesc}>
-          Simulate the blast radius of changing any node across your codebase.
-        </p>
-      </div>
+    <div className="ip-panel" style={{
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      color: '#e2e4f0',
+      position: 'relative',
+    }}>
+      <style>{panelCSS}</style>
 
-      {/* ── Controls ── */}
-      <div style={S.controls}>
-        {/* Search */}
-        <div style={S.searchWrap}>
-          <span style={S.searchIcon}><HiOutlineSearch size={14} /></span>
+      {/* ── Search & Controls ── */}
+      <div style={{
+        padding: '14px 20px 16px',
+        borderBottom: '1px solid rgba(255,255,255,0.06)',
+        display: 'flex', flexDirection: 'column', gap: 10,
+        flexShrink: 0,
+      }}>
+        {/* Search Input */}
+        <div style={{ position: 'relative' }}>
+          <span style={{
+            position: 'absolute', left: 12, top: '50%',
+            transform: 'translateY(-50%)', color: '#484b6a',
+            pointerEvents: 'none', display: 'flex',
+          }}>
+            <HiOutlineSearch size={14} />
+          </span>
           <input
             ref={searchRef}
+            className="ip-search-input"
             style={{
-              ...S.searchInput,
-              ...(showDropdown
-                ? { borderColor: 'rgba(244,63,94,0.35)', boxShadow: '0 0 0 3px rgba(244,63,94,0.07)' }
-                : {}),
+              width: '100%', padding: '10px 12px 10px 34px',
+              background: 'rgba(255,255,255,0.03)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              borderRadius: 10, fontSize: 12, color: '#e2e4f0',
+              outline: 'none', transition: 'all 0.2s ease',
+              boxSizing: 'border-box',
+              fontFamily: 'inherit',
             }}
             type="text"
             placeholder="Search files, functions, classes…"
@@ -280,18 +205,28 @@ export default function ImpactPanel({ onHighlightNodes, onSelectNode }) {
             onChange={e => { setSearchTerm(e.target.value); setShowDropdown(!!e.target.value); }}
           />
           {showDropdown && filteredNodes.length > 0 && (
-            <div ref={dropRef} style={S.dropdown}>
+            <div ref={dropRef} className="ip-scroll" style={{
+              position: 'absolute', top: 'calc(100% + 6px)', left: 0, right: 0, zIndex: 50,
+              background: 'rgba(15,15,20,0.98)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              borderRadius: 12, overflow: 'hidden', maxHeight: 180, overflowY: 'auto',
+              backdropFilter: 'blur(20px)',
+              boxShadow: '0 12px 40px rgba(0,0,0,0.5)',
+              animation: 'ip-fadeUp 0.15s ease',
+            }}>
               {filteredNodes.slice(0, 15).map(node => {
                 const tc = TYPE_COLORS[node.type] || TYPE_COLORS.file;
                 const isSelected = selectedNode?.id === node.id;
                 return (
                   <div
                     key={node.id}
+                    className="ip-drop-item"
                     style={{
-                      ...S.dropItem,
-                      background: isSelected
-                        ? 'rgba(244,63,94,0.07)'
-                        : hoveredItem === node.id ? '#1a1e35' : 'transparent',
+                      display: 'flex', alignItems: 'center', gap: 10,
+                      padding: '9px 14px', fontSize: 12, cursor: 'pointer',
+                      transition: 'background 0.12s',
+                      borderBottom: '1px solid rgba(255,255,255,0.04)',
+                      background: isSelected ? 'rgba(244,63,94,0.08)' : 'transparent',
                     }}
                     onMouseEnter={() => setHoveredItem(node.id)}
                     onMouseLeave={() => setHoveredItem(null)}
@@ -301,9 +236,20 @@ export default function ImpactPanel({ onHighlightNodes, onSelectNode }) {
                       setShowDropdown(false);
                     }}
                   >
-                    <span style={{ ...S.dropDot, background: tc.dot }} />
-                    <span style={S.dropLabel}>{node.label}</span>
-                    <span style={{ ...S.dropTypePill, background: tc.bg, color: tc.text }}>{node.type}</span>
+                    <span style={{
+                      width: 7, height: 7, borderRadius: '50%',
+                      background: tc.dot, flexShrink: 0,
+                      boxShadow: `0 0 6px ${tc.dot}40`,
+                    }} />
+                    <span style={{
+                      flex: 1, overflow: 'hidden', textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap', color: '#c8cae0',
+                    }}>{node.label}</span>
+                    <span style={{
+                      fontSize: 9.5, fontWeight: 600, padding: '2px 7px',
+                      borderRadius: 6, letterSpacing: '0.04em',
+                      background: tc.bg, color: tc.text,
+                    }}>{node.type}</span>
                   </div>
                 );
               })}
@@ -311,55 +257,244 @@ export default function ImpactPanel({ onHighlightNodes, onSelectNode }) {
           )}
         </div>
 
+        {/* Selected node pill */}
+        {selectedNode && (
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 8,
+            padding: '8px 12px', borderRadius: 10,
+            background: 'rgba(99,102,241,0.06)',
+            border: '1px solid rgba(99,102,241,0.15)',
+            animation: 'ip-fadeUp 0.2s ease',
+          }}>
+            <span style={{
+              width: 8, height: 8, borderRadius: '50%',
+              background: TYPE_COLORS[selectedNode.type]?.dot || '#6366f1',
+              boxShadow: `0 0 8px ${TYPE_COLORS[selectedNode.type]?.dot || '#6366f1'}50`,
+            }} />
+            <span style={{ fontSize: 12, color: '#c8cae0', flex: 1, fontWeight: 500 }}>
+              {selectedNode.label}
+            </span>
+            <button
+              onClick={() => { setSelectedNode(null); setSearchTerm(''); }}
+              style={{
+                background: 'none', border: 'none', color: '#555870',
+                cursor: 'pointer', padding: '2px 4px', fontSize: 14,
+                lineHeight: 1, borderRadius: 4,
+                transition: 'color 0.15s',
+              }}
+              onMouseEnter={e => e.target.style.color = '#e2e4f0'}
+              onMouseLeave={e => e.target.style.color = '#555870'}
+            >×</button>
+          </div>
+        )}
+
         {/* Analyze button */}
         <button
+          className="ip-btn-hover"
           onClick={handleAnalyze}
           disabled={isDisabled}
-          style={{ ...S.analyzeBtn, ...(isDisabled ? S.analyzeBtnDisabled : {}) }}
+          style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+            padding: '11px 16px', borderRadius: 12, border: 'none',
+            background: isDisabled
+              ? 'rgba(255,255,255,0.04)'
+              : 'linear-gradient(135deg, #f43f5e 0%, #e11d48 100%)',
+            color: isDisabled ? '#484b6a' : '#fff',
+            fontSize: 12.5, fontWeight: 700, cursor: isDisabled ? 'not-allowed' : 'pointer',
+            transition: 'all 0.2s ease', letterSpacing: '0.02em', width: '100%',
+            boxShadow: isDisabled ? 'none' : '0 4px 20px rgba(244,63,94,0.25)',
+            fontFamily: 'inherit',
+          }}
         >
           {loading ? (
             <><SpinnerIcon color="#fff" /> Analyzing…</>
           ) : (
-            <><HiOutlineLightningBolt size={14} /> {selectedNode ? `Simulate "${selectedNode.label}"` : 'Select a node first'}</>
+            <><HiOutlineLightningBolt size={15} /> {selectedNode ? 'Simulate Impact' : 'Select a node first'}</>
           )}
         </button>
       </div>
 
       {/* ── Results ── */}
-      <div style={S.resultArea}>
-        {error && <div style={S.errorBox}>{error}</div>}
+      <div className="ip-scroll" style={{
+        flex: 1, overflowY: 'auto', padding: '16px 20px',
+        display: 'flex', flexDirection: 'column', gap: 14,
+      }}>
+        {error && (
+          <div style={{
+            background: 'rgba(244,63,94,0.08)', border: '1px solid rgba(244,63,94,0.2)',
+            borderRadius: 12, padding: '12px 14px', fontSize: 12, color: '#f43f5e',
+            display: 'flex', alignItems: 'center', gap: 8,
+          }}>
+            <HiOutlineExclamationCircle size={16} />
+            {error}
+          </div>
+        )}
 
         {impactData && !impactData.error && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, animation: 'impact-fade 0.3s ease' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14, animation: 'ip-fadeUp 0.35s ease' }}>
 
-            {/* Summary cards */}
-            <div style={S.summaryGrid}>
-              {Object.entries(SEVERITY).map(([key, cfg]) => (
-                <div key={key} style={{ ...S.summaryCard, background: cfg.bg, borderColor: cfg.border }}>
-                  <span style={{ ...S.summaryNum, color: cfg.color }}>{impactData.summary?.[key] ?? 0}</span>
-                  <span style={S.summaryLabel}>{cfg.label}</span>
+            {/* Risk Score Banner */}
+            <div style={{
+              borderRadius: 14, padding: '16px',
+              background: 'linear-gradient(135deg, rgba(244,63,94,0.06) 0%, rgba(249,115,22,0.04) 100%)',
+              border: '1px solid rgba(244,63,94,0.12)',
+              position: 'relative', overflow: 'hidden',
+            }}>
+              {/* Shimmer effect */}
+              <div style={{
+                position: 'absolute', inset: 0, opacity: 0.5,
+                background: 'linear-gradient(90deg, transparent 0%, rgba(244,63,94,0.05) 50%, transparent 100%)',
+                backgroundSize: '200% 100%',
+                animation: 'ip-shimmer 3s ease infinite',
+              }} />
+
+              <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 14 }}>
+                {/* Total count */}
+                <div style={{
+                  width: 52, height: 52,
+                  borderRadius: 14,
+                  background: 'linear-gradient(135deg, rgba(244,63,94,0.15), rgba(244,63,94,0.05))',
+                  border: '1px solid rgba(244,63,94,0.2)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  flexShrink: 0,
+                }}>
+                  <span style={{
+                    fontSize: 22, fontWeight: 800, color: '#f43f5e',
+                    animation: 'ip-countUp 0.4s ease',
+                  }}>{totalImpacted}</span>
+                </div>
+
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: '#e2e4f0', marginBottom: 6 }}>
+                    Nodes Impacted
+                  </div>
+                  {/* Mini bar chart */}
+                  <div style={{ display: 'flex', gap: 3, height: 6, borderRadius: 4, overflow: 'hidden' }}>
+                    {totalImpacted > 0 && Object.entries(SEVERITY).map(([key, cfg]) => {
+                      const count = impactData.summary?.[key] ?? 0;
+                      const pct = (count / totalImpacted) * 100;
+                      if (!pct) return null;
+                      return (
+                        <div key={key} style={{
+                          width: `${pct}%`, height: '100%',
+                          background: cfg.gradient,
+                          borderRadius: 3,
+                          transition: 'width 0.4s ease',
+                        }} />
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Summary metric cards */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+              {Object.entries(SEVERITY).map(([key, cfg], idx) => (
+                <div key={key} style={{
+                  borderRadius: 12, padding: '14px 10px', textAlign: 'center',
+                  background: 'rgba(255,255,255,0.02)',
+                  border: '1px solid rgba(255,255,255,0.06)',
+                  display: 'flex', flexDirection: 'column', gap: 6,
+                  transition: 'all 0.2s ease',
+                  animation: `ip-fadeUp 0.3s ease ${idx * 0.08}s both`,
+                  cursor: 'default',
+                  position: 'relative', overflow: 'hidden',
+                }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.borderColor = `${cfg.color}30`;
+                    e.currentTarget.style.background = cfg.bg;
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)';
+                    e.currentTarget.style.background = 'rgba(255,255,255,0.02)';
+                  }}
+                >
+                  <span style={{
+                    fontSize: 24, fontWeight: 800, color: cfg.color,
+                    lineHeight: 1,
+                    animation: 'ip-countUp 0.4s ease',
+                  }}>
+                    {impactData.summary?.[key] ?? 0}
+                  </span>
+                  <span style={{
+                    fontSize: 9.5, fontWeight: 600, color: '#555870',
+                    letterSpacing: '0.08em', textTransform: 'uppercase',
+                  }}>{cfg.label}</span>
+                  {/* Bottom accent line */}
+                  <div style={{
+                    position: 'absolute', bottom: 0, left: '20%', right: '20%',
+                    height: 2, borderRadius: 2,
+                    background: cfg.gradient, opacity: 0.5,
+                  }} />
                 </div>
               ))}
             </div>
 
-            {/* Source node */}
-            <div style={S.sourceCard}>
-              <span style={S.sourceLabel}>
-                <HiOutlineLocationMarker style={{ display: 'inline', marginRight: 4, verticalAlign: 'middle' }} size={10} />
-                Source Node
-              </span>
-              <span style={S.sourceName}>{impactData.source?.label}</span>
-              <span style={S.sourceType}>{impactData.source?.type}</span>
+            {/* Source node card */}
+            <div style={{
+              borderRadius: 12,
+              border: '1px solid rgba(99,102,241,0.12)',
+              background: 'rgba(99,102,241,0.04)',
+              padding: '12px 14px',
+              display: 'flex', alignItems: 'center', gap: 12,
+            }}>
+              <div style={{
+                width: 34, height: 34, borderRadius: 10,
+                background: 'rgba(99,102,241,0.1)',
+                border: '1px solid rgba(99,102,241,0.2)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                flexShrink: 0,
+              }}>
+                <HiOutlineLocationMarker size={15} color="#818cf8" />
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{
+                  fontSize: 9.5, fontWeight: 600, color: '#555870',
+                  letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 2,
+                }}>Source Node</div>
+                <div style={{
+                  fontSize: 13, fontWeight: 600, color: '#818cf8',
+                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                }}>{impactData.source?.label}</div>
+              </div>
+              <span style={{
+                fontSize: 9, fontWeight: 600, padding: '3px 8px',
+                borderRadius: 6,
+                background: TYPE_COLORS[impactData.source?.type]?.bg || 'rgba(99,102,241,0.1)',
+                color: TYPE_COLORS[impactData.source?.type]?.text || '#818cf8',
+              }}>{impactData.source?.type}</span>
             </div>
 
             {/* AI Assessment */}
             {impactData.ai_summary && (
-              <div style={S.aiBlock}>
-                <div style={S.aiHead}>
-                  <HiOutlineSparkles size={12} color="#a78bfa" />
-                  <span style={S.aiLabel}>AI ASSESSMENT</span>
+              <div style={{
+                borderRadius: 14, overflow: 'hidden',
+                border: '1px solid rgba(139,92,246,0.12)',
+                background: 'rgba(139,92,246,0.03)',
+              }}>
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: 8,
+                  padding: '10px 14px',
+                  background: 'linear-gradient(135deg, rgba(139,92,246,0.08) 0%, rgba(139,92,246,0.02) 100%)',
+                  borderBottom: '1px solid rgba(139,92,246,0.08)',
+                }}>
+                  <HiOutlineSparkles size={13} color="#a78bfa" />
+                  <span style={{
+                    fontSize: 10.5, fontWeight: 700, color: '#a78bfa',
+                    letterSpacing: '0.08em', textTransform: 'uppercase',
+                  }}>AI Assessment</span>
+                  <div style={{
+                    marginLeft: 'auto',
+                    width: 6, height: 6, borderRadius: '50%',
+                    background: '#a78bfa',
+                    animation: 'ip-pulse 2s ease infinite',
+                  }} />
                 </div>
-                <div style={S.aiBody}>
+                <div style={{
+                  padding: '12px 14px', fontSize: 11.5, color: '#8b8fa8',
+                  lineHeight: 1.7, display: 'flex', flexDirection: 'column', gap: 4,
+                }}>
                   <AiMarkdown text={impactData.ai_summary} />
                 </div>
               </div>
@@ -370,44 +505,88 @@ export default function ImpactPanel({ onHighlightNodes, onSelectNode }) {
               const items = impactData[level];
               if (!items?.length) return null;
               const cfg = SEVERITY[level];
+              const isExpanded = expandedSection[level];
               return (
-                <div key={level}>
-                  <div style={{ ...S.sectionHead, color: cfg.color }}>
-                    <HiOutlineExclamationCircle size={13} />
-                    {cfg.label} Impact
+                <div key={level} style={{ animation: 'ip-fadeUp 0.3s ease' }}>
+                  {/* Section header */}
+                  <div
+                    onClick={() => setExpandedSection(prev => ({ ...prev, [level]: !prev[level] }))}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 8,
+                      padding: '8px 0', cursor: 'pointer',
+                      userSelect: 'none',
+                    }}
+                  >
+                    <div style={{
+                      width: 4, height: 16, borderRadius: 2,
+                      background: cfg.gradient, flexShrink: 0,
+                    }} />
                     <span style={{
-                      marginLeft: 2, fontSize: 9.5, fontWeight: 600,
-                      padding: '1px 6px', borderRadius: 10,
-                      background: cfg.bg, border: `1px solid ${cfg.border}`,
+                      fontSize: 11.5, fontWeight: 700, color: cfg.color,
+                      letterSpacing: '0.02em', flex: 1,
+                    }}>
+                      {cfg.label} Impact
+                    </span>
+                    <span style={{
+                      fontSize: 10, fontWeight: 700,
+                      padding: '2px 8px', borderRadius: 8,
+                      background: cfg.bg,
                       color: cfg.color,
+                      minWidth: 22, textAlign: 'center',
                     }}>
                       {items.length}
                     </span>
+                    <HiOutlineChevronRight
+                      size={12}
+                      color="#555870"
+                      style={{
+                        transition: 'transform 0.2s ease',
+                        transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
+                      }}
+                    />
                   </div>
-                  <div>
-                    {items.map((item, i) => (
-                      <div
-                        key={i}
-                        style={{
-                          ...S.impactItem,
-                          background: hoveredImpact === `${level}-${i}` ? '#1a1e35' : 'rgba(255,255,255,0.015)',
-                          borderColor: hoveredImpact === `${level}-${i}` ? cfg.border : 'rgba(99,102,241,0.08)',
-                        }}
-                        onMouseEnter={() => setHoveredImpact(`${level}-${i}`)}
-                        onMouseLeave={() => setHoveredImpact(null)}
-                        onClick={() => onSelectNode?.(item.id)}
-                      >
-                        <span style={{ width: 6, height: 6, borderRadius: '50%', background: cfg.color, flexShrink: 0 }} />
-                        <span style={S.impactLabel}>{item.label}</span>
-                        <span style={S.impactType}>{item.type}</span>
-                        <HiOutlineChevronRight
-                          size={11}
-                          color={cfg.color}
-                          style={{ opacity: hoveredImpact === `${level}-${i}` ? 1 : 0, transition: 'opacity 0.15s' }}
-                        />
-                      </div>
-                    ))}
-                  </div>
+                  {/* Items */}
+                  {isExpanded && (
+                    <div style={{
+                      display: 'flex', flexDirection: 'column', gap: 4,
+                      paddingLeft: 4,
+                      animation: 'ip-fadeUp 0.2s ease',
+                    }}>
+                      {items.map((item, i) => (
+                        <div
+                          key={i}
+                          className="ip-item"
+                          style={{
+                            display: 'flex', alignItems: 'center', gap: 10,
+                            padding: '9px 12px', borderRadius: 10, cursor: 'pointer',
+                            border: '1px solid rgba(255,255,255,0.04)',
+                            background: 'rgba(255,255,255,0.015)',
+                            transition: 'all 0.18s ease',
+                          }}
+                          onClick={() => onSelectNode?.(item.id)}
+                        >
+                          <span style={{
+                            width: 7, height: 7, borderRadius: '50%',
+                            background: cfg.color, flexShrink: 0,
+                            boxShadow: `0 0 6px ${cfg.glow}`,
+                          }} />
+                          <span style={{
+                            fontSize: 12, color: '#c8cae0', flex: 1,
+                            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                            fontWeight: 500,
+                          }}>{item.label}</span>
+                          <span style={{
+                            fontSize: 9.5, fontWeight: 600, color: '#555870',
+                          }}>{item.type}</span>
+                          <HiOutlineChevronRight
+                            size={11}
+                            color={cfg.color}
+                            style={{ opacity: 0.4, transition: 'opacity 0.15s' }}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -416,37 +595,69 @@ export default function ImpactPanel({ onHighlightNodes, onSelectNode }) {
 
         {/* Empty state */}
         {!impactData && !error && !loading && (
-          <div style={S.emptyState}>
-            <HiOutlineLightningBolt size={36} color="#2a2d42" />
-            <p style={{ fontSize: 11, color: '#3a3d52', lineHeight: 1.55, maxWidth: 200 }}>
-              Search for a node above and click Simulate Impact to see the blast radius.
-            </p>
+          <div style={{
+            display: 'flex', flexDirection: 'column', alignItems: 'center',
+            justifyContent: 'center', gap: 16, padding: '30px 20px',
+            textAlign: 'center', flex: 1,
+            position: 'relative',
+          }}>
+            <div style={{
+              position: 'absolute', top: -30, left: '50%', transform: 'translateX(-50%)',
+              width: 150, height: 150,
+              background: 'radial-gradient(circle, rgba(244,63,94,0.1) 0%, transparent 70%)',
+              borderRadius: '50%', pointerEvents: 'none',
+            }} />
+          
+            <div style={{
+              width: 48, height: 48,
+              background: 'linear-gradient(135deg, #f43f5e 0%, #e11d48 100%)',
+              borderRadius: 14,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: '0 4px 16px rgba(244,63,94,0.3)',
+              fontSize: 22,
+              marginBottom: 4,
+            }}>
+              ⚡
+            </div>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+              <div style={{ fontSize: 16, fontWeight: 700, color: '#f0f1f7', letterSpacing: '-0.01em' }}>
+                Impact Simulator
+              </div>
+              <div style={{ fontSize: 12, color: '#555870', letterSpacing: '0.01em', display: 'flex', alignItems: 'center', gap: 6 }}>
+                Blast radius analysis
+                <span style={{
+                  fontSize: 8.5, fontWeight: 700, padding: '2px 6px', borderRadius: 20,
+                  background: 'linear-gradient(135deg, rgba(244,63,94,0.15), rgba(244,63,94,0.05))',
+                  color: '#fb7185',
+                  border: '1px solid rgba(244,63,94,0.2)',
+                  letterSpacing: '0.08em',
+                  textTransform: 'uppercase',
+                }}>Risk</span>
+              </div>
+            </div>
+
+            <div style={{ marginTop: 12 }}>
+              <p style={{ fontSize: 12, color: '#3a3d52', lineHeight: 1.6, maxWidth: 220, margin: '0 auto' }}>
+                Search for a node above and click <span style={{ color: '#555870', fontWeight: 600 }}>Simulate Impact</span> to see the blast radius.
+              </p>
+            </div>
           </div>
         )}
       </div>
-
-      <style>{`
-        @keyframes impact-fade {
-          from { opacity: 0; transform: translateY(6px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes impact-spin {
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
     </div>
   );
 }
 
 /* ─── spinner ────────────────────────────────────────────────────────── */
 
-function SpinnerIcon({ color = '#1a1000' }) {
+function SpinnerIcon({ color = '#fff' }) {
   return (
     <svg
-      width="13" height="13" viewBox="0 0 13 13" fill="none"
-      style={{ animation: 'impact-spin 0.7s linear infinite', flexShrink: 0 }}
+      width="14" height="14" viewBox="0 0 13 13" fill="none"
+      style={{ animation: 'ip-spin 0.7s linear infinite', flexShrink: 0 }}
     >
-      <circle cx="6.5" cy="6.5" r="5.5" stroke="rgba(255,255,255,0.2)" strokeWidth="2" />
+      <circle cx="6.5" cy="6.5" r="5.5" stroke="rgba(255,255,255,0.15)" strokeWidth="2" />
       <path d="M6.5 1A5.5 5.5 0 0 1 12 6.5" stroke={color} strokeWidth="2" strokeLinecap="round" />
     </svg>
   );

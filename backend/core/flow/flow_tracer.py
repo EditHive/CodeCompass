@@ -103,7 +103,7 @@ class FlowTracer:
 
         return None
 
-    def _get_code_snippet(self, node_data: dict, max_lines: int = 10) -> str:
+    def _get_code_snippet(self, node_data: dict) -> str:
         """Get the source code snippet for a function."""
         file_path = node_data.get("file", "")
         line_start = node_data.get("line_start", 0)
@@ -118,7 +118,11 @@ class FlowTracer:
 
         lines = analysis.raw_source.splitlines()
         start = max(0, line_start - 1)
-        end = min(len(lines), start + max_lines)
+        
+        if line_end and line_end >= line_start:
+            end = min(len(lines), line_end)
+        else:
+            end = min(len(lines), start + 15)  # fallback if no end line
 
         return "\n".join(lines[start:end])
 

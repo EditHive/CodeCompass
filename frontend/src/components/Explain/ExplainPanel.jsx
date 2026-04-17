@@ -65,55 +65,7 @@ const S = {
     color: '#e2e4f0',
   },
 
-  /* header */
-  header: {
-    padding: '16px 18px 14px',
-    borderBottom: '1px solid rgba(99,102,241,0.12)',
-    background: 'linear-gradient(180deg,rgba(99,102,241,0.05) 0%,transparent 100%)',
-    flexShrink: 0,
-  },
-  headerTop: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 9,
-    marginBottom: 7,
-  },
-  logoMark: {
-    width: 26,
-    height: 26,
-    background: 'linear-gradient(135deg,#6366f1,#7c3aed)',
-    borderRadius: 7,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: 11,
-    fontWeight: 700,
-    color: '#fff',
-    letterSpacing: '-0.5px',
-    flexShrink: 0,
-  },
-  headerTitle: {
-    fontSize: 13,
-    fontWeight: 600,
-    color: '#e2e4f0',
-    letterSpacing: '0.02em',
-    flex: 1,
-  },
-  headerBadge: {
-    fontSize: 8.5,
-    fontWeight: 700,
-    padding: '2px 7px',
-    borderRadius: 20,
-    background: 'rgba(99,102,241,0.1)',
-    color: '#818cf8',
-    border: '1px solid rgba(99,102,241,0.2)',
-    letterSpacing: '0.06em',
-  },
-  headerDesc: {
-    fontSize: 11,
-    color: '#555870',
-    lineHeight: 1.5,
-  },
+  /* ── header removed ── */
 
   /* controls */
   controls: {
@@ -428,17 +380,7 @@ export default function ExplainPanel() {
 
   return (
     <div style={S.panel}>
-      {/* ── Header ── */}
-      <div style={S.header}>
-        <div style={S.headerTop}>
-          <div style={S.logoMark}>P</div>
-          <span style={S.headerTitle}>Explain Code</span>
-          <span style={S.headerBadge}>AI POWERED</span>
-        </div>
-        <p style={S.headerDesc}>
-          AI-powered explanations at your preferred expertise level.
-        </p>
-      </div>
+
 
       {/* ── Controls ── */}
       <div style={S.controls}>
@@ -665,9 +607,22 @@ export default function ExplainPanel() {
         {/* Empty state */}
         {!explainData && !error && !loading && (
           <div style={S.emptyState}>
-            <HiOutlineInformationCircle size={36} color="#2a2d42" />
-            <p style={{ fontSize: 11, color: '#3a3d52', lineHeight: 1.55, maxWidth: 200 }}>
-              Search for a file or function above, then click Explain for an AI analysis.
+            <div style={{
+              width: 48, height: 48,
+              background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+              borderRadius: 14,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: '0 4px 16px rgba(245,158,11,0.3)',
+              fontSize: 22, color: '#fff', margin: '0 auto 12px',
+            }}>
+              <HiOutlineSparkles size={24} color="#fff" />
+            </div>
+            <div style={{ fontSize: 16, fontWeight: 700, color: '#f0f1f7', letterSpacing: '-0.01em', fontFamily: 'Inter, sans-serif', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
+              Code Explainer
+              <span style={{ fontSize: 8.5, fontWeight: 700, padding: '2px 6px', borderRadius: 20, background: 'rgba(245,158,11,0.15)', color: '#f59e0b', border: '1px solid rgba(245,158,11,0.3)' }}>AI</span>
+            </div>
+            <p style={{ fontSize: 11, color: '#3a3d52', lineHeight: 1.55, maxWidth: 220 }}>
+              Search for a file or function above, then click Simulate to get an AI-powered explanation.
             </p>
           </div>
         )}

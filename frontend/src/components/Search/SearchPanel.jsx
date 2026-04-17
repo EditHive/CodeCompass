@@ -85,38 +85,7 @@ const styles = {
     flexDirection: 'column',
     height: '100%',
   },
-  panelHeader: {
-    padding: '16px 20px 14px',
-    borderBottom: '1px solid rgba(99,102,241,0.18)',
-    display: 'flex',
-    alignItems: 'center',
-    gap: 12,
-    background: '#13152a',
-  },
-  logoHex: {
-    width: 32, height: 32,
-    background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-    borderRadius: 8,
-    display: 'flex', alignItems: 'center', justifyContent: 'center',
-    fontSize: 13, fontWeight: 700, color: '#fff',
-  },
-  headerTitle: {
-    fontSize: 13, fontWeight: 700, color: '#e2e4f0',
-    letterSpacing: '0.12em', textTransform: 'uppercase', margin: 0,
-  },
-  headerSub: {
-    fontSize: 10, color: '#7b7fa8', letterSpacing: '0.08em', marginTop: 1,
-  },
-  versionBadge: {
-    marginLeft: 'auto',
-    background: '#202440',
-    border: '1px solid rgba(99,102,241,0.18)',
-    borderRadius: 20,
-    padding: '3px 10px',
-    fontSize: 10,
-    color: '#7b7fa8',
-    letterSpacing: '0.06em',
-  },
+  /* ── header removed ── */
   searchSection: {
     padding: '16px 20px',
     borderBottom: '1px solid rgba(99,102,241,0.18)',
@@ -317,15 +286,7 @@ export default function SearchPanel({ onSelectNode }) {
 
   return (
     <div style={styles.panel}>
-      {/* Header */}
-      <div style={styles.panelHeader}>
-        <div style={styles.logoHex}>P</div>
-        <div>
-          <p style={styles.headerTitle}>PrismCode</p>
-          <p style={styles.headerSub}>// semantic search engine</p>
-        </div>
-        <div style={styles.versionBadge}>v0.9.1</div>
-      </div>
+
 
       {/* Search input */}
       <div style={styles.searchSection}>
@@ -391,7 +352,19 @@ export default function SearchPanel({ onSelectNode }) {
 
         {!loading && !searchData && !error && (
           <div style={styles.emptyState}>
-            <div style={styles.emptyIcon}>◈</div>
+            <div style={{
+              width: 48, height: 48,
+              background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+              borderRadius: 14,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: '0 4px 16px rgba(139,92,246,0.3)',
+              fontSize: 22, color: '#fff', margin: '0 auto 16px',
+            }}>
+              ⌕
+            </div>
+            <div style={{ fontSize: 16, fontWeight: 700, color: '#f0f1f7', letterSpacing: '-0.01em', fontFamily: 'Inter, sans-serif', marginBottom: 8 }}>
+              Code Search Engine
+            </div>
             <div>
               Search your codebase using natural language.<br />
               Ask questions about what your code does.

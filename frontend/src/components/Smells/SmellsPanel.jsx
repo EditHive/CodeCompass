@@ -21,7 +21,6 @@ const SEVERITY_STYLES = {
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
 const STYLES = `
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
 
   .sp-root {
     font-family: 'Inter', sans-serif;
@@ -58,27 +57,7 @@ const STYLES = `
     overflow: hidden;
   }
 
-  /* ── Header ── */
-  .sp-header {
-    padding: 14px 16px 12px;
-    border-bottom: 1px solid rgba(255,255,255,0.06);
-    flex-shrink: 0;
-  }
-
-  .sp-header-title {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.09em;
-    color: rgba(148,163,184,0.55);
-    text-transform: uppercase;
-    margin-bottom: 3px;
-  }
-
-  .sp-header-sub {
-    font-size: 11px;
-    color: rgba(148,163,184,0.45);
-    line-height: 1.5;
-  }
+  /* ── header removed ── */
 
   /* ── Scroll body ── */
   .sp-body {
@@ -464,13 +443,29 @@ export default function SmellsPanel() {
       <style>{STYLES}</style>
       <div className="sp-inner">
 
-        {/* Header */}
-        <div className="sp-header">
-          <div className="sp-header-title">Risk Detect</div>
-          <div className="sp-header-sub">Anti-patterns &amp; quality issues</div>
-        </div>
+
 
         <div className="sp-body">
+
+          {/* Title Intro */}
+          <div className="sp-fadein" style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '0 4px', marginBottom: 6 }}>
+            <div style={{
+              width: 32, height: 32,
+              background: 'linear-gradient(135deg, #f43f5e 0%, #f59e0b 100%)',
+              borderRadius: 8,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: '0 4px 16px rgba(244,63,94,0.25)',
+              fontSize: 16, color: '#fff',
+            }}>
+              <HiOutlineShieldCheck />
+            </div>
+            <div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: '#f0f1f7', letterSpacing: '-0.01em', fontFamily: 'Inter, sans-serif' }}>
+                Code Risk Detect
+              </div>
+              <div style={{ fontSize: 11, color: '#64748b', marginTop: 2 }}>Anti-patterns &amp; health issues</div>
+            </div>
+          </div>
 
           {/* Health score */}
           <div

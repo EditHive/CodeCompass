@@ -4,7 +4,6 @@ import { traceFlow } from '../../services/api';
 
 // ─── Design token injection (matches RepoUpload system) ───────────────────
 const STYLES = `
-  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;600&display=swap');
 
   .fv-root {
     height: 100%; display: flex; flex-direction: column;
@@ -25,38 +24,7 @@ const STYLES = `
 
   .fv-content { position: relative; z-index: 1; display: flex; flex-direction: column; height: 100%; }
 
-  /* ── header ── */
-  .fv-header {
-    padding: 18px 20px 16px;
-    border-bottom: 1px solid rgba(99,102,241,0.12);
-    background: linear-gradient(180deg, rgba(13,15,26,0.8) 0%, transparent 100%);
-    flex-shrink: 0;
-  }
-  .fv-header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
-  .fv-title {
-    font-size: 11px; font-weight: 700; letter-spacing: 0.2em;
-    text-transform: uppercase; color: #7c7fa8;
-    font-family: 'JetBrains Mono', monospace;
-    display: flex; align-items: center; gap: 7px;
-  }
-  .fv-title-dot {
-    width: 5px; height: 5px; border-radius: 50%;
-    background: #4ade80; box-shadow: 0 0 6px #4ade80;
-    animation: fvBlink 2s ease-in-out infinite;
-  }
-  @keyframes fvBlink { 0%,100%{opacity:1} 50%{opacity:0.3} }
-
-  .fv-badge {
-    font-size: 9px; font-family: 'JetBrains Mono', monospace;
-    padding: 2px 8px; border-radius: 20px; font-weight: 500; letter-spacing: 0.08em;
-  }
-  .fv-badge-cyan { background: rgba(34,211,238,0.08); color: #22d3ee; border: 1px solid rgba(34,211,238,0.2); }
-  .fv-badge-violet { background: rgba(99,102,241,0.08); color: #818cf8; border: 1px solid rgba(99,102,241,0.2); }
-
-  .fv-desc {
-    font-size: 11px; color: #4a4d6e; font-family: 'JetBrains Mono', monospace;
-    letter-spacing: 0.02em; line-height: 1.5;
-  }
+  /* ── header removed ── */
 
   /* ── input row ── */
   .fv-input-row {
@@ -448,24 +416,7 @@ export default function FlowViewer({ onHighlightFlow }) {
       <div className="fv-root">
         <div className="fv-content">
 
-          {/* ── Header ── */}
-          <div className="fv-header">
-            <div className="fv-header-top">
-              <div className="fv-title">
-                <span className="fv-title-dot" />
-                Execution Flow Tracker
-              </div>
-              {hasData && (
-                <span className="fv-badge fv-badge-cyan">
-                  {flowData.total_steps} steps
-                </span>
-              )}
-              {!hasData && (
-                <span className="fv-badge fv-badge-violet">TRACER</span>
-              )}
-            </div>
-            <p className="fv-desc">// trace what happens when a function executes</p>
-          </div>
+
 
           {/* ── Input ── */}
           <div className="fv-input-row">
@@ -522,9 +473,22 @@ export default function FlowViewer({ onHighlightFlow }) {
 
             {/* Idle / welcome */}
             {showIdle && (
-              <div className="fv-empty">
-                <div className="fv-empty-icon">🔄</div>
-                <div className="fv-empty-text">
+              <div className="fv-empty" style={{ paddingTop: 40 }}>
+                <div style={{
+                  width: 48, height: 48,
+                  background: 'linear-gradient(135deg, #6366f1 0%, #4ade80 100%)',
+                  borderRadius: 14,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  boxShadow: '0 4px 16px rgba(74,222,128,0.2)',
+                  fontSize: 22,
+                  marginBottom: 10,
+                }}>
+                  🔄
+                </div>
+                <div style={{ fontSize: 16, fontWeight: 700, color: '#f0f1f7', letterSpacing: '-0.01em', fontFamily: 'Inter, sans-serif' }}>
+                  Execution Flow Tracker
+                </div>
+                <div className="fv-empty-text" style={{ marginTop: 8 }}>
                   Enter a function name above to trace<br />its full execution path across files
                 </div>
               </div>
