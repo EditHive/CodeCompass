@@ -12,9 +12,9 @@ import {
 /* ─── constants ─────────────────────────────────────────────────────── */
 
 const TYPE_CONFIG = {
-  file:     { color: '#6366f1', bg: 'rgba(99,102,241,0.1)',  border: 'rgba(99,102,241,0.22)',  icon: HiOutlineFolder, label: 'File' },
-  function: { color: '#22d3ee', bg: 'rgba(34,211,238,0.1)',  border: 'rgba(34,211,238,0.22)',  icon: HiOutlineCode,   label: 'Function' },
-  class:    { color: '#10b981', bg: 'rgba(16,185,129,0.1)',  border: 'rgba(16,185,129,0.22)',  icon: HiOutlineCube,   label: 'Class' },
+  file: { color: '#6366f1', bg: 'rgba(99,102,241,0.1)', border: 'rgba(99,102,241,0.22)', icon: HiOutlineFolder, label: 'File' },
+  function: { color: '#22d3ee', bg: 'rgba(34,211,238,0.1)', border: 'rgba(34,211,238,0.22)', icon: HiOutlineCode, label: 'Function' },
+  class: { color: '#10b981', bg: 'rgba(16,185,129,0.1)', border: 'rgba(16,185,129,0.22)', icon: HiOutlineCube, label: 'Class' },
 };
 
 /* ─── styles ─────────────────────────────────────────────────────────── */

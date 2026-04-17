@@ -849,6 +849,79 @@ export default function GraphCanvas({
         ))}
       </div>
 
+      {/* ── Zoom Controls ── */}
+      <div style={{
+        position: 'absolute', bottom: 16, left: '50%', transform: 'translateX(-50%)',
+        display: 'flex', alignItems: 'center', gap: 2,
+        background: 'rgba(13,15,26,0.92)',
+        border: '1px solid rgba(99,102,241,0.18)',
+        borderRadius: 10,
+        padding: '3px 4px',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(99,102,241,0.06)',
+        userSelect: 'none',
+        fontFamily: "'SF Mono','Fira Code',monospace",
+      }}>
+        {[
+          { label: '−', title: 'Zoom Out', action: () => {
+            const s = S.current;
+            const cx = s.W / 2, cy = s.H / 2;
+            const ns = Math.max(0.08, s.cam.scale * 0.8);
+            s.cam.x = cx - (cx - s.cam.x) * (ns / s.cam.scale);
+            s.cam.y = cy - (cy - s.cam.y) * (ns / s.cam.scale);
+            s.cam.scale = ns;
+          }},
+          { label: '⌂', title: 'Reset View', action: () => {
+            const s = S.current;
+            if (!s.districts.length || s.W <= 0) return;
+            let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+            s.districts.forEach(d => {
+              minX = Math.min(minX, d.x); minY = Math.min(minY, d.y);
+              maxX = Math.max(maxX, d.x + d.w); maxY = Math.max(maxY, d.y + d.h);
+            });
+            const pad = 80;
+            const bW = (maxX - minX) + pad * 2;
+            const bH = (maxY - minY) + pad * 2;
+            const sc = Math.min(s.W / bW, s.H / bH);
+            const cx = (minX + maxX) / 2;
+            const cy = (minY + maxY) / 2;
+            s.cam = { x: s.W / 2 - cx * sc, y: s.H / 2 - cy * sc, scale: sc };
+          }},
+          { label: '+', title: 'Zoom In', action: () => {
+            const s = S.current;
+            const cx = s.W / 2, cy = s.H / 2;
+            const ns = Math.min(8, s.cam.scale * 1.25);
+            s.cam.x = cx - (cx - s.cam.x) * (ns / s.cam.scale);
+            s.cam.y = cy - (cy - s.cam.y) * (ns / s.cam.scale);
+            s.cam.scale = ns;
+          }},
+        ].map(({ label, title, action }) => (
+          <button
+            key={title}
+            title={title}
+            onClick={action}
+            style={{
+              width: 30, height: 30, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: 'transparent', border: 'none', borderRadius: 7,
+              color: '#8b8fa8', fontSize: label === '⌂' ? 14 : 16, fontWeight: 700,
+              cursor: 'pointer', transition: 'all 0.15s ease',
+              lineHeight: 1,
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.background = 'rgba(99,102,241,0.15)';
+              e.currentTarget.style.color = '#c4c9ff';
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.background = 'transparent';
+              e.currentTarget.style.color = '#8b8fa8';
+            }}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
       {/* ── Minimap HUD ── */}
       <div style={{
         position: 'absolute', bottom: 16, right: 16,
