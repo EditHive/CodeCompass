@@ -685,31 +685,7 @@ export default function TopNav({ activeTab, onTabChange, isAnalyzed, repoPath, s
         {/* ── Right: Stats + Load ── */}
         <div className="tn-right">
 
-          {/* Stats */}
-          {stats && (
-            <div className="tn-stats">
-              <StatBadge
-                icon={HiOutlineFolder}
-                value={stats.total_files}
-                label="files"
-                color="#6366f1"
-              />
-              <div className="tn-stat-divider" />
-              <StatBadge
-                icon={HiOutlineCode}
-                value={stats.total_functions}
-                label="fn"
-                color="#22d3ee"
-              />
-              <div className="tn-stat-divider" />
-              <StatBadge
-                icon={HiOutlineCode}
-                value={stats.total_classes}
-                label="cls"
-                color="#8b5cf6"
-              />
-            </div>
-          )}
+
 
           {/* Load/Change Button */}
           <button className="tn-load-btn" onClick={onUploadClick}>
