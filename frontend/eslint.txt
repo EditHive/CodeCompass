@@ -1,0 +1,100 @@
+
+> frontend@0.0.0 lint
+> eslint .
+
+
+/Users/Anurag/Documents/CodeCompass/frontend/src/App.jsx
+  28:17  error    'healthData' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   no-unused-vars
+  48:6   warning  React Hook useEffect has missing dependencies: 'checkHealth', 'loadGraph', and 'loadStats'. Either include them or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               react-hooks/exhaustive-deps
+  57:7   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  55 |         .catch(() => setSelectedNodeData(null));
+  56 |     } else {
+> 57 |       setSelectedNodeData(null);
+     |       ^^^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  58 |     }
+  59 |   }, [selectedNode]);
+  60 |  react-hooks/set-state-in-effect
+
+/Users/Anurag/Documents/CodeCompass/frontend/src/components/Explain/ExplainPanel.jsx
+  376:9  error  'activeLevelMeta' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/Users/Anurag/Documents/CodeCompass/frontend/src/components/Flow/FlowViewer.jsx
+  1:35  error  'useEffect' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/Users/Anurag/Documents/CodeCompass/frontend/src/components/Graph/GraphCanvas.jsx
+    1:36  error    'useState' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                              no-unused-vars
+    1:46  error    'useCallback' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                           no-unused-vars
+  218:33  error    'i' is defined but never used                                                                                                no-unused-vars
+  408:6   warning  React Hook useEffect has missing dependencies: 'draw' and 'drawMinimap'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+  599:32  error    's' is defined but never used                                                                                                no-unused-vars
+
+/Users/Anurag/Documents/CodeCompass/frontend/src/components/Graph/NodeDetail.jsx
+  342:12  error  Parsing error: Unexpected token `}`. Did you mean `&rbrace;` or `{"}"}`?
+
+/Users/Anurag/Documents/CodeCompass/frontend/src/components/Impact/ImpactPanel.jsx
+  120:10  error  'hoveredItem' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u       no-unused-vars
+  121:10  error  'hoveredImpact' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u     no-unused-vars
+  121:25  error  'setHoveredImpact' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/Users/Anurag/Documents/CodeCompass/frontend/src/components/Layout/Header.jsx
+  48:23  error  'Icon' is defined but never used  no-unused-vars
+
+/Users/Anurag/Documents/CodeCompass/frontend/src/components/Layout/Sidebar.jsx
+  1:17  error  'useState' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/Users/Anurag/Documents/CodeCompass/frontend/src/components/Layout/TopNav.jsx
+    1:27  error  'useEffect' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  605:80  error  'stats' is defined but never used                                                 no-unused-vars
+  704:28  error  'Icon' is defined but never used                                                  no-unused-vars
+
+/Users/Anurag/Documents/CodeCompass/frontend/src/components/Onboarding/OnboardingGuide.jsx
+  221:35  warning  React Hook useEffect has a missing dependency: 'execute'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/Anurag/Documents/CodeCompass/frontend/src/components/Smells/SmellsPanel.jsx
+  402:35  warning  React Hook useEffect has a missing dependency: 'execute'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/Anurag/Documents/CodeCompass/frontend/src/components/Upload/RepoUpload.jsx
+  431:21  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  429 |   // Cycle through analysis steps when loading
+  430 |   useEffect(() => {
+> 431 |     if (!loading) { setStep(0); return; }
+      |                     ^^^^^^^ Avoid calling setState() directly within an effect
+  432 |     const t = setInterval(() => setStep(s => s < ANALYSIS_STEPS.length - 1 ? s + 1 : s), 1200);
+  433 |     return () => clearInterval(t);
+  434 |   }, [loading]);  react-hooks/set-state-in-effect
+
+/Users/Anurag/Documents/CodeCompass/frontend/src/hooks/useApi.js
+  27:7  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  25 |   useEffect(() => {
+  26 |     if (autoFetch) {
+> 27 |       execute();
+     |       ^^^^^^^ Avoid calling setState() directly within an effect
+  28 |     }
+  29 |   }, [...deps, autoFetch]);
+  30 |  react-hooks/set-state-in-effect
+  29:6  warning  React Hook useEffect has a missing dependency: 'execute'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        react-hooks/exhaustive-deps
+  29:7  warning  React Hook useEffect has a spread element in its dependency array. This means we can't statically verify whether you've passed the correct dependencies                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           react-hooks/exhaustive-deps
+
+✖ 25 problems (19 errors, 6 warnings)
+

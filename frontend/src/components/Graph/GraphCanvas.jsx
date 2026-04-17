@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, { useRef, useEffect } from 'react';
 
 // ─── Codebase City: Data-Driven Digital Twin ──────────────────────────────────
 // Every element on this canvas is derived from real repo analysis data.
@@ -215,7 +215,7 @@ export default function GraphCanvas({
       return road.type === 'imports' ? '#818cf8' : '#fbbf24'; // indigo for imports, yellow for standard func calls
     }
 
-    s.cars = s.roads.map((road, i) => ({
+    s.cars = s.roads.map((road) => ({
       road,
       t: Math.random(),
       speed: 0.0015 + Math.random() * 0.001,
@@ -428,7 +428,7 @@ export default function GraphCanvas({
     for (let y = 0; y < worldH; y += 80) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(worldW, y); ctx.stroke(); }
 
     // Roads (draw under everything)
-    s.roads.forEach(r => drawRoad(ctx, r, s));
+    s.roads.forEach(r => drawRoad(ctx, r));
 
     // Districts
     s.districts.forEach(d => drawDistrict(ctx, d));
@@ -596,7 +596,7 @@ export default function GraphCanvas({
     }
   }
 
-  function drawRoad(ctx, road, s) {
+  function drawRoad(ctx, road) {
     const { ax, ay, bx, by, type } = road;
 
     // Road surface

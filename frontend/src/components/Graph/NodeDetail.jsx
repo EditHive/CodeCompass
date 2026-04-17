@@ -339,74 +339,8 @@ export default function NodeDetail({ nodeId, nodeData, onClose }) {
                 </p>
               )}
             </div>
-          )}
-          {type === 'function' && (
-            <div className="grid grid-cols-3 gap-2">
-              <Metric label="Line Range" value={`${nodeData.line_start}–${nodeData.line_end}`} color={config.color} />
-              <Metric label="Params" value={nodeData.params?.length || 0} color="#22d3ee" />
-              <Metric label="Complexity" value={nodeData.complexity} color={nodeData.complexity > 5 ? '#ef4444' : '#10b981'} warn={nodeData.complexity > 5} />
-            </div>
-          )}
-          {type === 'class' && (
-            <div className="grid grid-cols-2 gap-2">
-              <Metric label="Line Range" value={`${nodeData.line_start}–${nodeData.line_end}`} color={config.color} />
-              <Metric label="Methods" value={nodeData.num_functions} color="#22d3ee" />
-            </div>
-          )}
-
-          {/* ── Contains (classes & functions) ── */}
-          {containsEdges.length > 0 && (
-            <div>
-              <SectionHeader icon={HiOutlineCode} label="Contains" count={containsEdges.length} color={config.color} />
-              <div className="flex flex-wrap gap-1.5 mt-2">
-                {containsEdges.slice(0, 12).map((e, i) => {
-                  const name = (e.target || e.source).split('::').pop().split('/').pop();
-                  return (
-                    <span
-                      key={i}
-                      className="inline-flex items-center gap-1 px-2 py-1 rounded text-[10px] font-mono border transition-colors hover:bg-white/[0.04] cursor-default"
-                      style={{ color: '#c4c9d4', background: '#111525', borderColor: `${config.color}20` }}
-                    >
-                      <span style={{ color: config.color, fontSize: 8 }}>●</span>
-                      {name}
-                    </span>
-                  );
-                })}
-                {containsEdges.length > 12 && (
-                  <span className="px-2 py-1 rounded text-[10px] font-mono text-white/25 bg-white/[0.02] border border-white/[0.04]">
-                    +{containsEdges.length - 12}
-                  </span>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* ── Incoming connections ── */}
-          {incomingEdges.length > 0 && (
-            <div>
-              <SectionHeader icon={HiOutlineArrowLeft} label="Incoming" count={incomingEdges.length} color="#818cf8" />
-              <div className="mt-2 space-y-1">
-                {incomingEdges.slice(0, 5).map((e, i) => (
-                  <EdgeRow key={i} edge={e} direction="in" color="#818cf8" />
-                ))}
-                {incomingEdges.length > 5 && <MoreRow count={incomingEdges.length - 5} />}
-              </div>
-            </div>
-          )}
-
-          {/* ── Outgoing connections ── */}
-          {otherOutgoingEdges.length > 0 && (
-            <div>
-              <SectionHeader icon={HiOutlineArrowRight} label="Outgoing" count={otherOutgoingEdges.length} color="#34d399" />
-              <div className="mt-2 space-y-1">
-                {otherOutgoingEdges.slice(0, 5).map((e, i) => (
-                  <EdgeRow key={i} edge={e} direction="out" color="#34d399" />
-                ))}
-                {otherOutgoingEdges.length > 5 && <MoreRow count={otherOutgoingEdges.length - 5} />}
-              </div>
-            </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       <style>{`
