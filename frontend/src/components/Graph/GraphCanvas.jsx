@@ -778,88 +778,61 @@ export default function GraphCanvas({
     >
       <canvas ref={canvasRef} className="block" />
 
-      {/* HUD: Title */}
-      <div className="absolute top-4 left-4 pointer-events-none select-none">
-        <div className="text-white font-bold text-xs tracking-[0.2em] bg-black/50 px-3 py-1 rounded backdrop-blur-sm">PRISMCODE</div>
-        <div className="text-[#4b5072] text-[9px] font-mono bg-black/40 px-3 py-0.5 rounded backdrop-blur-sm border border-white/5 mt-1">
-          {'// CODEBASE CITY \u00b7 LIVE DEPENDENCY MAP'}
-        </div>
-      </div>
+
 
       {/* HUD: Legend */}
-      <div className="absolute bottom-4 left-4 bg-black/60 border border-white/10 p-3 rounded-lg backdrop-blur-md flex flex-col gap-1.5 min-w-[160px] select-none">
-        <div className="text-[8px] text-slate-500 uppercase tracking-wider font-bold mb-1">Legend</div>
-        <div className="flex items-center gap-2 text-[9px] text-slate-400 font-mono">
-          <div className="w-2.5 h-2.5 rounded-sm" style={{ background: '#6366f1' }} /> District (Directory)
+      <div 
+        className="absolute bottom-6 left-6 p-4 rounded-xl flex flex-col gap-2.5 min-w-[180px] select-none z-10"
+        style={{
+          background: 'rgba(10, 13, 20, 0.85)',
+          backdropFilter: 'blur(32px) saturate(150%)',
+          WebkitBackdropFilter: 'blur(32px) saturate(150%)',
+          border: '1px solid rgba(255,255,255,0.08)',
+          boxShadow: '0 24px 48px -12px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1)'
+        }}
+      >
+        <div className="text-[10px] text-slate-400 uppercase tracking-widest font-bold mb-1 border-b border-white/[0.04] pb-2">Legend</div>
+        <div className="flex items-center gap-3 text-[10px] text-slate-300 font-mono">
+          <div className="w-3 h-3 rounded shadow-sm border border-[#6366f1]/20" style={{ background: '#6366f1' }} /> District (Directory)
         </div>
-        <div className="flex items-center gap-2 text-[9px] text-slate-400 font-mono">
-          <div className="w-2.5 h-2.5 bg-[#111422] border border-white/20 rounded-sm" /> File (Building)
+        <div className="flex items-center gap-3 text-[10px] text-slate-300 font-mono">
+          <div className="w-3 h-3 bg-[#111422] border border-white/20 rounded shadow-sm" /> File (Building)
         </div>
-        <div className="flex items-center gap-2 text-[9px] text-slate-400 font-mono">
-          <div className="w-2.5 h-2.5 bg-amber-500 rounded-full" /> Critical Landmark
+        <div className="flex items-center gap-3 text-[10px] text-slate-300 font-mono">
+          <div className="w-3 h-3 bg-amber-500 rounded-full shadow-[0_0_8px_rgba(245,158,11,0.5)] border border-amber-400/50" /> Critical Landmark
         </div>
-        <div className="flex items-center gap-2 text-[9px] text-slate-400 font-mono">
-          <div className="w-2.5 h-2.5 bg-rose-500 rounded-sm" /> Database Traffic
+        <div className="flex items-center gap-3 text-[10px] text-slate-300 font-mono">
+          <div className="w-3 h-3 rounded shadow-sm border border-indigo-400/20" style={{ background: 'linear-gradient(135deg, #818cf8, #6366f1)' }} /> Import Traffic
         </div>
-        <div className="flex items-center gap-2 text-[9px] text-slate-400 font-mono">
-          <div className="w-2.5 h-2.5 bg-cyan-400 rounded-sm" /> API Traffic
+        <div className="flex items-center gap-3 text-[10px] text-slate-300 font-mono">
+          <div className="w-3 h-3 rounded shadow-sm border border-amber-400/20" style={{ background: 'linear-gradient(135deg, #fbbf24, #f59e0b)' }} /> Call Traffic
         </div>
-        <div className="flex items-center gap-2 text-[9px] text-slate-400 font-mono">
-          <div className="w-2.5 h-2.5 bg-amber-400 rounded-sm" /> Call Traffic
+        <div className="flex items-center gap-3 text-[10px] text-slate-300 font-mono">
+          <div className="w-3 h-3 rounded shadow-sm border border-rose-400/20" style={{ background: 'linear-gradient(135deg, #fb7185, #f43f5e)' }} /> Database Traffic
         </div>
-        <div className="flex items-center gap-2 text-[9px] text-slate-400 font-mono">
-          <div className="w-2.5 h-2.5 bg-indigo-400 rounded-sm" /> Import Traffic
+        <div className="flex items-center gap-3 text-[10px] text-slate-300 font-mono">
+          <div className="w-3 h-3 rounded shadow-sm border border-cyan-400/20" style={{ background: 'linear-gradient(135deg, #67e8f9, #22d3ee)' }} /> API Traffic
         </div>
       </div>
 
       {/* HUD: Minimap */}
-      <div className="absolute bottom-4 right-4 w-[140px] h-[100px] bg-black/80 border border-white/10 rounded-lg overflow-hidden ring-1 ring-white/5">
-        <canvas ref={mmRef} width={140} height={100} />
+      <div 
+        className="absolute bottom-6 right-6 w-[150px] h-[110px] rounded-xl overflow-hidden z-10 flex items-center justify-center p-1.5"
+        style={{
+          background: 'rgba(10, 13, 20, 0.85)',
+          backdropFilter: 'blur(32px) saturate(150%)',
+          WebkitBackdropFilter: 'blur(32px) saturate(150%)',
+          border: '1px solid rgba(255,255,255,0.08)',
+          boxShadow: '0 24px 48px -12px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1)'
+        }}
+      >
+        <div className="w-full h-full rounded-lg overflow-hidden border border-white/[0.04] bg-[#04060d] shadow-inner relative">
+          <canvas ref={mmRef} className="w-full h-full block" />
+        </div>
       </div>
 
-      {/* HUD: Selection Panel */}
-      {panelNode && (
-        <div className="absolute top-4 right-4 w-64 bg-[#0c0f18]/95 border border-white/10 rounded-xl shadow-2xl backdrop-blur-xl">
-          <div className="p-3 border-b border-white/5 flex justify-between items-center bg-white/[0.03]">
-            <div className="text-[9px] font-bold text-slate-400 tracking-widest uppercase">Building Inspector</div>
-            <button onClick={() => setPanelNode(null)} className="text-slate-500 hover:text-white transition-colors text-xs">✕</button>
-          </div>
-          <div className="p-4">
-            <div className="text-white font-bold text-sm mb-0.5 truncate">{panelNode.label}</div>
-            <div className="text-[10px] text-slate-500 font-mono mb-3 truncate">{panelNode.id}</div>
 
-            <div className="flex gap-1.5 mb-4">
-              <span className="px-2 py-0.5 bg-indigo-500/20 border border-indigo-500/30 text-indigo-400 text-[8px] rounded uppercase font-bold">
-                {panelNode.language}
-              </span>
-              {panelNode.score > 3 && (
-                <span className="px-2 py-0.5 bg-amber-500/20 border border-amber-500/30 text-amber-400 text-[8px] rounded uppercase font-bold">hub</span>
-              )}
-            </div>
 
-            <div className="flex flex-col gap-1.5">
-              {[
-                ['Lines of Code', panelNode.loc],
-                ['Functions', panelNode.funcs],
-                ['Classes', panelNode.classes],
-                ['Imports', panelNode.imports],
-                ['Connections', panelNode.score],
-              ].map(([k, v]) => (
-                <div key={k} className="flex justify-between text-[11px] py-1 border-b border-white/5">
-                  <span className="text-slate-500">{k}</span>
-                  <span className="text-slate-200 font-mono font-bold">{v}</span>
-                </div>
-              ))}
-            </div>
-
-            {panelNode.docstring && (
-              <div className="mt-3 text-[10px] text-slate-400 italic border-t border-white/5 pt-2">
-                {panelNode.docstring.slice(0, 120)}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
