@@ -4,7 +4,7 @@ import { getOnboarding } from '../../services/api';
 
 const PHASE_COLORS = {
   'Entry Point': '#f43f5e',
-  'Core Module': '#94a3b8',
+  'Core Module': '#6366f1',
   'Utility':     '#10b981',
 };
 
@@ -19,7 +19,7 @@ const s = {
   panel: {
     background: '#0d0e1a',
     borderRadius: 16,
-    border: '1px solid rgba(148, 163, 184,0.18)',
+    border: '1px solid rgba(99,102,241,0.18)',
     overflow: 'hidden',
     fontFamily: "'SF Mono', 'Fira Code', monospace",
     maxWidth: 560,
@@ -89,10 +89,10 @@ const s = {
     fontSize: 10, color: '#9396b8', lineHeight: 1.6,
   },
   stepDocstring: {
-    fontSize: 10, color: '#94a3b8', fontStyle: 'italic',
+    fontSize: 10, color: '#6366f1', fontStyle: 'italic',
     lineHeight: 1.5, marginTop: 4,
     paddingLeft: 8,
-    borderLeft: '2px solid rgba(148, 163, 184,0.3)',
+    borderLeft: '2px solid rgba(99,102,241,0.3)',
   },
   exploreRow: {
     display: 'flex', alignItems: 'center', gap: 4,
@@ -101,7 +101,7 @@ const s = {
     opacity: 0, transition: 'opacity 0.15s',
   },
   divider: {
-    height: 1, background: 'rgba(148, 163, 184,0.1)', margin: '20px 0',
+    height: 1, background: 'rgba(99,102,241,0.1)', margin: '20px 0',
   },
   statsGrid: {
     display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8,
@@ -124,8 +124,8 @@ const s = {
   },
   spinner: {
     width: 28, height: 28,
-    border: '2px solid rgba(148, 163, 184,0.2)',
-    borderTop: '2px solid #94a3b8',
+    border: '2px solid rgba(99,102,241,0.2)',
+    borderTop: '2px solid #6366f1',
     borderRadius: '50%',
     animation: 'prism-spin 0.8s linear infinite',
     marginBottom: 10,
@@ -164,7 +164,7 @@ function SummaryCard({ label, value, color }) {
 /* ─── StepRow ───────────────────────────────────────────────────────────── */
 function StepRow({ step, isLast, onSelectNode }) {
   const [hovered, setHovered] = useState(false);
-  const color = PHASE_COLORS[step.phase] || '#94a3b8';
+  const color = PHASE_COLORS[step.phase] || '#6366f1';
   const icon  = PHASE_ICONS[step.phase]  || '◇';
 
   return (
@@ -172,8 +172,8 @@ function StepRow({ step, isLast, onSelectNode }) {
       <button
         style={{
           ...s.stepRow,
-          background: hovered ? 'rgba(148, 163, 184,0.06)' : 'transparent',
-          borderColor: hovered ? 'rgba(148, 163, 184,0.18)' : 'transparent',
+          background: hovered ? 'rgba(99,102,241,0.06)' : 'transparent',
+          borderColor: hovered ? 'rgba(99,102,241,0.18)' : 'transparent',
         }}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
@@ -234,10 +234,10 @@ export default function OnboardingGuide({ onSelectNode }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
             <div style={{
               width: 38, height: 38,
-              background: 'linear-gradient(135deg, #3b82f6 0%, #475569 100%)',
+              background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
               borderRadius: 10,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 4px 16px rgba(71, 85, 105,0.25)',
+              boxShadow: '0 4px 16px rgba(139,92,246,0.25)',
               fontSize: 18, color: '#fff',
             }}>
               🗺️
@@ -248,7 +248,7 @@ export default function OnboardingGuide({ onSelectNode }) {
               </div>
               <p style={s.subHeaderText} style={{ fontSize: 11, color: '#64748b', marginTop: 2 }}>
                 Recommended exploration path &nbsp;·&nbsp;
-                <span style={{ color: '#475569', fontWeight: 700 }}>{displayData.total_files}</span> files
+                <span style={{ color: '#8b5cf6', fontWeight: 700 }}>{displayData.total_files}</span> files
               </p>
             </div>
           </div>
@@ -292,7 +292,7 @@ export default function OnboardingGuide({ onSelectNode }) {
           <p style={s.sectionLabel}>Codebase breakdown</p>
           <div style={s.statsGrid}>
             <SummaryCard label="Entry Points" value={displayData.entry_points?.length  || 0} color="#f43f5e" />
-            <SummaryCard label="Core Modules" value={displayData.core_modules?.length  || 0} color="#94a3b8" />
+            <SummaryCard label="Core Modules" value={displayData.core_modules?.length  || 0} color="#6366f1" />
             <SummaryCard label="Utilities"    value={displayData.utility_modules?.length || 0} color="#10b981" />
           </div>
         </div>

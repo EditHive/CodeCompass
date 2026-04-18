@@ -97,13 +97,13 @@ const STYLES = `
     background: linear-gradient(
       90deg,
       transparent 0%,
-      rgba(148, 163, 184, 0.0) 5%,
-      rgba(148, 163, 184, 0.5) 20%,
-      rgba(71, 85, 105, 0.6) 35%,
+      rgba(99, 102, 241, 0.0) 5%,
+      rgba(99, 102, 241, 0.5) 20%,
+      rgba(139, 92, 246, 0.6) 35%,
       rgba(236, 72, 153, 0.5) 50%,
       rgba(34, 211, 238, 0.5) 65%,
-      rgba(148, 163, 184, 0.5) 80%,
-      rgba(148, 163, 184, 0.0) 95%,
+      rgba(99, 102, 241, 0.5) 80%,
+      rgba(99, 102, 241, 0.0) 95%,
       transparent 100%
     );
     background-size: 200% 100%;
@@ -154,7 +154,7 @@ const STYLES = `
     background: linear-gradient(
       180deg,
       transparent,
-      rgba(148, 163, 184, 0.3),
+      rgba(99, 102, 241, 0.3),
       transparent
     );
   }
@@ -175,8 +175,8 @@ const STYLES = `
     inset: -3px;
     border-radius: 50%;
     border: 1.5px solid transparent;
-    border-top-color: rgba(148, 163, 184, 0.5);
-    border-right-color: rgba(71, 85, 105, 0.3);
+    border-top-color: rgba(99, 102, 241, 0.5);
+    border-right-color: rgba(139, 92, 246, 0.3);
     animation: tn-orbit 6s linear infinite;
   }
 
@@ -184,7 +184,7 @@ const STYLES = `
     width: 30px;
     height: 30px;
     border-radius: 10px;
-    background: linear-gradient(135deg, #94a3b8 0%, #475569 50%, #64748b 100%);
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a78bfa 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -193,8 +193,8 @@ const STYLES = `
     color: #fff;
     letter-spacing: -0.02em;
     box-shadow:
-      0 0 20px rgba(148, 163, 184, 0.35),
-      0 0 40px rgba(71, 85, 105, 0.15),
+      0 0 20px rgba(99, 102, 241, 0.35),
+      0 0 40px rgba(139, 92, 246, 0.15),
       inset 0 1px 0 rgba(255, 255, 255, 0.2);
     position: relative;
     z-index: 1;
@@ -204,8 +204,8 @@ const STYLES = `
   .tn-logo-container:hover .tn-logo-core {
     transform: scale(1.08) rotate(-5deg);
     box-shadow:
-      0 0 25px rgba(148, 163, 184, 0.5),
-      0 0 50px rgba(71, 85, 105, 0.25),
+      0 0 25px rgba(99, 102, 241, 0.5),
+      0 0 50px rgba(139, 92, 246, 0.25),
       inset 0 1px 0 rgba(255, 255, 255, 0.25);
   }
 
@@ -231,7 +231,7 @@ const STYLES = `
   }
 
   .tn-brand-name .tn-brand-highlight {
-    background: linear-gradient(135deg, #cbd5e1 0%, #64748b 100%);
+    background: linear-gradient(135deg, #818cf8 0%, #a78bfa 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -491,7 +491,7 @@ const STYLES = `
     padding: 8px 18px;
     border-radius: 12px;
     border: none;
-    background: linear-gradient(135deg, #94a3b8 0%, #334155 50%, #475569 100%);
+    background: linear-gradient(135deg, #6366f1 0%, #7c3aed 50%, #8b5cf6 100%);
     background-size: 200% 200%;
     animation: tn-gradient-shift 4s ease infinite;
     color: #fff;
@@ -504,8 +504,8 @@ const STYLES = `
     letter-spacing: 0.03em;
     overflow: hidden;
     box-shadow:
-      0 2px 12px rgba(148, 163, 184, 0.25),
-      0 4px 24px rgba(148, 163, 184, 0.1);
+      0 2px 12px rgba(99, 102, 241, 0.25),
+      0 4px 24px rgba(99, 102, 241, 0.1);
   }
 
   .tn-load-btn::before {
@@ -551,14 +551,14 @@ const STYLES = `
   .tn-load-btn:hover {
     transform: translateY(-2px) scale(1.02);
     box-shadow:
-      0 4px 20px rgba(148, 163, 184, 0.4),
-      0 8px 32px rgba(148, 163, 184, 0.15);
+      0 4px 20px rgba(99, 102, 241, 0.4),
+      0 8px 32px rgba(99, 102, 241, 0.15);
   }
 
   .tn-load-btn:active {
     transform: translateY(0) scale(0.98);
     box-shadow:
-      0 1px 6px rgba(148, 163, 184, 0.3);
+      0 1px 6px rgba(99, 102, 241, 0.3);
   }
 
   .tn-load-btn svg {

@@ -8,9 +8,9 @@ const STYLES = `
     --bg: #070810;
     --surface: #0d0f1a;
     --surface2: #111425;
-    --border: rgba(148, 163, 184,0.18);
-    --border-glow: rgba(148, 163, 184,0.45);
-    --accent: #94a3b8;
+    --border: rgba(99,102,241,0.18);
+    --border-glow: rgba(99,102,241,0.45);
+    --accent: #6366f1;
     --accent2: #4ade80;
     --text: #e8eaf6;
     --text-dim: #7c7fa8;
@@ -32,8 +32,8 @@ const STYLES = `
   .pu-grid {
     position: absolute; inset: 0; pointer-events: none;
     background-image:
-      linear-gradient(rgba(148, 163, 184,0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(148, 163, 184,0.04) 1px, transparent 1px);
+      linear-gradient(rgba(99,102,241,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(99,102,241,0.04) 1px, transparent 1px);
     background-size: 48px 48px;
     mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
   }
@@ -43,7 +43,7 @@ const STYLES = `
     position: absolute; border-radius: 50%; pointer-events: none;
     filter: blur(80px); animation: orbFloat linear infinite;
   }
-  .pu-orb1 { width: 500px; height: 500px; background: rgba(148, 163, 184,0.12); top: -120px; left: -100px; animation-duration: 18s; }
+  .pu-orb1 { width: 500px; height: 500px; background: rgba(99,102,241,0.12); top: -120px; left: -100px; animation-duration: 18s; }
   .pu-orb2 { width: 350px; height: 350px; background: rgba(74,222,128,0.07); bottom: -80px; right: -60px; animation-duration: 22s; animation-direction: reverse; }
   .pu-orb3 { width: 250px; height: 250px; background: rgba(244,63,94,0.06); top: 30%; right: 10%; animation-duration: 15s; }
 
@@ -61,7 +61,7 @@ const STYLES = `
   .pu-scanline::after {
     content: '';
     position: absolute; left: 0; right: 0; height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(148, 163, 184,0.3), transparent);
+    background: linear-gradient(90deg, transparent, rgba(99,102,241,0.3), transparent);
     animation: scanSweep 6s ease-in-out infinite;
   }
   @keyframes scanSweep {
@@ -80,9 +80,9 @@ const STYLES = `
     border-radius: 20px;
     padding: 40px;
     box-shadow:
-      0 0 0 1px rgba(148, 163, 184,0.05) inset,
+      0 0 0 1px rgba(99,102,241,0.05) inset,
       0 40px 80px rgba(0,0,0,0.6),
-      0 0 60px rgba(148, 163, 184,0.08);
+      0 0 60px rgba(99,102,241,0.08);
     animation: cardIn 0.6s cubic-bezier(0.22,1,0.36,1) both;
     backdrop-filter: blur(24px);
   }
@@ -119,8 +119,8 @@ const STYLES = `
     animation: hexPulse 3s ease-in-out infinite;
   }
   @keyframes hexPulse {
-    0%, 100% { filter: drop-shadow(0 0 8px rgba(148, 163, 184,0.5)); }
-    50%       { filter: drop-shadow(0 0 20px rgba(148, 163, 184,0.9)); }
+    0%, 100% { filter: drop-shadow(0 0 8px rgba(99,102,241,0.5)); }
+    50%       { filter: drop-shadow(0 0 20px rgba(99,102,241,0.9)); }
   }
 
   .pu-wordmark {
@@ -187,8 +187,8 @@ const STYLES = `
   .pu-input::placeholder { color: var(--text-muted); }
   .pu-input:focus {
     border-color: var(--border-glow);
-    background: rgba(148, 163, 184,0.04);
-    box-shadow: 0 0 0 3px rgba(148, 163, 184,0.08), 0 0 20px rgba(148, 163, 184,0.05);
+    background: rgba(99,102,241,0.04);
+    box-shadow: 0 0 0 3px rgba(99,102,241,0.08), 0 0 20px rgba(99,102,241,0.05);
   }
   .pu-input:focus + .pu-input-icon { color: var(--accent); }
   .pu-input.valid { border-color: rgba(74,222,128,0.4); }
@@ -215,13 +215,13 @@ const STYLES = `
     font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700;
     letter-spacing: 0.05em; color: white; overflow: hidden;
     transition: transform 0.15s, box-shadow 0.2s, opacity 0.2s;
-    background: linear-gradient(135deg, #94a3b8 0%, #64748b 50%, #334155 100%);
-    box-shadow: 0 4px 24px rgba(148, 163, 184,0.35);
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 50%, #4338ca 100%);
+    box-shadow: 0 4px 24px rgba(99,102,241,0.35);
     animation: fadeUp 0.5s 0.3s both;
   }
   .pu-btn:not(:disabled):hover {
     transform: translateY(-1px);
-    box-shadow: 0 8px 32px rgba(148, 163, 184,0.5);
+    box-shadow: 0 8px 32px rgba(99,102,241,0.5);
   }
   .pu-btn:not(:disabled):active { transform: scale(0.98); }
   .pu-btn:disabled { opacity: 0.35; cursor: not-allowed; }
@@ -300,20 +300,20 @@ const STYLES = `
 
   .pu-feat {
     position: relative; padding: 12px 8px; border-radius: 12px;
-    border: 1px solid rgba(148, 163, 184,0.1);
+    border: 1px solid rgba(99,102,241,0.1);
     background: rgba(255,255,255,0.02);
     text-align: center; cursor: default;
     transition: border-color 0.25s, background 0.25s, transform 0.2s;
     overflow: hidden;
   }
   .pu-feat:hover {
-    border-color: rgba(148, 163, 184,0.35);
-    background: rgba(148, 163, 184,0.06);
+    border-color: rgba(99,102,241,0.35);
+    background: rgba(99,102,241,0.06);
     transform: translateY(-2px);
   }
   .pu-feat::before {
     content: ''; position: absolute; inset: 0;
-    background: radial-gradient(circle at 50% 0%, rgba(148, 163, 184,0.1), transparent 70%);
+    background: radial-gradient(circle at 50% 0%, rgba(99,102,241,0.1), transparent 70%);
     opacity: 0; transition: opacity 0.25s;
   }
   .pu-feat:hover::before { opacity: 1; }
@@ -388,8 +388,8 @@ function HexLogo() {
     <svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <linearGradient id="hg1" x1="0" y1="0" x2="56" y2="56" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#cbd5e1" />
-          <stop offset="100%" stopColor="#64748b" />
+          <stop offset="0%" stopColor="#818cf8" />
+          <stop offset="100%" stopColor="#4f46e5" />
         </linearGradient>
         <linearGradient id="hg2" x1="0" y1="0" x2="56" y2="56" gradientUnits="userSpaceOnUse">
           <stop offset="0%" stopColor="#4ade80" />
@@ -438,7 +438,7 @@ export default function RepoUpload({ onAnalyze, loading, error }) {
 
   const statusLabel = {
     github: { text: '⬡ GitHub', color: '#4ade80' },
-    url: { text: '⬡ URL', color: '#94a3b8' },
+    url: { text: '⬡ URL', color: '#6366f1' },
     local: { text: '⬡ local', color: '#f59e0b' },
     typing: { text: '…', color: '#7c7fa8' },
     idle: { text: null, color: null },

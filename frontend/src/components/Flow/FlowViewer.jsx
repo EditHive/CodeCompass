@@ -16,8 +16,8 @@ const STYLES = `
     content: '';
     position: absolute; inset: 0; pointer-events: none; z-index: 0;
     background-image:
-      linear-gradient(rgba(148, 163, 184,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(148, 163, 184,0.03) 1px, transparent 1px);
+      linear-gradient(rgba(99,102,241,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(99,102,241,0.03) 1px, transparent 1px);
     background-size: 40px 40px;
     mask-image: radial-gradient(ellipse 100% 100% at 50% 0%, black 50%, transparent 100%);
   }
@@ -29,7 +29,7 @@ const STYLES = `
   /* ── input row ── */
   .fv-input-row {
     padding: 14px 20px;
-    border-bottom: 1px solid rgba(148, 163, 184,0.1);
+    border-bottom: 1px solid rgba(99,102,241,0.1);
     background: rgba(13,15,26,0.5); flex-shrink: 0;
   }
   .fv-input-inner { display: flex; gap: 8px; align-items: center; }
@@ -42,7 +42,7 @@ const STYLES = `
   .fv-input {
     width: 100%; padding: 10px 12px 10px 52px;
     background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(148, 163, 184,0.15); border-radius: 10px;
+    border: 1px solid rgba(99,102,241,0.15); border-radius: 10px;
     color: #e8eaf6; font-size: 12px; font-family: 'JetBrains Mono', monospace;
     outline: none; transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
     caret-color: #22d3ee;
@@ -85,10 +85,10 @@ const STYLES = `
   /* ── scroll body ── */
   .fv-body {
     flex: 1; overflow-y: auto; padding: 16px 20px;
-    scrollbar-width: thin; scrollbar-color: rgba(148, 163, 184,0.2) transparent;
+    scrollbar-width: thin; scrollbar-color: rgba(99,102,241,0.2) transparent;
   }
   .fv-body::-webkit-scrollbar { width: 4px; }
-  .fv-body::-webkit-scrollbar-thumb { background: rgba(148, 163, 184,0.2); border-radius: 2px; }
+  .fv-body::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.2); border-radius: 2px; }
 
   /* ── error ── */
   .fv-error {
@@ -105,8 +105,8 @@ const STYLES = `
   }
   .fv-empty-icon {
     width: 48px; height: 48px; border-radius: 14px;
-    border: 1px solid rgba(148, 163, 184,0.2);
-    background: rgba(148, 163, 184,0.05);
+    border: 1px solid rgba(99,102,241,0.2);
+    background: rgba(99,102,241,0.05);
     display: flex; align-items: center; justify-content: center; font-size: 20px;
   }
   .fv-empty-text { font-size: 11px; color: #4a4d6e; font-family: 'JetBrains Mono', monospace; text-align: center; line-height: 1.6; }
@@ -137,10 +137,10 @@ const STYLES = `
   .fv-file-chip {
     font-size: 10px; font-family: 'JetBrains Mono', monospace;
     padding: 3px 9px; border-radius: 6px; cursor: default;
-    background: rgba(148, 163, 184,0.08); border: 1px solid rgba(148, 163, 184,0.2);
-    color: #cbd5e1; transition: background 0.2s;
+    background: rgba(99,102,241,0.08); border: 1px solid rgba(99,102,241,0.2);
+    color: #818cf8; transition: background 0.2s;
   }
-  .fv-file-chip:hover { background: rgba(148, 163, 184,0.15); }
+  .fv-file-chip:hover { background: rgba(99,102,241,0.15); }
 
   /* ── timeline ── */
   .fv-timeline { display: flex; flex-direction: column; gap: 0; }
@@ -171,7 +171,7 @@ const STYLES = `
   .fv-step-connector::after {
     content: ''; position: absolute;
     top: 0; bottom: 0; left: 0; width: 1px;
-    background: linear-gradient(180deg, var(--conn-color, rgba(148, 163, 184,0.25)), transparent);
+    background: linear-gradient(180deg, var(--conn-color, rgba(99,102,241,0.25)), transparent);
   }
 
   /* arrow tick on connector */
@@ -189,7 +189,7 @@ const STYLES = `
     min-width: 0;
   }
   .fv-step-body:hover { background: rgba(255,255,255,0.04); }
-  .fv-step-body.expanded { border-color: rgba(148, 163, 184,0.18) !important; }
+  .fv-step-body.expanded { border-color: rgba(99,102,241,0.18) !important; }
 
   .fv-step-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; }
   .fv-step-emoji { font-size: 14px; line-height: 1; }
@@ -224,30 +224,30 @@ const STYLES = `
   /* code snippet */
   .fv-code-wrap {
     margin-top: 10px; border-radius: 8px; overflow: hidden;
-    border: 1px solid rgba(148, 163, 184,0.12);
+    border: 1px solid rgba(99,102,241,0.12);
     animation: fvFadeUp 0.25s ease;
   }
   .fv-code-header {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 6px 12px; background: rgba(148, 163, 184,0.06);
-    border-bottom: 1px solid rgba(148, 163, 184,0.1);
+    padding: 6px 12px; background: rgba(99,102,241,0.06);
+    border-bottom: 1px solid rgba(99,102,241,0.1);
   }
-  .fv-code-lang { font-size: 9px; font-family: 'JetBrains Mono', monospace; color: #94a3b8; letter-spacing: 0.1em; font-weight: 600; }
+  .fv-code-lang { font-size: 9px; font-family: 'JetBrains Mono', monospace; color: #6366f1; letter-spacing: 0.1em; font-weight: 600; }
   .fv-code-copy {
     font-size: 9px; font-family: 'JetBrains Mono', monospace; color: #4a4d6e;
     background: none; border: none; cursor: pointer; padding: 0; letter-spacing: 0.06em;
     transition: color 0.2s;
   }
-  .fv-code-copy:hover { color: #cbd5e1; }
+  .fv-code-copy:hover { color: #818cf8; }
   .fv-code {
     padding: 12px 14px; max-height: 160px; overflow-y: auto;
     background: rgba(7,8,16,0.8); font-size: 11px; line-height: 1.7;
     font-family: 'JetBrains Mono', monospace; color: #a5b4fc;
     white-space: pre; scrollbar-width: thin;
-    scrollbar-color: rgba(148, 163, 184,0.2) transparent;
+    scrollbar-color: rgba(99,102,241,0.2) transparent;
   }
   .fv-code::-webkit-scrollbar { height: 3px; }
-  .fv-code::-webkit-scrollbar-thumb { background: rgba(148, 163, 184,0.2); border-radius: 2px; }
+  .fv-code::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.2); border-radius: 2px; }
 
   /* no-result */
   .fv-no-result {
@@ -265,23 +265,23 @@ const STYLES = `
   .fv-suggestion {
     font-size: 10px; font-family: 'JetBrains Mono', monospace;
     padding: 4px 10px; border-radius: 6px;
-    background: rgba(255,255,255,0.03); border: 1px solid rgba(148, 163, 184,0.15);
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(99,102,241,0.15);
     color: #7c7fa8; cursor: pointer; transition: all 0.15s; letter-spacing: 0.03em;
   }
-  .fv-suggestion:hover { background: rgba(148, 163, 184,0.08); border-color: rgba(148, 163, 184,0.3); color: #cbd5e1; }
+  .fv-suggestion:hover { background: rgba(99,102,241,0.08); border-color: rgba(99,102,241,0.3); color: #818cf8; }
 `;
 
 // ─── Operation metadata ────────────────────────────────────────────────────
 const OPS = {
   authentication: { color: '#ec4899', glow: 'rgba(236,72,153,0.25)', icon: '🔐', label: 'auth' },
   database:       { color: '#10b981', glow: 'rgba(16,185,129,0.25)', icon: '💾', label: 'db' },
-  api_call:       { color: '#94a3b8', glow: 'rgba(148, 163, 184,0.25)', icon: '🌐', label: 'api' },
+  api_call:       { color: '#6366f1', glow: 'rgba(99,102,241,0.25)', icon: '🌐', label: 'api' },
   validation:     { color: '#22d3ee', glow: 'rgba(34,211,238,0.25)', icon: '✅', label: 'validate' },
   logging:        { color: '#71717a', glow: 'rgba(113,113,122,0.2)', icon: '📝', label: 'log' },
-  initialization: { color: '#475569', glow: 'rgba(71, 85, 105,0.25)', icon: '🚀', label: 'init' },
+  initialization: { color: '#8b5cf6', glow: 'rgba(139,92,246,0.25)', icon: '🚀', label: 'init' },
   payment:        { color: '#eab308', glow: 'rgba(234,179,8,0.25)',  icon: '💳', label: 'payment' },
   notification:   { color: '#f97316', glow: 'rgba(249,115,22,0.25)', icon: '📧', label: 'notify' },
-  computation:    { color: '#64748b', glow: 'rgba(100, 116, 139,0.25)', icon: '⚙️', label: 'compute' },
+  computation:    { color: '#a78bfa', glow: 'rgba(167,139,250,0.25)', icon: '⚙️', label: 'compute' },
 };
 const DEFAULT_OP = { color: '#7c7fa8', glow: 'rgba(124,127,168,0.2)', icon: '⚙️', label: 'exec' };
 
@@ -359,7 +359,7 @@ function StepCard({ step, index, total, isExpanded, onToggle }) {
           <span style={{ opacity: 0.5 }}>◈</span>
           <span style={{ color: '#4a4d6e' }}>
             {step.file}
-            <span style={{ color: '#94a3b8', opacity: 0.7 }}>:{step.line_start}</span>
+            <span style={{ color: '#6366f1', opacity: 0.7 }}>:{step.line_start}</span>
           </span>
         </div>
 
@@ -476,7 +476,7 @@ export default function FlowViewer({ onHighlightFlow }) {
               <div className="fv-empty" style={{ paddingTop: 40 }}>
                 <div style={{
                   width: 48, height: 48,
-                  background: 'linear-gradient(135deg, #94a3b8 0%, #4ade80 100%)',
+                  background: 'linear-gradient(135deg, #6366f1 0%, #4ade80 100%)',
                   borderRadius: 14,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   boxShadow: '0 4px 16px rgba(74,222,128,0.2)',
@@ -501,7 +501,7 @@ export default function FlowViewer({ onHighlightFlow }) {
                   <div key={i} style={{
                     height: 68, borderRadius: 12,
                     background: 'rgba(255,255,255,0.02)',
-                    border: '1px solid rgba(148, 163, 184,0.08)',
+                    border: '1px solid rgba(99,102,241,0.08)',
                     animation: `fvPulse 1.4s ease-in-out ${i * 0.1}s infinite`,
                   }} />
                 ))}
@@ -555,7 +555,7 @@ export default function FlowViewer({ onHighlightFlow }) {
                 <div style={{
                   marginTop: 20, padding: '10px 14px',
                   borderRadius: 8, background: 'rgba(255,255,255,0.02)',
-                  border: '1px solid rgba(148, 163, 184,0.1)',
+                  border: '1px solid rgba(99,102,241,0.1)',
                   display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                 }}>
                   <span style={{ fontSize: 10, fontFamily: "'JetBrains Mono', monospace", color: '#4a4d6e' }}>

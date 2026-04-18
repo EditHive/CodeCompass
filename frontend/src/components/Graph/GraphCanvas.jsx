@@ -90,7 +90,7 @@ export default function GraphCanvas({
     const ROW_SLOT = ROOF_H + MAX_BLDG_H + LABEL_H + FILE_GAP; // = 144px per row
     const CONTENT_TOP = HEADER + PAD + 10;     // top of first row inside district
 
-    const COLORS = ['#94a3b8', '#f43f5e', '#22d3ee', '#10b981', '#f59e0b', '#64748b', '#64748b', '#ec4899', '#14b8a6', '#475569'];
+    const COLORS = ['#6366f1', '#f43f5e', '#22d3ee', '#10b981', '#f59e0b', '#a78bfa', '#64748b', '#ec4899', '#14b8a6', '#8b5cf6'];
 
     s.districts = [];
     s.buildings = [];
@@ -212,7 +212,7 @@ export default function GraphCanvas({
 
       if (isDb) return '#f43f5e'; // rose/red for database traffic
       if (isApi) return '#22d3ee'; // cyan for api traffic
-      return road.type === 'imports' ? '#cbd5e1' : '#fbbf24'; // indigo for imports, yellow for standard func calls
+      return road.type === 'imports' ? '#818cf8' : '#fbbf24'; // indigo for imports, yellow for standard func calls
     }
 
     s.cars = s.roads.map((road) => ({
@@ -616,7 +616,7 @@ export default function GraphCanvas({
 
     // Lane markings
     ctx.setLineDash([6, 8]);
-    ctx.strokeStyle = type === 'imports' ? '#94a3b822' : '#f59e0b18';
+    ctx.strokeStyle = type === 'imports' ? '#6366f122' : '#f59e0b18';
     ctx.lineWidth = 0.8;
     ctx.stroke();
     ctx.setLineDash([]);
@@ -626,7 +626,7 @@ export default function GraphCanvas({
     ctx.save();
     ctx.translate(mid.x, mid.y);
     ctx.rotate(mid.angle);
-    ctx.fillStyle = type === 'imports' ? '#94a3b844' : '#f59e0b33';
+    ctx.fillStyle = type === 'imports' ? '#6366f144' : '#f59e0b33';
     ctx.beginPath();
     ctx.moveTo(6, 0);
     ctx.lineTo(-3, -3);
@@ -781,14 +781,14 @@ export default function GraphCanvas({
       <div style={{
         position: 'absolute', bottom: 16, left: 16,
         background: 'rgba(13,15,26,0.92)',
-        border: '1px solid rgba(148, 163, 184,0.18)',
+        border: '1px solid rgba(99,102,241,0.18)',
         borderRadius: 12,
         backdropFilter: 'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',
         padding: '10px 12px',
         display: 'flex', flexDirection: 'column', gap: 0,
         minWidth: 172,
-        boxShadow: '0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(148, 163, 184,0.06)',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(99,102,241,0.06)',
         userSelect: 'none',
         fontFamily: "'SF Pro Display',-apple-system,BlinkMacSystemFont,sans-serif",
       }}>
@@ -796,11 +796,11 @@ export default function GraphCanvas({
         <div style={{
           display: 'flex', alignItems: 'center', gap: 6,
           marginBottom: 8, paddingBottom: 8,
-          borderBottom: '1px solid rgba(148, 163, 184,0.1)',
+          borderBottom: '1px solid rgba(99,102,241,0.1)',
         }}>
           <div style={{
             width: 14, height: 14, borderRadius: 4,
-            background: 'linear-gradient(135deg,#94a3b8,#334155)',
+            background: 'linear-gradient(135deg,#6366f1,#7c3aed)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontSize: 7, color: '#fff', fontWeight: 700,
           }}>P</div>
@@ -814,7 +814,7 @@ export default function GraphCanvas({
           Nodes
         </div>
         {[
-          { swatch: { background: 'linear-gradient(135deg,#94a3b8,#64748b)', borderRadius: 4 }, label: 'District (Directory)' },
+          { swatch: { background: 'linear-gradient(135deg,#6366f1,#4f46e5)', borderRadius: 4 }, label: 'District (Directory)' },
           { swatch: { background: '#111422', border: '1px solid rgba(255,255,255,0.18)', borderRadius: 4 }, label: 'File (Building)' },
           { swatch: { background: '#f59e0b', borderRadius: '50%', boxShadow: '0 0 6px rgba(245,158,11,0.5)' }, label: 'Critical Landmark' },
         ].map(({ swatch, label }) => (
@@ -825,7 +825,7 @@ export default function GraphCanvas({
         ))}
 
         {/* Divider */}
-        <div style={{ height: 1, background: 'rgba(148, 163, 184,0.08)', margin: '6px 0' }} />
+        <div style={{ height: 1, background: 'rgba(99,102,241,0.08)', margin: '6px 0' }} />
 
         {/* Traffic section */}
         <div style={{ fontSize: 8.5, fontWeight: 600, color: '#3a3d52', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 5 }}>
@@ -835,7 +835,7 @@ export default function GraphCanvas({
           { color: '#f43f5e', glow: 'rgba(244,63,94,0.4)', label: 'Database', shape: 4 },
           { color: '#22d3ee', glow: 'rgba(34,211,238,0.4)', label: 'API', shape: 4 },
           { color: '#f59e0b', glow: 'rgba(245,158,11,0.4)', label: 'Call', shape: 4 },
-          { color: '#cbd5e1', glow: 'rgba(203, 213, 225,0.4)', label: 'Import', shape: 4 },
+          { color: '#818cf8', glow: 'rgba(129,140,248,0.4)', label: 'Import', shape: 4 },
         ].map(({ color, glow, label, shape }) => (
           <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
             <div style={{
@@ -927,10 +927,10 @@ export default function GraphCanvas({
         position: 'absolute', bottom: 16, right: 16,
         width: 148,
         background: 'rgba(13,15,26,0.92)',
-        border: '1px solid rgba(148, 163, 184,0.18)',
+        border: '1px solid rgba(99,102,241,0.18)',
         borderRadius: 12,
         overflow: 'hidden',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(148, 163, 184,0.06)',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(99,102,241,0.06)',
         backdropFilter: 'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',
         fontFamily: "'SF Pro Display',-apple-system,BlinkMacSystemFont,sans-serif",
@@ -939,14 +939,14 @@ export default function GraphCanvas({
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           padding: '6px 9px',
-          borderBottom: '1px solid rgba(148, 163, 184,0.1)',
-          background: 'rgba(148, 163, 184,0.04)',
+          borderBottom: '1px solid rgba(99,102,241,0.1)',
+          background: 'rgba(99,102,241,0.04)',
         }}>
           <span style={{ fontSize: 8.5, fontWeight: 700, color: '#555870', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
             Minimap
           </span>
           <div style={{ display: 'flex', gap: 3 }}>
-            <div style={{ width: 5, height: 5, borderRadius: '50%', background: 'rgba(148, 163, 184,0.3)' }} />
+            <div style={{ width: 5, height: 5, borderRadius: '50%', background: 'rgba(99,102,241,0.3)' }} />
             <div style={{ width: 5, height: 5, borderRadius: '50%', background: 'rgba(34,211,238,0.3)' }} />
           </div>
         </div>
@@ -955,18 +955,18 @@ export default function GraphCanvas({
         <div style={{ position: 'relative' }}>
           <canvas ref={mmRef} width={148} height={100} style={{ display: 'block' }} />
           {/* corner accent lines */}
-          <div style={{ position: 'absolute', top: 4, left: 4, width: 8, height: 8, borderTop: '1px solid rgba(148, 163, 184,0.4)', borderLeft: '1px solid rgba(148, 163, 184,0.4)' }} />
-          <div style={{ position: 'absolute', top: 4, right: 4, width: 8, height: 8, borderTop: '1px solid rgba(148, 163, 184,0.4)', borderRight: '1px solid rgba(148, 163, 184,0.4)' }} />
-          <div style={{ position: 'absolute', bottom: 4, left: 4, width: 8, height: 8, borderBottom: '1px solid rgba(148, 163, 184,0.4)', borderLeft: '1px solid rgba(148, 163, 184,0.4)' }} />
-          <div style={{ position: 'absolute', bottom: 4, right: 4, width: 8, height: 8, borderBottom: '1px solid rgba(148, 163, 184,0.4)', borderRight: '1px solid rgba(148, 163, 184,0.4)' }} />
+          <div style={{ position: 'absolute', top: 4, left: 4, width: 8, height: 8, borderTop: '1px solid rgba(99,102,241,0.4)', borderLeft: '1px solid rgba(99,102,241,0.4)' }} />
+          <div style={{ position: 'absolute', top: 4, right: 4, width: 8, height: 8, borderTop: '1px solid rgba(99,102,241,0.4)', borderRight: '1px solid rgba(99,102,241,0.4)' }} />
+          <div style={{ position: 'absolute', bottom: 4, left: 4, width: 8, height: 8, borderBottom: '1px solid rgba(99,102,241,0.4)', borderLeft: '1px solid rgba(99,102,241,0.4)' }} />
+          <div style={{ position: 'absolute', bottom: 4, right: 4, width: 8, height: 8, borderBottom: '1px solid rgba(99,102,241,0.4)', borderRight: '1px solid rgba(99,102,241,0.4)' }} />
         </div>
 
         {/* Footer coordinates */}
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           padding: '4px 9px',
-          borderTop: '1px solid rgba(148, 163, 184,0.08)',
-          background: 'rgba(148, 163, 184,0.02)',
+          borderTop: '1px solid rgba(99,102,241,0.08)',
+          background: 'rgba(99,102,241,0.02)',
         }}>
           <span style={{
             fontSize: 8.5, color: '#3a3d52', fontFamily: "'SF Mono','Fira Code',monospace",
