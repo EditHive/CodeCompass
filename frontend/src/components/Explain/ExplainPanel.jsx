@@ -47,7 +47,7 @@ const LEVELS = [
 ];
 
 const TYPE_COLORS = {
-  file: { dot: '#6366f1', bg: 'rgba(99,102,241,0.1)', text: '#818cf8' },
+  file: { dot: '#94a3b8', bg: 'rgba(148, 163, 184,0.1)', text: '#cbd5e1' },
   function: { dot: '#22d3ee', bg: 'rgba(34,211,238,0.1)', text: '#67e8f9' },
   class: { dot: '#10b981', bg: 'rgba(16,185,129,0.1)', text: '#34d399' },
 };
@@ -70,7 +70,7 @@ const S = {
   /* controls */
   controls: {
     padding: '13px 16px',
-    borderBottom: '1px solid rgba(99,102,241,0.12)',
+    borderBottom: '1px solid rgba(148, 163, 184,0.12)',
     display: 'flex',
     flexDirection: 'column',
     gap: 10,
@@ -92,7 +92,7 @@ const S = {
     width: '100%',
     padding: '9px 10px 9px 32px',
     background: '#1a1e35',
-    border: '1px solid rgba(99,102,241,0.13)',
+    border: '1px solid rgba(148, 163, 184,0.13)',
     borderRadius: 9,
     fontSize: 11.5,
     color: '#e2e4f0',
@@ -109,7 +109,7 @@ const S = {
     right: 0,
     zIndex: 50,
     background: '#131629',
-    border: '1px solid rgba(99,102,241,0.22)',
+    border: '1px solid rgba(148, 163, 184,0.22)',
     borderRadius: 9,
     overflow: 'hidden',
     maxHeight: 140,
@@ -123,7 +123,7 @@ const S = {
     fontSize: 11.5,
     cursor: 'pointer',
     transition: 'background 0.12s',
-    borderBottom: '1px solid rgba(99,102,241,0.06)',
+    borderBottom: '1px solid rgba(148, 163, 184,0.06)',
   },
   dropDot: { width: 6, height: 6, borderRadius: '50%', flexShrink: 0 },
   dropLabel: { flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: '#c8cae0' },
@@ -144,7 +144,7 @@ const S = {
     gap: 5,
     padding: '9px 6px',
     borderRadius: 9,
-    border: '1px solid rgba(99,102,241,0.13)',
+    border: '1px solid rgba(148, 163, 184,0.13)',
     background: 'rgba(255,255,255,0.015)',
     fontSize: 10,
     fontWeight: 600,
@@ -236,7 +236,7 @@ const S = {
   codeLabel: { fontSize: 9, fontWeight: 700, color: '#3a3d52', letterSpacing: '0.1em', textTransform: 'uppercase' },
   codeBlock: {
     background: '#1a1e35',
-    border: '1px solid rgba(99,102,241,0.12)',
+    border: '1px solid rgba(148, 163, 184,0.12)',
     borderRadius: 9,
     padding: '10px 12px',
     fontFamily: "'SF Mono','Fira Code',monospace",
@@ -250,7 +250,7 @@ const S = {
 
   metaBlock: {
     background: 'rgba(255,255,255,0.015)',
-    border: '1px solid rgba(99,102,241,0.1)',
+    border: '1px solid rgba(148, 163, 184,0.1)',
     borderRadius: 9,
     padding: '9px 12px',
     display: 'flex',
@@ -462,7 +462,7 @@ export default function ExplainPanel() {
                   ...(isActive
                     ? { background: l.bg, borderColor: l.border, color: l.color }
                     : isHovered
-                    ? { background: '#1a1e35', borderColor: 'rgba(99,102,241,0.22)', color: '#8b8fa8' }
+                    ? { background: '#1a1e35', borderColor: 'rgba(148, 163, 184,0.22)', color: '#8b8fa8' }
                     : {}),
                 }}
                 onMouseEnter={() => setHoveredLevel(l.id)}
@@ -513,9 +513,9 @@ export default function ExplainPanel() {
               <span
                 style={{
                   ...S.badge,
-                  background: 'rgba(99,102,241,0.1)',
-                  color: '#818cf8',
-                  border: '1px solid rgba(99,102,241,0.18)',
+                  background: 'rgba(148, 163, 184,0.1)',
+                  color: '#cbd5e1',
+                  border: '1px solid rgba(148, 163, 184,0.18)',
                 }}
               >
                 {explainData.type}

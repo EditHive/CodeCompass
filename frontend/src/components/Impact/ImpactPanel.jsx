@@ -19,7 +19,7 @@ const SEVERITY = {
 };
 
 const TYPE_COLORS = {
-  file:     { dot: '#6366f1', bg: 'rgba(99,102,241,0.12)',  text: '#818cf8' },
+  file:     { dot: '#94a3b8', bg: 'rgba(148, 163, 184,0.12)',  text: '#cbd5e1' },
   function: { dot: '#22d3ee', bg: 'rgba(34,211,238,0.12)',  text: '#67e8f9' },
   class:    { dot: '#10b981', bg: 'rgba(16,185,129,0.12)',  text: '#34d399' },
 };
@@ -74,7 +74,7 @@ const panelCSS = `
 
   .ip-item:hover {
     background: rgba(255,255,255,0.04) !important;
-    border-color: rgba(99,102,241,0.2) !important;
+    border-color: rgba(148, 163, 184,0.2) !important;
     transform: translateX(2px);
   }
 
@@ -84,8 +84,8 @@ const panelCSS = `
 
   .ip-scroll::-webkit-scrollbar { width: 4px; }
   .ip-scroll::-webkit-scrollbar-track { background: transparent; }
-  .ip-scroll::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.15); border-radius: 4px; }
-  .ip-scroll::-webkit-scrollbar-thumb:hover { background: rgba(99,102,241,0.3); }
+  .ip-scroll::-webkit-scrollbar-thumb { background: rgba(148, 163, 184,0.15); border-radius: 4px; }
+  .ip-scroll::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184,0.3); }
 `;
 
 /* ─── markdown renderer ──────────────────────────────────────────────── */
@@ -99,7 +99,7 @@ function AiMarkdown({ text }) {
         if (l.trim().startsWith('-'))
           return (
             <div key={i} style={{ display: 'flex', gap: 8, paddingLeft: 2, marginBottom: 4 }}>
-              <span style={{ color: '#a78bfa', flexShrink: 0, fontSize: 10, lineHeight: '18px' }}>●</span>
+              <span style={{ color: '#64748b', flexShrink: 0, fontSize: 10, lineHeight: '18px' }}>●</span>
               <span style={{ lineHeight: 1.6 }}>{l.substring(l.indexOf('-') + 1).trim()}</span>
             </div>
           );
@@ -262,14 +262,14 @@ export default function ImpactPanel({ onHighlightNodes, onSelectNode }) {
           <div style={{
             display: 'flex', alignItems: 'center', gap: 8,
             padding: '8px 12px', borderRadius: 10,
-            background: 'rgba(99,102,241,0.06)',
-            border: '1px solid rgba(99,102,241,0.15)',
+            background: 'rgba(148, 163, 184,0.06)',
+            border: '1px solid rgba(148, 163, 184,0.15)',
             animation: 'ip-fadeUp 0.2s ease',
           }}>
             <span style={{
               width: 8, height: 8, borderRadius: '50%',
-              background: TYPE_COLORS[selectedNode.type]?.dot || '#6366f1',
-              boxShadow: `0 0 8px ${TYPE_COLORS[selectedNode.type]?.dot || '#6366f1'}50`,
+              background: TYPE_COLORS[selectedNode.type]?.dot || '#94a3b8',
+              boxShadow: `0 0 8px ${TYPE_COLORS[selectedNode.type]?.dot || '#94a3b8'}50`,
             }} />
             <span style={{ fontSize: 12, color: '#c8cae0', flex: 1, fontWeight: 500 }}>
               {selectedNode.label}
@@ -434,19 +434,19 @@ export default function ImpactPanel({ onHighlightNodes, onSelectNode }) {
             {/* Source node card */}
             <div style={{
               borderRadius: 12,
-              border: '1px solid rgba(99,102,241,0.12)',
-              background: 'rgba(99,102,241,0.04)',
+              border: '1px solid rgba(148, 163, 184,0.12)',
+              background: 'rgba(148, 163, 184,0.04)',
               padding: '12px 14px',
               display: 'flex', alignItems: 'center', gap: 12,
             }}>
               <div style={{
                 width: 34, height: 34, borderRadius: 10,
-                background: 'rgba(99,102,241,0.1)',
-                border: '1px solid rgba(99,102,241,0.2)',
+                background: 'rgba(148, 163, 184,0.1)',
+                border: '1px solid rgba(148, 163, 184,0.2)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 flexShrink: 0,
               }}>
-                <HiOutlineLocationMarker size={15} color="#818cf8" />
+                <HiOutlineLocationMarker size={15} color="#cbd5e1" />
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{
@@ -454,15 +454,15 @@ export default function ImpactPanel({ onHighlightNodes, onSelectNode }) {
                   letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 2,
                 }}>Source Node</div>
                 <div style={{
-                  fontSize: 13, fontWeight: 600, color: '#818cf8',
+                  fontSize: 13, fontWeight: 600, color: '#cbd5e1',
                   overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                 }}>{impactData.source?.label}</div>
               </div>
               <span style={{
                 fontSize: 9, fontWeight: 600, padding: '3px 8px',
                 borderRadius: 6,
-                background: TYPE_COLORS[impactData.source?.type]?.bg || 'rgba(99,102,241,0.1)',
-                color: TYPE_COLORS[impactData.source?.type]?.text || '#818cf8',
+                background: TYPE_COLORS[impactData.source?.type]?.bg || 'rgba(148, 163, 184,0.1)',
+                color: TYPE_COLORS[impactData.source?.type]?.text || '#cbd5e1',
               }}>{impactData.source?.type}</span>
             </div>
 
@@ -470,24 +470,24 @@ export default function ImpactPanel({ onHighlightNodes, onSelectNode }) {
             {impactData.ai_summary && (
               <div style={{
                 borderRadius: 14, overflow: 'hidden',
-                border: '1px solid rgba(139,92,246,0.12)',
-                background: 'rgba(139,92,246,0.03)',
+                border: '1px solid rgba(71, 85, 105,0.12)',
+                background: 'rgba(71, 85, 105,0.03)',
               }}>
                 <div style={{
                   display: 'flex', alignItems: 'center', gap: 8,
                   padding: '10px 14px',
-                  background: 'linear-gradient(135deg, rgba(139,92,246,0.08) 0%, rgba(139,92,246,0.02) 100%)',
-                  borderBottom: '1px solid rgba(139,92,246,0.08)',
+                  background: 'linear-gradient(135deg, rgba(71, 85, 105,0.08) 0%, rgba(71, 85, 105,0.02) 100%)',
+                  borderBottom: '1px solid rgba(71, 85, 105,0.08)',
                 }}>
-                  <HiOutlineSparkles size={13} color="#a78bfa" />
+                  <HiOutlineSparkles size={13} color="#64748b" />
                   <span style={{
-                    fontSize: 10.5, fontWeight: 700, color: '#a78bfa',
+                    fontSize: 10.5, fontWeight: 700, color: '#64748b',
                     letterSpacing: '0.08em', textTransform: 'uppercase',
                   }}>AI Assessment</span>
                   <div style={{
                     marginLeft: 'auto',
                     width: 6, height: 6, borderRadius: '50%',
-                    background: '#a78bfa',
+                    background: '#64748b',
                     animation: 'ip-pulse 2s ease infinite',
                   }} />
                 </div>

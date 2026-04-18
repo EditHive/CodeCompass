@@ -48,9 +48,9 @@ const STYLES = `
     background: linear-gradient(
       180deg,
       transparent 0%,
-      rgba(99,102,241,0.35) 25%,
-      rgba(139,92,246,0.35) 50%,
-      rgba(99,102,241,0.35) 75%,
+      rgba(148, 163, 184,0.35) 25%,
+      rgba(71, 85, 105,0.35) 50%,
+      rgba(148, 163, 184,0.35) 75%,
       transparent 100%
     );
     pointer-events: none;
@@ -61,7 +61,7 @@ const STYLES = `
     width: 34px;
     height: 34px;
     border-radius: 10px;
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    background: linear-gradient(135deg, #94a3b8 0%, #475569 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -69,7 +69,7 @@ const STYLES = `
     font-weight: 800;
     color: #fff;
     letter-spacing: -0.02em;
-    box-shadow: 0 0 14px rgba(99,102,241,0.4);
+    box-shadow: 0 0 14px rgba(148, 163, 184,0.4);
     flex-shrink: 0;
     margin-bottom: 4px;
     cursor: default;
@@ -291,8 +291,8 @@ const STYLES = `
     gap: 3px;
     padding: 7px 0;
     border-radius: 10px;
-    border: 1px solid rgba(99,102,241,0.28);
-    background: rgba(99,102,241,0.1);
+    border: 1px solid rgba(148, 163, 184,0.28);
+    background: rgba(148, 163, 184,0.1);
     cursor: pointer;
     font-family: inherit;
     transition: all 0.15s;
@@ -300,8 +300,8 @@ const STYLES = `
   }
 
   .sn-load-btn:hover {
-    background: rgba(99,102,241,0.18);
-    border-color: rgba(99,102,241,0.45);
+    background: rgba(148, 163, 184,0.18);
+    border-color: rgba(148, 163, 184,0.45);
   }
 
   .sn-load-btn:active {
@@ -311,7 +311,7 @@ const STYLES = `
   .sn-load-btn svg {
     width: 15px;
     height: 15px;
-    color: #818cf8;
+    color: #cbd5e1;
     transition: transform 0.15s;
   }
 
@@ -324,7 +324,7 @@ const STYLES = `
     font-weight: 600;
     letter-spacing: 0.07em;
     text-transform: uppercase;
-    color: #818cf8;
+    color: #cbd5e1;
     line-height: 1;
   }
 

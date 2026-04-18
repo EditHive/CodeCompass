@@ -10,7 +10,7 @@ const EXAMPLE_QUERIES = [
 ];
 
 const typeConfig = {
-  file:     { color: '#6366f1', bg: 'rgba(99,102,241,0.12)',  icon: '◫' },
+  file:     { color: '#94a3b8', bg: 'rgba(148, 163, 184,0.12)',  icon: '◫' },
   function: { color: '#22d3ee', bg: 'rgba(34,211,238,0.12)',  icon: 'ƒ'  },
   class:    { color: '#10b981', bg: 'rgba(16,185,129,0.12)',  icon: '◉' },
 };
@@ -20,7 +20,7 @@ const styles = {
   panel: {
     background: '#0d0e1a',
     borderRadius: 16,
-    border: '1px solid rgba(99,102,241,0.18)',
+    border: '1px solid rgba(148, 163, 184,0.18)',
     overflow: 'hidden',
     fontFamily: "'SF Mono', 'Fira Code', monospace",
     maxWidth: 560,
@@ -32,7 +32,7 @@ const styles = {
   /* ── header removed ── */
   searchSection: {
     padding: '16px 20px',
-    borderBottom: '1px solid rgba(99,102,241,0.18)',
+    borderBottom: '1px solid rgba(148, 163, 184,0.18)',
   },
   searchRow: { display: 'flex', gap: 8 },
   searchWrap: { flex: 1, position: 'relative' },
@@ -43,7 +43,7 @@ const styles = {
   searchInput: {
     width: '100%', padding: '10px 12px 10px 36px',
     background: '#1a1d35',
-    border: '1px solid rgba(99,102,241,0.18)',
+    border: '1px solid rgba(148, 163, 184,0.18)',
     borderRadius: 10,
     fontFamily: 'inherit',
     fontSize: 12,
@@ -68,7 +68,7 @@ const styles = {
     fontSize: 10, fontWeight: 500,
     background: '#1a1d35',
     color: '#9396b8',
-    border: '1px solid rgba(99,102,241,0.18)',
+    border: '1px solid rgba(148, 163, 184,0.18)',
     cursor: 'pointer',
     fontFamily: 'inherit',
     transition: 'background 0.15s, color 0.15s',
@@ -97,7 +97,7 @@ const styles = {
     padding: '11px 12px',
     borderRadius: 10,
     background: 'rgba(26,29,53,0.4)',
-    border: '1px solid rgba(99,102,241,0.12)',
+    border: '1px solid rgba(148, 163, 184,0.12)',
     cursor: 'pointer',
     marginBottom: 6,
     width: '100%',
@@ -171,7 +171,7 @@ function ResultCard({ result, onSelect }) {
       style={{
         ...styles.resultCard,
         background: hovered ? '#1a1d35' : 'rgba(26,29,53,0.4)',
-        borderColor: hovered ? 'rgba(99,102,241,0.35)' : 'rgba(99,102,241,0.12)',
+        borderColor: hovered ? 'rgba(148, 163, 184,0.35)' : 'rgba(148, 163, 184,0.12)',
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -296,10 +296,10 @@ export default function SearchPanel({ onSelectNode }) {
           <div style={styles.emptyState}>
             <div style={{
               width: 48, height: 48,
-              background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+              background: 'linear-gradient(135deg, #94a3b8 0%, #475569 100%)',
               borderRadius: 14,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 4px 16px rgba(139,92,246,0.3)',
+              boxShadow: '0 4px 16px rgba(71, 85, 105,0.3)',
               fontSize: 22, color: '#fff', margin: '0 auto 16px',
             }}>
               ⌕
@@ -327,7 +327,7 @@ function ChipButton({ label, onClick }) {
         ...styles.chip,
         background: hovered ? '#202440' : '#1a1d35',
         color: hovered ? '#e2e4f0' : '#9396b8',
-        borderColor: hovered ? 'rgba(99,102,241,0.35)' : 'rgba(99,102,241,0.18)',
+        borderColor: hovered ? 'rgba(148, 163, 184,0.35)' : 'rgba(148, 163, 184,0.18)',
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
