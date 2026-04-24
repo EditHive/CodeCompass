@@ -19,7 +19,7 @@ const SEVERITY = {
 };
 
 const TYPE_COLORS = {
-  file:     { dot: '#6366f1', bg: 'rgba(99,102,241,0.12)',  text: '#818cf8' },
+  file:     { dot: '#f97316', bg: 'rgba(249,115,22,0.12)',  text: '#fb923c' },
   function: { dot: '#22d3ee', bg: 'rgba(34,211,238,0.12)',  text: '#67e8f9' },
   class:    { dot: '#10b981', bg: 'rgba(16,185,129,0.12)',  text: '#34d399' },
 };
@@ -74,7 +74,7 @@ const panelCSS = `
 
   .ip-item:hover {
     background: rgba(255,255,255,0.04) !important;
-    border-color: rgba(99,102,241,0.2) !important;
+    border-color: rgba(249,115,22,0.2) !important;
     transform: translateX(2px);
   }
 
@@ -84,8 +84,8 @@ const panelCSS = `
 
   .ip-scroll::-webkit-scrollbar { width: 4px; }
   .ip-scroll::-webkit-scrollbar-track { background: transparent; }
-  .ip-scroll::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.15); border-radius: 4px; }
-  .ip-scroll::-webkit-scrollbar-thumb:hover { background: rgba(99,102,241,0.3); }
+  .ip-scroll::-webkit-scrollbar-thumb { background: rgba(249,115,22,0.15); border-radius: 4px; }
+  .ip-scroll::-webkit-scrollbar-thumb:hover { background: rgba(249,115,22,0.3); }
 `;
 
 /* ─── markdown renderer ──────────────────────────────────────────────── */
@@ -99,12 +99,12 @@ function AiMarkdown({ text }) {
         if (l.trim().startsWith('-'))
           return (
             <div key={i} style={{ display: 'flex', gap: 8, paddingLeft: 2, marginBottom: 4 }}>
-              <span style={{ color: '#a78bfa', flexShrink: 0, fontSize: 10, lineHeight: '18px' }}>●</span>
+              <span style={{ color: '#fb923c', flexShrink: 0, fontSize: 10, lineHeight: '18px' }}>●</span>
               <span style={{ lineHeight: 1.6 }}>{l.substring(l.indexOf('-') + 1).trim()}</span>
             </div>
           );
         if (/^\d+\./.test(l.trim()))
-          return <p key={i} style={{ fontWeight: 600, color: '#c8cae0', marginTop: 6, marginBottom: 2, fontSize: 11.5 }}>{l.trim()}</p>;
+          return <p key={i} style={{ fontWeight: 600, color: '#d6e0d8', marginTop: 6, marginBottom: 2, fontSize: 11.5 }}>{l.trim()}</p>;
         return <p key={i} style={{ marginBottom: 4, lineHeight: 1.65 }}>{l.trim()}</p>;
       })}
     </>
@@ -117,8 +117,6 @@ export default function ImpactPanel({ onHighlightNodes, onSelectNode }) {
   const [selectedNode, setSelectedNode] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
-  const [hoveredItem, setHoveredItem] = useState(null);
-  const [hoveredImpact, setHoveredImpact] = useState(null);
   const [expandedSection, setExpandedSection] = useState({ direct: true, indirect: true, potential: true });
 
   const { data: nodesData, execute: loadNodes } = useApi(getNodes);
@@ -164,7 +162,7 @@ export default function ImpactPanel({ onHighlightNodes, onSelectNode }) {
       height: '100%',
       display: 'flex',
       flexDirection: 'column',
-      color: '#e2e4f0',
+      color: '#eef4ef',
       position: 'relative',
     }}>
       <style>{panelCSS}</style>
@@ -180,7 +178,7 @@ export default function ImpactPanel({ onHighlightNodes, onSelectNode }) {
         <div style={{ position: 'relative' }}>
           <span style={{
             position: 'absolute', left: 12, top: '50%',
-            transform: 'translateY(-50%)', color: '#484b6a',
+            transform: 'translateY(-50%)', color: '#5e6d63',
             pointerEvents: 'none', display: 'flex',
           }}>
             <HiOutlineSearch size={14} />
@@ -192,7 +190,7 @@ export default function ImpactPanel({ onHighlightNodes, onSelectNode }) {
               width: '100%', padding: '10px 12px 10px 34px',
               background: 'rgba(255,255,255,0.03)',
               border: '1px solid rgba(255,255,255,0.08)',
-              borderRadius: 10, fontSize: 12, color: '#e2e4f0',
+              borderRadius: 10, fontSize: 12, color: '#eef4ef',
               outline: 'none', transition: 'all 0.2s ease',
               boxSizing: 'border-box',
               fontFamily: 'inherit',
@@ -228,8 +226,6 @@ export default function ImpactPanel({ onHighlightNodes, onSelectNode }) {
                       borderBottom: '1px solid rgba(255,255,255,0.04)',
                       background: isSelected ? 'rgba(244,63,94,0.08)' : 'transparent',
                     }}
-                    onMouseEnter={() => setHoveredItem(node.id)}
-                    onMouseLeave={() => setHoveredItem(null)}
                     onClick={() => {
                       setSelectedNode(node);
                       setSearchTerm(node.label);
@@ -243,7 +239,7 @@ export default function ImpactPanel({ onHighlightNodes, onSelectNode }) {
                     }} />
                     <span style={{
                       flex: 1, overflow: 'hidden', textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap', color: '#c8cae0',
+                      whiteSpace: 'nowrap', color: '#d6e0d8',
                     }}>{node.label}</span>
                     <span style={{
                       fontSize: 9.5, fontWeight: 600, padding: '2px 7px',
@@ -262,28 +258,28 @@ export default function ImpactPanel({ onHighlightNodes, onSelectNode }) {
           <div style={{
             display: 'flex', alignItems: 'center', gap: 8,
             padding: '8px 12px', borderRadius: 10,
-            background: 'rgba(99,102,241,0.06)',
-            border: '1px solid rgba(99,102,241,0.15)',
+            background: 'rgba(249,115,22,0.06)',
+            border: '1px solid rgba(249,115,22,0.15)',
             animation: 'ip-fadeUp 0.2s ease',
           }}>
             <span style={{
               width: 8, height: 8, borderRadius: '50%',
-              background: TYPE_COLORS[selectedNode.type]?.dot || '#6366f1',
-              boxShadow: `0 0 8px ${TYPE_COLORS[selectedNode.type]?.dot || '#6366f1'}50`,
+              background: TYPE_COLORS[selectedNode.type]?.dot || '#f97316',
+              boxShadow: `0 0 8px ${TYPE_COLORS[selectedNode.type]?.dot || '#f97316'}50`,
             }} />
-            <span style={{ fontSize: 12, color: '#c8cae0', flex: 1, fontWeight: 500 }}>
+            <span style={{ fontSize: 12, color: '#d6e0d8', flex: 1, fontWeight: 500 }}>
               {selectedNode.label}
             </span>
             <button
               onClick={() => { setSelectedNode(null); setSearchTerm(''); }}
               style={{
-                background: 'none', border: 'none', color: '#555870',
+                background: 'none', border: 'none', color: '#718379',
                 cursor: 'pointer', padding: '2px 4px', fontSize: 14,
                 lineHeight: 1, borderRadius: 4,
                 transition: 'color 0.15s',
               }}
-              onMouseEnter={e => e.target.style.color = '#e2e4f0'}
-              onMouseLeave={e => e.target.style.color = '#555870'}
+              onMouseEnter={e => e.target.style.color = '#eef4ef'}
+              onMouseLeave={e => e.target.style.color = '#718379'}
             >×</button>
           </div>
         )}
@@ -365,7 +361,7 @@ export default function ImpactPanel({ onHighlightNodes, onSelectNode }) {
                 </div>
 
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: '#e2e4f0', marginBottom: 6 }}>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: '#eef4ef', marginBottom: 6 }}>
                     Nodes Impacted
                   </div>
                   {/* Mini bar chart */}
@@ -418,7 +414,7 @@ export default function ImpactPanel({ onHighlightNodes, onSelectNode }) {
                     {impactData.summary?.[key] ?? 0}
                   </span>
                   <span style={{
-                    fontSize: 9.5, fontWeight: 600, color: '#555870',
+                    fontSize: 9.5, fontWeight: 600, color: '#718379',
                     letterSpacing: '0.08em', textTransform: 'uppercase',
                   }}>{cfg.label}</span>
                   {/* Bottom accent line */}
@@ -434,35 +430,35 @@ export default function ImpactPanel({ onHighlightNodes, onSelectNode }) {
             {/* Source node card */}
             <div style={{
               borderRadius: 12,
-              border: '1px solid rgba(99,102,241,0.12)',
-              background: 'rgba(99,102,241,0.04)',
+              border: '1px solid rgba(249,115,22,0.12)',
+              background: 'rgba(249,115,22,0.04)',
               padding: '12px 14px',
               display: 'flex', alignItems: 'center', gap: 12,
             }}>
               <div style={{
                 width: 34, height: 34, borderRadius: 10,
-                background: 'rgba(99,102,241,0.1)',
-                border: '1px solid rgba(99,102,241,0.2)',
+                background: 'rgba(249,115,22,0.1)',
+                border: '1px solid rgba(249,115,22,0.2)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 flexShrink: 0,
               }}>
-                <HiOutlineLocationMarker size={15} color="#818cf8" />
+                <HiOutlineLocationMarker size={15} color="#fb923c" />
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{
-                  fontSize: 9.5, fontWeight: 600, color: '#555870',
+                  fontSize: 9.5, fontWeight: 600, color: '#718379',
                   letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 2,
                 }}>Source Node</div>
                 <div style={{
-                  fontSize: 13, fontWeight: 600, color: '#818cf8',
+                  fontSize: 13, fontWeight: 600, color: '#fb923c',
                   overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                 }}>{impactData.source?.label}</div>
               </div>
               <span style={{
                 fontSize: 9, fontWeight: 600, padding: '3px 8px',
                 borderRadius: 6,
-                background: TYPE_COLORS[impactData.source?.type]?.bg || 'rgba(99,102,241,0.1)',
-                color: TYPE_COLORS[impactData.source?.type]?.text || '#818cf8',
+                background: TYPE_COLORS[impactData.source?.type]?.bg || 'rgba(249,115,22,0.1)',
+                color: TYPE_COLORS[impactData.source?.type]?.text || '#fb923c',
               }}>{impactData.source?.type}</span>
             </div>
 
@@ -470,29 +466,29 @@ export default function ImpactPanel({ onHighlightNodes, onSelectNode }) {
             {impactData.ai_summary && (
               <div style={{
                 borderRadius: 14, overflow: 'hidden',
-                border: '1px solid rgba(139,92,246,0.12)',
-                background: 'rgba(139,92,246,0.03)',
+                border: '1px solid rgba(20,184,166,0.12)',
+                background: 'rgba(20,184,166,0.03)',
               }}>
                 <div style={{
                   display: 'flex', alignItems: 'center', gap: 8,
                   padding: '10px 14px',
-                  background: 'linear-gradient(135deg, rgba(139,92,246,0.08) 0%, rgba(139,92,246,0.02) 100%)',
-                  borderBottom: '1px solid rgba(139,92,246,0.08)',
+                  background: 'linear-gradient(135deg, rgba(20,184,166,0.08) 0%, rgba(20,184,166,0.02) 100%)',
+                  borderBottom: '1px solid rgba(20,184,166,0.08)',
                 }}>
-                  <HiOutlineSparkles size={13} color="#a78bfa" />
+                  <HiOutlineSparkles size={13} color="#14b8a6" />
                   <span style={{
-                    fontSize: 10.5, fontWeight: 700, color: '#a78bfa',
+                    fontSize: 10.5, fontWeight: 700, color: '#14b8a6',
                     letterSpacing: '0.08em', textTransform: 'uppercase',
                   }}>AI Assessment</span>
                   <div style={{
                     marginLeft: 'auto',
                     width: 6, height: 6, borderRadius: '50%',
-                    background: '#a78bfa',
+                    background: '#14b8a6',
                     animation: 'ip-pulse 2s ease infinite',
                   }} />
                 </div>
                 <div style={{
-                  padding: '12px 14px', fontSize: 11.5, color: '#8b8fa8',
+                  padding: '12px 14px', fontSize: 11.5, color: '#9baaa0',
                   lineHeight: 1.7, display: 'flex', flexDirection: 'column', gap: 4,
                 }}>
                   <AiMarkdown text={impactData.ai_summary} />
@@ -538,7 +534,7 @@ export default function ImpactPanel({ onHighlightNodes, onSelectNode }) {
                     </span>
                     <HiOutlineChevronRight
                       size={12}
-                      color="#555870"
+                      color="#718379"
                       style={{
                         transition: 'transform 0.2s ease',
                         transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
@@ -571,12 +567,12 @@ export default function ImpactPanel({ onHighlightNodes, onSelectNode }) {
                             boxShadow: `0 0 6px ${cfg.glow}`,
                           }} />
                           <span style={{
-                            fontSize: 12, color: '#c8cae0', flex: 1,
+                            fontSize: 12, color: '#d6e0d8', flex: 1,
                             overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                             fontWeight: 500,
                           }}>{item.label}</span>
                           <span style={{
-                            fontSize: 9.5, fontWeight: 600, color: '#555870',
+                            fontSize: 9.5, fontWeight: 600, color: '#718379',
                           }}>{item.type}</span>
                           <HiOutlineChevronRight
                             size={11}
@@ -621,10 +617,10 @@ export default function ImpactPanel({ onHighlightNodes, onSelectNode }) {
             </div>
             
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-              <div style={{ fontSize: 16, fontWeight: 700, color: '#f0f1f7', letterSpacing: '-0.01em' }}>
+              <div style={{ fontSize: 16, fontWeight: 700, color: '#eef4ef', letterSpacing: '-0.01em' }}>
                 Impact Simulator
               </div>
-              <div style={{ fontSize: 12, color: '#555870', letterSpacing: '0.01em', display: 'flex', alignItems: 'center', gap: 6 }}>
+              <div style={{ fontSize: 12, color: '#718379', letterSpacing: '0.01em', display: 'flex', alignItems: 'center', gap: 6 }}>
                 Blast radius analysis
                 <span style={{
                   fontSize: 8.5, fontWeight: 700, padding: '2px 6px', borderRadius: 20,
@@ -638,8 +634,8 @@ export default function ImpactPanel({ onHighlightNodes, onSelectNode }) {
             </div>
 
             <div style={{ marginTop: 12 }}>
-              <p style={{ fontSize: 12, color: '#3a3d52', lineHeight: 1.6, maxWidth: 220, margin: '0 auto' }}>
-                Search for a node above and click <span style={{ color: '#555870', fontWeight: 600 }}>Simulate Impact</span> to see the blast radius.
+              <p style={{ fontSize: 12, color: '#526056', lineHeight: 1.6, maxWidth: 220, margin: '0 auto' }}>
+                Search for a node above and click <span style={{ color: '#718379', fontWeight: 600 }}>Simulate Impact</span> to see the blast radius.
               </p>
             </div>
           </div>

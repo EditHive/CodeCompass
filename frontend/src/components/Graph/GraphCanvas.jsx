@@ -90,7 +90,7 @@ export default function GraphCanvas({
     const ROW_SLOT = ROOF_H + MAX_BLDG_H + LABEL_H + FILE_GAP; // = 144px per row
     const CONTENT_TOP = HEADER + PAD + 10;     // top of first row inside district
 
-    const COLORS = ['#6366f1', '#f43f5e', '#22d3ee', '#10b981', '#f59e0b', '#a78bfa', '#64748b', '#ec4899', '#14b8a6', '#8b5cf6'];
+    const COLORS = ['#f97316', '#f43f5e', '#22d3ee', '#10b981', '#f59e0b', '#38bdf8', '#64748b', '#14b8a6', '#84cc16', '#ef4444'];
 
     s.districts = [];
     s.buildings = [];
@@ -212,7 +212,7 @@ export default function GraphCanvas({
 
       if (isDb) return '#f43f5e'; // rose/red for database traffic
       if (isApi) return '#22d3ee'; // cyan for api traffic
-      return road.type === 'imports' ? '#818cf8' : '#fbbf24'; // indigo for imports, yellow for standard func calls
+      return road.type === 'imports' ? '#38bdf8' : '#fbbf24'; // sky for imports, yellow for standard func calls
     }
 
     s.cars = s.roads.map((road) => ({
@@ -414,7 +414,7 @@ export default function GraphCanvas({
     ctx.clearRect(0, 0, s.W, s.H);
 
     // Background
-    ctx.fillStyle = '#0a0d14';
+    ctx.fillStyle = '#0a0f0c';
     ctx.fillRect(0, 0, s.W, s.H);
 
     // Apply camera
@@ -515,7 +515,7 @@ export default function GraphCanvas({
     }
 
     // Body
-    const bodyColor = selected ? '#1a1f38' : hovered ? '#161b30' : '#111525';
+    const bodyColor = selected ? '#1c231f' : hovered ? '#18201b' : '#121813';
     ctx.fillStyle = bodyColor;
     ctx.strokeStyle = selected ? '#ffffffcc' : hovered ? d.color : d.color + '40';
     ctx.lineWidth = selected ? 2.5 : hovered ? 2 : 1;
@@ -616,7 +616,7 @@ export default function GraphCanvas({
 
     // Lane markings
     ctx.setLineDash([6, 8]);
-    ctx.strokeStyle = type === 'imports' ? '#6366f122' : '#f59e0b18';
+    ctx.strokeStyle = type === 'imports' ? '#38bdf822' : '#f59e0b18';
     ctx.lineWidth = 0.8;
     ctx.stroke();
     ctx.setLineDash([]);
@@ -626,7 +626,7 @@ export default function GraphCanvas({
     ctx.save();
     ctx.translate(mid.x, mid.y);
     ctx.rotate(mid.angle);
-    ctx.fillStyle = type === 'imports' ? '#6366f144' : '#f59e0b33';
+    ctx.fillStyle = type === 'imports' ? '#38bdf844' : '#f59e0b33';
     ctx.beginPath();
     ctx.moveTo(6, 0);
     ctx.lineTo(-3, -3);
@@ -726,7 +726,7 @@ export default function GraphCanvas({
 
   function drawMinimap(mctx, s) {
     const MW = 140, MH = 100;
-    mctx.fillStyle = '#0d1117';
+    mctx.fillStyle = '#0f1511';
     mctx.fillRect(0, 0, MW, MH);
 
     if (!s.districts.length) return;
@@ -771,7 +771,7 @@ export default function GraphCanvas({
   return (
     <div
       ref={wrapRef}
-      className="w-full h-full relative bg-[#0a0d14] rounded-xl overflow-hidden border border-white/5"
+      className="w-full h-full relative bg-[#0a0f0c] rounded-xl overflow-hidden border border-white/5"
       style={{ cursor: 'grab' }}
     >
       <canvas ref={canvasRef} className="block" />
@@ -780,15 +780,15 @@ export default function GraphCanvas({
       {/* HUD: Legend */}
       <div style={{
         position: 'absolute', bottom: 16, left: 16,
-        background: 'rgba(13,15,26,0.92)',
-        border: '1px solid rgba(99,102,241,0.18)',
+        background: 'rgba(15,20,17,0.92)',
+        border: '1px solid rgba(249,115,22,0.18)',
         borderRadius: 12,
         backdropFilter: 'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',
         padding: '10px 12px',
         display: 'flex', flexDirection: 'column', gap: 0,
         minWidth: 172,
-        boxShadow: '0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(99,102,241,0.06)',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(249,115,22,0.06)',
         userSelect: 'none',
         fontFamily: "'SF Pro Display',-apple-system,BlinkMacSystemFont,sans-serif",
       }}>
@@ -796,53 +796,53 @@ export default function GraphCanvas({
         <div style={{
           display: 'flex', alignItems: 'center', gap: 6,
           marginBottom: 8, paddingBottom: 8,
-          borderBottom: '1px solid rgba(99,102,241,0.1)',
+          borderBottom: '1px solid rgba(249,115,22,0.1)',
         }}>
           <div style={{
             width: 14, height: 14, borderRadius: 4,
-            background: 'linear-gradient(135deg,#6366f1,#7c3aed)',
+            background: 'linear-gradient(135deg,#f97316,#14b8a6)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontSize: 7, color: '#fff', fontWeight: 700,
           }}>P</div>
-          <span style={{ fontSize: 9, fontWeight: 700, color: '#555870', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+          <span style={{ fontSize: 9, fontWeight: 700, color: '#718379', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
             City Legend
           </span>
         </div>
 
         {/* Nodes section */}
-        <div style={{ fontSize: 8.5, fontWeight: 600, color: '#3a3d52', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 5 }}>
+        <div style={{ fontSize: 8.5, fontWeight: 600, color: '#526056', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 5 }}>
           Nodes
         </div>
         {[
-          { swatch: { background: 'linear-gradient(135deg,#6366f1,#4f46e5)', borderRadius: 4 }, label: 'District (Directory)' },
-          { swatch: { background: '#111422', border: '1px solid rgba(255,255,255,0.18)', borderRadius: 4 }, label: 'File (Building)' },
+          { swatch: { background: 'linear-gradient(135deg,#f97316,#ea580c)', borderRadius: 4 }, label: 'District (Directory)' },
+          { swatch: { background: '#121813', border: '1px solid rgba(255,255,255,0.18)', borderRadius: 4 }, label: 'File (Building)' },
           { swatch: { background: '#f59e0b', borderRadius: '50%', boxShadow: '0 0 6px rgba(245,158,11,0.5)' }, label: 'Critical Landmark' },
         ].map(({ swatch, label }) => (
           <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
             <div style={{ width: 10, height: 10, flexShrink: 0, ...swatch }} />
-            <span style={{ fontSize: 9.5, color: '#8b8fa8', fontFamily: "'SF Mono','Fira Code',monospace" }}>{label}</span>
+            <span style={{ fontSize: 9.5, color: '#99aaa0', fontFamily: "'SF Mono','Fira Code',monospace" }}>{label}</span>
           </div>
         ))}
 
         {/* Divider */}
-        <div style={{ height: 1, background: 'rgba(99,102,241,0.08)', margin: '6px 0' }} />
+        <div style={{ height: 1, background: 'rgba(249,115,22,0.08)', margin: '6px 0' }} />
 
         {/* Traffic section */}
-        <div style={{ fontSize: 8.5, fontWeight: 600, color: '#3a3d52', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 5 }}>
+        <div style={{ fontSize: 8.5, fontWeight: 600, color: '#526056', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 5 }}>
           Traffic
         </div>
         {[
           { color: '#f43f5e', glow: 'rgba(244,63,94,0.4)', label: 'Database', shape: 4 },
           { color: '#22d3ee', glow: 'rgba(34,211,238,0.4)', label: 'API', shape: 4 },
           { color: '#f59e0b', glow: 'rgba(245,158,11,0.4)', label: 'Call', shape: 4 },
-          { color: '#818cf8', glow: 'rgba(129,140,248,0.4)', label: 'Import', shape: 4 },
+          { color: '#38bdf8', glow: 'rgba(56,189,248,0.4)', label: 'Import', shape: 4 },
         ].map(({ color, glow, label, shape }) => (
           <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
             <div style={{
               width: 10, height: 10, flexShrink: 0, borderRadius: shape,
               background: color, boxShadow: `0 0 5px ${glow}`,
             }} />
-            <span style={{ fontSize: 9.5, color: '#8b8fa8', fontFamily: "'SF Mono','Fira Code',monospace" }}>
+            <span style={{ fontSize: 9.5, color: '#99aaa0', fontFamily: "'SF Mono','Fira Code',monospace" }}>
               {label} Traffic
             </span>
           </div>
@@ -853,13 +853,13 @@ export default function GraphCanvas({
       <div style={{
         position: 'absolute', bottom: 16, left: '50%', transform: 'translateX(-50%)',
         display: 'flex', alignItems: 'center', gap: 2,
-        background: 'rgba(13,15,26,0.92)',
-        border: '1px solid rgba(99,102,241,0.18)',
+        background: 'rgba(15,20,17,0.92)',
+        border: '1px solid rgba(249,115,22,0.18)',
         borderRadius: 10,
         padding: '3px 4px',
         backdropFilter: 'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(99,102,241,0.06)',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(249,115,22,0.06)',
         userSelect: 'none',
         fontFamily: "'SF Mono','Fira Code',monospace",
       }}>
@@ -904,17 +904,17 @@ export default function GraphCanvas({
             style={{
               width: 30, height: 30, display: 'flex', alignItems: 'center', justifyContent: 'center',
               background: 'transparent', border: 'none', borderRadius: 7,
-              color: '#8b8fa8', fontSize: label === '⌂' ? 14 : 16, fontWeight: 700,
+              color: '#99aaa0', fontSize: label === '⌂' ? 14 : 16, fontWeight: 700,
               cursor: 'pointer', transition: 'all 0.15s ease',
               lineHeight: 1,
             }}
             onMouseEnter={e => {
-              e.currentTarget.style.background = 'rgba(99,102,241,0.15)';
-              e.currentTarget.style.color = '#c4c9ff';
+              e.currentTarget.style.background = 'rgba(249,115,22,0.15)';
+              e.currentTarget.style.color = '#fdba74';
             }}
             onMouseLeave={e => {
               e.currentTarget.style.background = 'transparent';
-              e.currentTarget.style.color = '#8b8fa8';
+              e.currentTarget.style.color = '#99aaa0';
             }}
           >
             {label}
@@ -926,11 +926,11 @@ export default function GraphCanvas({
       <div style={{
         position: 'absolute', bottom: 16, right: 16,
         width: 148,
-        background: 'rgba(13,15,26,0.92)',
-        border: '1px solid rgba(99,102,241,0.18)',
+        background: 'rgba(15,20,17,0.92)',
+        border: '1px solid rgba(249,115,22,0.18)',
         borderRadius: 12,
         overflow: 'hidden',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(99,102,241,0.06)',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(249,115,22,0.06)',
         backdropFilter: 'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',
         fontFamily: "'SF Pro Display',-apple-system,BlinkMacSystemFont,sans-serif",
@@ -939,14 +939,14 @@ export default function GraphCanvas({
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           padding: '6px 9px',
-          borderBottom: '1px solid rgba(99,102,241,0.1)',
-          background: 'rgba(99,102,241,0.04)',
+          borderBottom: '1px solid rgba(249,115,22,0.1)',
+          background: 'rgba(249,115,22,0.04)',
         }}>
-          <span style={{ fontSize: 8.5, fontWeight: 700, color: '#555870', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+          <span style={{ fontSize: 8.5, fontWeight: 700, color: '#718379', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
             Minimap
           </span>
           <div style={{ display: 'flex', gap: 3 }}>
-            <div style={{ width: 5, height: 5, borderRadius: '50%', background: 'rgba(99,102,241,0.3)' }} />
+            <div style={{ width: 5, height: 5, borderRadius: '50%', background: 'rgba(249,115,22,0.3)' }} />
             <div style={{ width: 5, height: 5, borderRadius: '50%', background: 'rgba(34,211,238,0.3)' }} />
           </div>
         </div>
@@ -955,21 +955,21 @@ export default function GraphCanvas({
         <div style={{ position: 'relative' }}>
           <canvas ref={mmRef} width={148} height={100} style={{ display: 'block' }} />
           {/* corner accent lines */}
-          <div style={{ position: 'absolute', top: 4, left: 4, width: 8, height: 8, borderTop: '1px solid rgba(99,102,241,0.4)', borderLeft: '1px solid rgba(99,102,241,0.4)' }} />
-          <div style={{ position: 'absolute', top: 4, right: 4, width: 8, height: 8, borderTop: '1px solid rgba(99,102,241,0.4)', borderRight: '1px solid rgba(99,102,241,0.4)' }} />
-          <div style={{ position: 'absolute', bottom: 4, left: 4, width: 8, height: 8, borderBottom: '1px solid rgba(99,102,241,0.4)', borderLeft: '1px solid rgba(99,102,241,0.4)' }} />
-          <div style={{ position: 'absolute', bottom: 4, right: 4, width: 8, height: 8, borderBottom: '1px solid rgba(99,102,241,0.4)', borderRight: '1px solid rgba(99,102,241,0.4)' }} />
+          <div style={{ position: 'absolute', top: 4, left: 4, width: 8, height: 8, borderTop: '1px solid rgba(249,115,22,0.4)', borderLeft: '1px solid rgba(249,115,22,0.4)' }} />
+          <div style={{ position: 'absolute', top: 4, right: 4, width: 8, height: 8, borderTop: '1px solid rgba(249,115,22,0.4)', borderRight: '1px solid rgba(249,115,22,0.4)' }} />
+          <div style={{ position: 'absolute', bottom: 4, left: 4, width: 8, height: 8, borderBottom: '1px solid rgba(249,115,22,0.4)', borderLeft: '1px solid rgba(249,115,22,0.4)' }} />
+          <div style={{ position: 'absolute', bottom: 4, right: 4, width: 8, height: 8, borderBottom: '1px solid rgba(249,115,22,0.4)', borderRight: '1px solid rgba(249,115,22,0.4)' }} />
         </div>
 
         {/* Footer coordinates */}
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           padding: '4px 9px',
-          borderTop: '1px solid rgba(99,102,241,0.08)',
-          background: 'rgba(99,102,241,0.02)',
+          borderTop: '1px solid rgba(249,115,22,0.08)',
+          background: 'rgba(249,115,22,0.02)',
         }}>
           <span style={{
-            fontSize: 8.5, color: '#3a3d52', fontFamily: "'SF Mono','Fira Code',monospace",
+            fontSize: 8.5, color: '#526056', fontFamily: "'SF Mono','Fira Code',monospace",
             letterSpacing: '0.04em',
           }}>
             CITY VIEW v0.9

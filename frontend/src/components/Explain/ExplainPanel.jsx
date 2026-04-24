@@ -47,7 +47,7 @@ const LEVELS = [
 ];
 
 const TYPE_COLORS = {
-  file: { dot: '#6366f1', bg: 'rgba(99,102,241,0.1)', text: '#818cf8' },
+  file: { dot: '#f97316', bg: 'rgba(249,115,22,0.1)', text: '#fb923c' },
   function: { dot: '#22d3ee', bg: 'rgba(34,211,238,0.1)', text: '#67e8f9' },
   class: { dot: '#10b981', bg: 'rgba(16,185,129,0.1)', text: '#34d399' },
 };
@@ -60,9 +60,9 @@ const S = {
     height: '100%',
     display: 'flex',
     flexDirection: 'column',
-    background: '#111422',
+    background: '#111512',
     fontFamily: "'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Inter', sans-serif",
-    color: '#e2e4f0',
+    color: '#eef4ef',
   },
 
   /* ── header removed ── */
@@ -70,7 +70,7 @@ const S = {
   /* controls */
   controls: {
     padding: '13px 16px',
-    borderBottom: '1px solid rgba(99,102,241,0.12)',
+    borderBottom: '1px solid rgba(249,115,22,0.12)',
     display: 'flex',
     flexDirection: 'column',
     gap: 10,
@@ -84,18 +84,18 @@ const S = {
     left: 10,
     top: '50%',
     transform: 'translateY(-50%)',
-    color: '#555870',
+    color: '#718379',
     pointerEvents: 'none',
     display: 'flex',
   },
   searchInput: {
     width: '100%',
     padding: '9px 10px 9px 32px',
-    background: '#1a1e35',
-    border: '1px solid rgba(99,102,241,0.13)',
+    background: '#1a201b',
+    border: '1px solid rgba(249,115,22,0.13)',
     borderRadius: 9,
     fontSize: 11.5,
-    color: '#e2e4f0',
+    color: '#eef4ef',
     outline: 'none',
     transition: 'border-color 0.2s, box-shadow 0.2s',
     boxSizing: 'border-box',
@@ -108,8 +108,8 @@ const S = {
     left: 0,
     right: 0,
     zIndex: 50,
-    background: '#131629',
-    border: '1px solid rgba(99,102,241,0.22)',
+    background: '#141915',
+    border: '1px solid rgba(249,115,22,0.22)',
     borderRadius: 9,
     overflow: 'hidden',
     maxHeight: 140,
@@ -123,10 +123,10 @@ const S = {
     fontSize: 11.5,
     cursor: 'pointer',
     transition: 'background 0.12s',
-    borderBottom: '1px solid rgba(99,102,241,0.06)',
+    borderBottom: '1px solid rgba(249,115,22,0.06)',
   },
   dropDot: { width: 6, height: 6, borderRadius: '50%', flexShrink: 0 },
-  dropLabel: { flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: '#c8cae0' },
+  dropLabel: { flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: '#d6e0d8' },
   dropTypePill: {
     fontSize: 9,
     fontWeight: 600,
@@ -144,11 +144,11 @@ const S = {
     gap: 5,
     padding: '9px 6px',
     borderRadius: 9,
-    border: '1px solid rgba(99,102,241,0.13)',
+    border: '1px solid rgba(249,115,22,0.13)',
     background: 'rgba(255,255,255,0.015)',
     fontSize: 10,
     fontWeight: 600,
-    color: '#555870',
+    color: '#718379',
     cursor: 'pointer',
     transition: 'all 0.18s',
     letterSpacing: '0.02em',
@@ -164,7 +164,7 @@ const S = {
     borderRadius: 10,
     border: 'none',
     background: 'linear-gradient(135deg,#f59e0b 0%,#d97706 100%)',
-    color: '#1a1000',
+    color: '#2a1303',
     fontSize: 12,
     fontWeight: 700,
     cursor: 'pointer',
@@ -197,14 +197,14 @@ const S = {
     justifyContent: 'center',
     gap: 10,
     padding: '40px 16px',
-    color: '#3a3d52',
+    color: '#526056',
     textAlign: 'center',
     flex: 1,
   },
 
   /* result blocks */
   resultHeader: { display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' },
-  resultName: { fontSize: 13, fontWeight: 600, color: '#e2e4f0' },
+  resultName: { fontSize: 13, fontWeight: 600, color: '#eef4ef' },
   badge: { fontSize: 9, fontWeight: 700, padding: '2px 7px', borderRadius: 12, letterSpacing: '0.05em' },
 
   aiBlock: {
@@ -225,7 +225,7 @@ const S = {
   aiBody: {
     padding: '10px 12px',
     fontSize: 11,
-    color: '#8b8fa8',
+    color: '#9baaa0',
     lineHeight: 1.65,
     display: 'flex',
     flexDirection: 'column',
@@ -233,10 +233,10 @@ const S = {
   },
 
   codeBlockWrap: { display: 'flex', flexDirection: 'column', gap: 5 },
-  codeLabel: { fontSize: 9, fontWeight: 700, color: '#3a3d52', letterSpacing: '0.1em', textTransform: 'uppercase' },
+  codeLabel: { fontSize: 9, fontWeight: 700, color: '#526056', letterSpacing: '0.1em', textTransform: 'uppercase' },
   codeBlock: {
-    background: '#1a1e35',
-    border: '1px solid rgba(99,102,241,0.12)',
+    background: '#1a201b',
+    border: '1px solid rgba(249,115,22,0.12)',
     borderRadius: 9,
     padding: '10px 12px',
     fontFamily: "'SF Mono','Fira Code',monospace",
@@ -250,7 +250,7 @@ const S = {
 
   metaBlock: {
     background: 'rgba(255,255,255,0.015)',
-    border: '1px solid rgba(99,102,241,0.1)',
+    border: '1px solid rgba(249,115,22,0.1)',
     borderRadius: 9,
     padding: '9px 12px',
     display: 'flex',
@@ -258,8 +258,8 @@ const S = {
     gap: 5,
   },
   metaRow: { display: 'flex', alignItems: 'baseline', gap: 6, fontSize: 11 },
-  metaKey: { color: '#3a3d52', fontWeight: 600, minWidth: 72, fontSize: 10.5 },
-  metaVal: { color: '#8b8fa8', fontFamily: "'SF Mono','Fira Code',monospace", fontSize: 10.5 },
+  metaKey: { color: '#526056', fontWeight: 600, minWidth: 72, fontSize: 10.5 },
+  metaVal: { color: '#9baaa0', fontFamily: "'SF Mono','Fira Code',monospace", fontSize: 10.5 },
 
   errorBox: {
     background: 'rgba(244,63,94,0.07)',
@@ -281,14 +281,14 @@ function AiMarkdown({ text }) {
         if (!line.trim()) return null;
         if (line.startsWith('### ')) {
           return (
-            <p key={i} style={{ fontSize: 11.5, fontWeight: 600, color: '#c8cae0', marginTop: 4 }}>
+            <p key={i} style={{ fontSize: 11.5, fontWeight: 600, color: '#d6e0d8', marginTop: 4 }}>
               {line.slice(4).replace(/\*\*/g, '')}
             </p>
           );
         }
         if (line.startsWith('## ')) {
           return (
-            <p key={i} style={{ fontSize: 12, fontWeight: 700, color: '#e2e4f0', marginTop: 6 }}>
+            <p key={i} style={{ fontSize: 12, fontWeight: 700, color: '#eef4ef', marginTop: 6 }}>
               {line.slice(3).replace(/\*\*/g, '')}
             </p>
           );
@@ -316,7 +316,7 @@ function renderInline(text) {
         style={{
           padding: '1px 5px',
           borderRadius: 5,
-          background: '#1f2440',
+          background: '#222821',
           color: '#22d3ee',
           fontFamily: "'SF Mono','Fira Code',monospace",
           fontSize: 10.5,
@@ -373,7 +373,6 @@ export default function ExplainPanel() {
         n.id.toLowerCase().includes(searchTerm.toLowerCase())
     ) || [];
 
-  const activeLevelMeta = LEVELS.find((l) => l.id === level);
   const explainLevelMeta = explainData
     ? LEVELS.find((l) => l.id === explainData.level)
     : null;
@@ -394,7 +393,7 @@ export default function ExplainPanel() {
             style={{
               ...S.searchInput,
               ...(showDropdown
-                ? { borderColor: 'rgba(245,158,11,0.35)', boxShadow: '0 0 0 3px rgba(245,158,11,0.07)' }
+                ? { borderColor: 'rgba(249,115,22,0.35)', boxShadow: '0 0 0 3px rgba(249,115,22,0.07)' }
                 : {}),
             }}
             type="text"
@@ -420,7 +419,7 @@ export default function ExplainPanel() {
                     key={node.id}
                     style={{
                       ...S.dropItem,
-                      background: hoveredItem === node.id ? '#1a1e35' : 'transparent',
+                      background: hoveredItem === node.id ? '#1a201b' : 'transparent',
                     }}
                     onMouseEnter={() => setHoveredItem(node.id)}
                     onMouseLeave={() => setHoveredItem(null)}
@@ -462,7 +461,7 @@ export default function ExplainPanel() {
                   ...(isActive
                     ? { background: l.bg, borderColor: l.border, color: l.color }
                     : isHovered
-                    ? { background: '#1a1e35', borderColor: 'rgba(99,102,241,0.22)', color: '#8b8fa8' }
+                    ? { background: '#1a201b', borderColor: 'rgba(249,115,22,0.22)', color: '#9baaa0' }
                     : {}),
                 }}
                 onMouseEnter={() => setHoveredLevel(l.id)}
@@ -513,9 +512,9 @@ export default function ExplainPanel() {
               <span
                 style={{
                   ...S.badge,
-                  background: 'rgba(99,102,241,0.1)',
-                  color: '#818cf8',
-                  border: '1px solid rgba(99,102,241,0.18)',
+                  background: 'rgba(249,115,22,0.1)',
+                  color: '#fb923c',
+                  border: '1px solid rgba(249,115,22,0.18)',
                 }}
               >
                 {explainData.type}
@@ -549,7 +548,7 @@ export default function ExplainPanel() {
 
             {/* Fallback explanation */}
             {!explainData.ai_explanation && explainData.explanation && (
-              <div style={{ fontSize: 11, color: '#8b8fa8', lineHeight: 1.65, display: 'flex', flexDirection: 'column', gap: 5 }}>
+              <div style={{ fontSize: 11, color: '#9baaa0', lineHeight: 1.65, display: 'flex', flexDirection: 'column', gap: 5 }}>
                 <AiMarkdown text={explainData.explanation} />
               </div>
             )}
@@ -558,7 +557,7 @@ export default function ExplainPanel() {
             {explainData.code_snippet && (
               <div style={S.codeBlockWrap}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <HiOutlineCode size={11} color="#3a3d52" />
+                  <HiOutlineCode size={11} color="#526056" />
                   <span style={S.codeLabel}>Source Code</span>
                 </div>
                 <div style={S.codeBlock}>{explainData.code_snippet}</div>
@@ -587,7 +586,7 @@ export default function ExplainPanel() {
                       }}
                     >
                       {explainData.metadata.complexity}
-                      <span style={{ color: '#3a3d52', fontWeight: 400 }}> / 10</span>
+                      <span style={{ color: '#526056', fontWeight: 400 }}> / 10</span>
                     </span>
                   </div>
                 )}
@@ -617,11 +616,11 @@ export default function ExplainPanel() {
             }}>
               <HiOutlineSparkles size={24} color="#fff" />
             </div>
-            <div style={{ fontSize: 16, fontWeight: 700, color: '#f0f1f7', letterSpacing: '-0.01em', fontFamily: 'Inter, sans-serif', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ fontSize: 16, fontWeight: 700, color: '#eef4ef', letterSpacing: '-0.01em', fontFamily: 'Inter, sans-serif', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
               Code Explainer
               <span style={{ fontSize: 8.5, fontWeight: 700, padding: '2px 6px', borderRadius: 20, background: 'rgba(245,158,11,0.15)', color: '#f59e0b', border: '1px solid rgba(245,158,11,0.3)' }}>AI</span>
             </div>
-            <p style={{ fontSize: 11, color: '#3a3d52', lineHeight: 1.55, maxWidth: 220 }}>
+            <p style={{ fontSize: 11, color: '#526056', lineHeight: 1.55, maxWidth: 220 }}>
               Search for a file or function above, then click Simulate to get an AI-powered explanation.
             </p>
           </div>
@@ -652,10 +651,10 @@ function SpinnerIcon() {
       fill="none"
       style={{ animation: 'prism-spin 0.7s linear infinite', flexShrink: 0 }}
     >
-      <circle cx="6.5" cy="6.5" r="5.5" stroke="rgba(26,16,0,0.35)" strokeWidth="2" />
+      <circle cx="6.5" cy="6.5" r="5.5" stroke="rgba(42,19,3,0.35)" strokeWidth="2" />
       <path
         d="M6.5 1A5.5 5.5 0 0 1 12 6.5"
-        stroke="#1a1000"
+        stroke="#2a1303"
         strokeWidth="2"
         strokeLinecap="round"
       />

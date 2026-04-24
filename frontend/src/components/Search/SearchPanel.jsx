@@ -10,7 +10,7 @@ const EXAMPLE_QUERIES = [
 ];
 
 const typeConfig = {
-  file:     { color: '#6366f1', bg: 'rgba(99,102,241,0.12)',  icon: '◫' },
+  file:     { color: '#f97316', bg: 'rgba(249,115,22,0.12)',  icon: '◫' },
   function: { color: '#22d3ee', bg: 'rgba(34,211,238,0.12)',  icon: 'ƒ'  },
   class:    { color: '#10b981', bg: 'rgba(16,185,129,0.12)',  icon: '◉' },
 };
@@ -18,9 +18,9 @@ const typeConfig = {
 /* ─── Styles ────────────────────────────────────────────────────────────── */
 const styles = {
   panel: {
-    background: '#0d0e1a',
+    background: '#101410',
     borderRadius: 16,
-    border: '1px solid rgba(99,102,241,0.18)',
+    border: '1px solid rgba(249,115,22,0.18)',
     overflow: 'hidden',
     fontFamily: "'SF Mono', 'Fira Code', monospace",
     maxWidth: 560,
@@ -32,22 +32,22 @@ const styles = {
   /* ── header removed ── */
   searchSection: {
     padding: '16px 20px',
-    borderBottom: '1px solid rgba(99,102,241,0.18)',
+    borderBottom: '1px solid rgba(249,115,22,0.18)',
   },
   searchRow: { display: 'flex', gap: 8 },
   searchWrap: { flex: 1, position: 'relative' },
   searchIcon: {
     position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)',
-    color: '#7b7fa8', fontSize: 14, pointerEvents: 'none',
+    color: '#718379', fontSize: 14, pointerEvents: 'none',
   },
   searchInput: {
     width: '100%', padding: '10px 12px 10px 36px',
-    background: '#1a1d35',
-    border: '1px solid rgba(99,102,241,0.18)',
+    background: '#1a201b',
+    border: '1px solid rgba(249,115,22,0.18)',
     borderRadius: 10,
     fontFamily: 'inherit',
     fontSize: 12,
-    color: '#e2e4f0',
+    color: '#eef4ef',
     outline: 'none',
   },
   searchBtn: {
@@ -66,9 +66,9 @@ const styles = {
     padding: '4px 10px',
     borderRadius: 20,
     fontSize: 10, fontWeight: 500,
-    background: '#1a1d35',
-    color: '#9396b8',
-    border: '1px solid rgba(99,102,241,0.18)',
+    background: '#1a201b',
+    color: '#9baaa0',
+    border: '1px solid rgba(249,115,22,0.18)',
     cursor: 'pointer',
     fontFamily: 'inherit',
     transition: 'background 0.15s, color 0.15s',
@@ -91,13 +91,13 @@ const styles = {
     marginBottom: 6, display: 'flex', alignItems: 'center', gap: 6,
   },
   aiText: { fontSize: 11, color: '#9396b8', lineHeight: 1.6 },
-  resultsCount: { fontSize: 10, color: '#7b7fa8', marginBottom: 8 },
+  resultsCount: { fontSize: 10, color: '#718379', marginBottom: 8 },
   resultCard: {
     display: 'flex', alignItems: 'flex-start', gap: 10,
     padding: '11px 12px',
     borderRadius: 10,
-    background: 'rgba(26,29,53,0.4)',
-    border: '1px solid rgba(99,102,241,0.12)',
+    background: 'rgba(26,32,27,0.45)',
+    border: '1px solid rgba(249,115,22,0.12)',
     cursor: 'pointer',
     marginBottom: 6,
     width: '100%',
@@ -112,18 +112,18 @@ const styles = {
   },
   resultBody: { flex: 1, minWidth: 0 },
   resultTop: { display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2, flexWrap: 'wrap' },
-  resultName: { fontSize: 12, fontWeight: 700, color: '#e2e4f0' },
+  resultName: { fontSize: 12, fontWeight: 700, color: '#eef4ef' },
   typeBadge: {
     fontSize: 9, fontWeight: 700,
     padding: '2px 7px', borderRadius: 20,
     textTransform: 'uppercase', letterSpacing: '0.06em',
   },
   score: { marginLeft: 'auto', fontSize: 10, fontWeight: 700, color: '#eab308' },
-  resultPath: { fontSize: 10, color: '#7b7fa8', fontFamily: "'SF Mono', monospace" },
-  resultExplanation: { fontSize: 10, color: '#9396b8', marginTop: 4, lineHeight: 1.5 },
+  resultPath: { fontSize: 10, color: '#718379', fontFamily: "'SF Mono', monospace" },
+  resultExplanation: { fontSize: 10, color: '#9baaa0', marginTop: 4, lineHeight: 1.5 },
   emptyState: {
     textAlign: 'center', padding: '40px 20px',
-    color: '#7b7fa8', fontSize: 11, lineHeight: 1.7,
+    color: '#718379', fontSize: 11, lineHeight: 1.7,
   },
   emptyIcon: { fontSize: 28, marginBottom: 8 },
   errorBox: {
@@ -147,7 +147,7 @@ function LoadingDots() {
           key={i}
           style={{
             width: 6, height: 6, borderRadius: '50%',
-            background: '#10b981',
+        background: '#14b8a6',
             animation: 'prism-pulse 1s ease-in-out infinite',
             animationDelay: `${i * 0.2}s`,
           }}
@@ -170,8 +170,8 @@ function ResultCard({ result, onSelect }) {
     <button
       style={{
         ...styles.resultCard,
-        background: hovered ? '#1a1d35' : 'rgba(26,29,53,0.4)',
-        borderColor: hovered ? 'rgba(99,102,241,0.35)' : 'rgba(99,102,241,0.12)',
+        background: hovered ? '#1a201b' : 'rgba(26,32,27,0.45)',
+        borderColor: hovered ? 'rgba(249,115,22,0.35)' : 'rgba(249,115,22,0.12)',
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -296,15 +296,15 @@ export default function SearchPanel({ onSelectNode }) {
           <div style={styles.emptyState}>
             <div style={{
               width: 48, height: 48,
-              background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+              background: 'linear-gradient(135deg, #f97316 0%, #14b8a6 100%)',
               borderRadius: 14,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 4px 16px rgba(139,92,246,0.3)',
+              boxShadow: '0 4px 16px rgba(249,115,22,0.25)',
               fontSize: 22, color: '#fff', margin: '0 auto 16px',
             }}>
               ⌕
             </div>
-            <div style={{ fontSize: 16, fontWeight: 700, color: '#f0f1f7', letterSpacing: '-0.01em', fontFamily: 'Inter, sans-serif', marginBottom: 8 }}>
+            <div style={{ fontSize: 16, fontWeight: 700, color: '#eef4ef', letterSpacing: '-0.01em', fontFamily: 'Inter, sans-serif', marginBottom: 8 }}>
               Code Search Engine
             </div>
             <div>
@@ -325,9 +325,9 @@ function ChipButton({ label, onClick }) {
     <button
       style={{
         ...styles.chip,
-        background: hovered ? '#202440' : '#1a1d35',
-        color: hovered ? '#e2e4f0' : '#9396b8',
-        borderColor: hovered ? 'rgba(99,102,241,0.35)' : 'rgba(99,102,241,0.18)',
+        background: hovered ? '#212923' : '#1a201b',
+        color: hovered ? '#eef4ef' : '#9baaa0',
+        borderColor: hovered ? 'rgba(249,115,22,0.35)' : 'rgba(249,115,22,0.18)',
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}

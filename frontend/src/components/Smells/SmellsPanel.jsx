@@ -9,7 +9,7 @@ const CATEGORY_INFO = {
   complexity:   { label: 'Complexity',   color: '#f43f5e', icon: '◈' },
   coupling:     { label: 'Coupling',     color: '#f97316', icon: '⬡' },
   design:       { label: 'Design',       color: '#eab308', icon: '◇' },
-  architecture: { label: 'Architecture', color: '#ec4899', icon: '△' },
+  architecture: { label: 'Architecture', color: '#38bdf8', icon: '△' },
 };
 
 const SEVERITY_STYLES = {
@@ -43,7 +43,7 @@ const STYLES = `
       radial-gradient(1px 1px at 40% 60%, rgba(255,255,255,0.15) 0%, transparent 100%),
       radial-gradient(1px 1px at 70% 20%, rgba(255,255,255,0.2)  0%, transparent 100%),
       radial-gradient(1px 1px at 85% 75%, rgba(255,255,255,0.18) 0%, transparent 100%),
-      radial-gradient(80px 80px at 90% 10%, rgba(244,63,94,0.04) 0%, transparent 100%);
+      radial-gradient(80px 80px at 90% 10%, rgba(249,115,22,0.05) 0%, transparent 100%);
     pointer-events: none;
     z-index: 0;
   }
@@ -342,7 +342,7 @@ const STYLES = `
     width: 28px;
     height: 28px;
     border: 2px solid rgba(255,255,255,0.06);
-    border-top-color: #f59e0b;
+    border-top-color: #f97316;
     border-radius: 50%;
     animation: sp-spin 0.8s linear infinite;
   }
@@ -451,16 +451,16 @@ export default function SmellsPanel() {
           <div className="sp-fadein" style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '0 4px', marginBottom: 6 }}>
             <div style={{
               width: 32, height: 32,
-              background: 'linear-gradient(135deg, #f43f5e 0%, #f59e0b 100%)',
+              background: 'linear-gradient(135deg, #f97316 0%, #14b8a6 100%)',
               borderRadius: 8,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 4px 16px rgba(244,63,94,0.25)',
+              boxShadow: '0 4px 16px rgba(249,115,22,0.25)',
               fontSize: 16, color: '#fff',
             }}>
               <HiOutlineShieldCheck />
             </div>
             <div>
-              <div style={{ fontSize: 16, fontWeight: 700, color: '#f0f1f7', letterSpacing: '-0.01em', fontFamily: 'Inter, sans-serif' }}>
+              <div style={{ fontSize: 16, fontWeight: 700, color: '#eef4ef', letterSpacing: '-0.01em', fontFamily: 'Inter, sans-serif' }}>
                 Code Risk Detect
               </div>
               <div style={{ fontSize: 11, color: '#64748b', marginTop: 2 }}>Anti-patterns &amp; health issues</div>

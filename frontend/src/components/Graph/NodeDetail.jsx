@@ -12,7 +12,7 @@ import {
 /* ─── constants ─────────────────────────────────────────────────────── */
 
 const TYPE_CONFIG = {
-  file: { color: '#6366f1', bg: 'rgba(99,102,241,0.1)', border: 'rgba(99,102,241,0.22)', icon: HiOutlineFolder, label: 'File' },
+  file: { color: '#f97316', bg: 'rgba(249,115,22,0.1)', border: 'rgba(249,115,22,0.22)', icon: HiOutlineFolder, label: 'File' },
   function: { color: '#22d3ee', bg: 'rgba(34,211,238,0.1)', border: 'rgba(34,211,238,0.22)', icon: HiOutlineCode, label: 'Function' },
   class: { color: '#10b981', bg: 'rgba(16,185,129,0.1)', border: 'rgba(16,185,129,0.22)', icon: HiOutlineCube, label: 'Class' },
 };
@@ -23,13 +23,13 @@ const S = {
   wrap: {
     width: 380,
     maxHeight: 520,
-    background: '#111422',
-    border: '1px solid rgba(99,102,241,0.15)',
+    background: '#111512',
+    border: '1px solid rgba(249,115,22,0.15)',
     borderRadius: 14,
     overflow: 'hidden',
     display: 'flex',
     flexDirection: 'column',
-    boxShadow: '0 24px 64px rgba(0,0,0,0.7), 0 0 0 1px rgba(99,102,241,0.06)',
+    boxShadow: '0 24px 64px rgba(0,0,0,0.7), 0 0 0 1px rgba(249,115,22,0.06)',
     fontFamily: "'SF Pro Display',-apple-system,BlinkMacSystemFont,'Inter',sans-serif",
     animation: 'nd-slide 0.22s cubic-bezier(0.16,1,0.3,1)',
   },
@@ -38,8 +38,8 @@ const S = {
   header: {
     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
     padding: '12px 14px',
-    borderBottom: '1px solid rgba(99,102,241,0.12)',
-    background: 'linear-gradient(180deg,rgba(99,102,241,0.05) 0%,transparent 100%)',
+    borderBottom: '1px solid rgba(249,115,22,0.12)',
+    background: 'linear-gradient(180deg,rgba(249,115,22,0.05) 0%,transparent 100%)',
     flexShrink: 0,
     gap: 10,
   },
@@ -49,22 +49,22 @@ const S = {
     display: 'flex', alignItems: 'center', justifyContent: 'center',
   },
   nodeName: {
-    fontSize: 13, fontWeight: 600, color: '#e2e4f0',
+    fontSize: 13, fontWeight: 600, color: '#eef4ef',
     overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
   },
-  nodeType: { fontSize: 10, color: '#555870', fontWeight: 500, marginTop: 1 },
+  nodeType: { fontSize: 10, color: '#718379', fontWeight: 500, marginTop: 1 },
   closeBtn: {
     width: 24, height: 24, borderRadius: 6, border: 'none',
     background: 'transparent', cursor: 'pointer',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
-    color: '#555870', transition: 'all 0.15s', flexShrink: 0,
+    color: '#718379', transition: 'all 0.15s', flexShrink: 0,
   },
 
   /* body */
   body: {
     flex: 1, overflowY: 'auto', padding: '14px 16px',
     display: 'flex', flexDirection: 'column', gap: 12,
-    scrollbarWidth: 'thin', scrollbarColor: 'rgba(99,102,241,0.15) transparent',
+    scrollbarWidth: 'thin', scrollbarColor: 'rgba(249,115,22,0.15) transparent',
   },
 
   /* metric grid */
@@ -74,25 +74,25 @@ const S = {
     border: '1px solid', display: 'flex', flexDirection: 'column', gap: 3,
   },
   metricVal: { fontSize: 15, fontWeight: 700, lineHeight: 1 },
-  metricLabel: { fontSize: 9.5, fontWeight: 600, color: '#555870', letterSpacing: '0.04em' },
+  metricLabel: { fontSize: 9.5, fontWeight: 600, color: '#718379', letterSpacing: '0.04em' },
 
   /* docstring */
   section: { display: 'flex', flexDirection: 'column', gap: 6 },
   sectionLabel: {
-    fontSize: 9.5, fontWeight: 700, color: '#3a3d52',
+    fontSize: 9.5, fontWeight: 700, color: '#526056',
     letterSpacing: '0.08em', textTransform: 'uppercase',
     display: 'flex', alignItems: 'center', gap: 5,
   },
-  docText: { fontSize: 11.5, color: '#8b8fa8', lineHeight: 1.65 },
+  docText: { fontSize: 11.5, color: '#9baaa0', lineHeight: 1.65 },
 
   /* file path */
   filePath: {
     display: 'flex', alignItems: 'center', gap: 8,
     padding: '8px 11px', borderRadius: 8,
-    background: '#1a1e35', border: '1px solid rgba(99,102,241,0.12)',
+    background: '#1a201b', border: '1px solid rgba(249,115,22,0.12)',
   },
   filePathText: {
-    fontSize: 10.5, color: '#818cf8',
+    fontSize: 10.5, color: '#fb923c',
     fontFamily: "'SF Mono','Fira Code',monospace",
     overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
   },
@@ -100,12 +100,12 @@ const S = {
   /* edge section header */
   edgeSectionHead: {
     display: 'flex', alignItems: 'center', gap: 6,
-    fontSize: 11, fontWeight: 700, color: '#555870',
+    fontSize: 11, fontWeight: 700, color: '#718379',
   },
   edgeCount: {
     fontSize: 9.5, fontWeight: 600, padding: '1px 6px',
-    borderRadius: 10, background: 'rgba(99,102,241,0.08)',
-    color: '#6366f1', border: '1px solid rgba(99,102,241,0.15)',
+    borderRadius: 10, background: 'rgba(249,115,22,0.08)',
+    color: '#f97316', border: '1px solid rgba(249,115,22,0.15)',
     marginLeft: 2,
   },
 
@@ -114,7 +114,7 @@ const S = {
     display: 'flex', alignItems: 'center', gap: 8,
     padding: '7px 10px', borderRadius: 8,
     background: 'rgba(255,255,255,0.015)',
-    border: '1px solid rgba(99,102,241,0.08)',
+    border: '1px solid rgba(249,115,22,0.08)',
     transition: 'all 0.14s', cursor: 'default',
   },
   edgeBadge: {
@@ -122,19 +122,19 @@ const S = {
     borderRadius: 5, letterSpacing: '0.04em', flexShrink: 0,
   },
   edgeLabel: {
-    fontSize: 11, color: '#c8cae0', flex: 1,
+    fontSize: 11, color: '#d6e0d8', flex: 1,
     overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
   },
 };
 
 /* ─── sub-components ─────────────────────────────────────────────────── */
 
-function MetricCard({ label, value, color = '#555870', bg, border, highlight }) {
+function MetricCard({ label, value, color = '#718379', bg, border, highlight }) {
   return (
     <div style={{
       ...S.metricCard,
       background: highlight ? 'rgba(244,63,94,0.06)' : (bg || 'rgba(255,255,255,0.02)'),
-      borderColor: highlight ? 'rgba(244,63,94,0.22)' : (border || 'rgba(99,102,241,0.1)'),
+      borderColor: highlight ? 'rgba(244,63,94,0.22)' : (border || 'rgba(249,115,22,0.1)'),
     }}>
       <span style={{ ...S.metricVal, color }}>{value ?? '—'}</span>
       <span style={S.metricLabel}>{label}</span>
@@ -149,8 +149,8 @@ function EdgeItem({ edge, color, bg, isHovered, onEnter, onLeave }) {
     <div
       style={{
         ...S.edgeItem,
-        background: isHovered ? '#1a1e35' : 'rgba(255,255,255,0.015)',
-        borderColor: isHovered ? `rgba(${color === '#22d3ee' ? '34,211,238' : '16,185,129'},0.2)` : 'rgba(99,102,241,0.08)',
+        background: isHovered ? '#1a201b' : 'rgba(255,255,255,0.015)',
+        borderColor: isHovered ? `${color}33` : 'rgba(249,115,22,0.08)',
       }}
       onMouseEnter={onEnter}
       onMouseLeave={onLeave}
@@ -203,7 +203,7 @@ export default function NodeDetail({ nodeId, nodeData, onClose }) {
           style={{
             ...S.closeBtn,
             background: hoveredClose ? 'rgba(244,63,94,0.08)' : 'transparent',
-            color: hoveredClose ? '#f43f5e' : '#555870',
+            color: hoveredClose ? '#f43f5e' : '#718379',
           }}
           onMouseEnter={() => setHoveredClose(true)}
           onMouseLeave={() => setHoveredClose(false)}
@@ -219,7 +219,7 @@ export default function NodeDetail({ nodeId, nodeData, onClose }) {
         {/* Metrics — File */}
         {nodeData.type === 'file' && (
           <div style={S.metricGrid}>
-            <MetricCard label="LOC" value={nodeData.loc} color="#6366f1" bg="rgba(99,102,241,0.06)" border="rgba(99,102,241,0.15)" />
+            <MetricCard label="LOC" value={nodeData.loc} color="#f97316" bg="rgba(249,115,22,0.06)" border="rgba(249,115,22,0.15)" />
             <MetricCard label="Functions" value={nodeData.num_functions} color="#22d3ee" bg="rgba(34,211,238,0.06)" border="rgba(34,211,238,0.15)" />
             <MetricCard label="Classes" value={nodeData.num_classes} color="#10b981" bg="rgba(16,185,129,0.06)" border="rgba(16,185,129,0.15)" />
           </div>
@@ -231,9 +231,9 @@ export default function NodeDetail({ nodeId, nodeData, onClose }) {
             <MetricCard
               label="Lines"
               value={nodeData.line_start != null ? `${nodeData.line_start}–${nodeData.line_end}` : '—'}
-              color="#818cf8"
-              bg="rgba(99,102,241,0.06)"
-              border="rgba(99,102,241,0.15)"
+              color="#fb923c"
+              bg="rgba(249,115,22,0.06)"
+              border="rgba(249,115,22,0.15)"
             />
             <MetricCard label="Params" value={nodeData.params?.length ?? 0} color="#22d3ee" bg="rgba(34,211,238,0.06)" border="rgba(34,211,238,0.15)" />
             <MetricCard
@@ -259,7 +259,7 @@ export default function NodeDetail({ nodeId, nodeData, onClose }) {
         {/* File path */}
         {nodeData.file && (
           <div style={S.filePath}>
-            <HiOutlineFolder size={11} color="#555870" style={{ flexShrink: 0 }} />
+            <HiOutlineFolder size={11} color="#718379" style={{ flexShrink: 0 }} />
             <span style={S.filePathText}>{nodeData.file}</span>
           </div>
         )}
@@ -290,7 +290,7 @@ export default function NodeDetail({ nodeId, nodeData, onClose }) {
         {nodeData.incoming_edges?.length > 0 && (
           <div style={S.section}>
             <div style={S.edgeSectionHead}>
-              <HiOutlineArrowLeft size={12} color="#818cf8" />
+              <HiOutlineArrowLeft size={12} color="#fb923c" />
               <span>Incoming</span>
               <span style={S.edgeCount}>{nodeData.incoming_edges.length}</span>
             </div>
@@ -298,14 +298,14 @@ export default function NodeDetail({ nodeId, nodeData, onClose }) {
               {nodeData.incoming_edges.slice(0, 6).map((e, i) => (
                 <EdgeItem
                   key={i} edge={{ ...e, source: e.source }}
-                  color="#818cf8" bg="#6366f1"
+                  color="#fb923c" bg="#f97316"
                   isHovered={hoveredEdge === `in-${i}`}
                   onEnter={() => setHoveredEdge(`in-${i}`)}
                   onLeave={() => setHoveredEdge(null)}
                 />
               ))}
               {nodeData.incoming_edges.length > 6 && (
-                <p style={{ fontSize: 10, color: '#3a3d52', textAlign: 'center', paddingTop: 2 }}>
+                <p style={{ fontSize: 10, color: '#526056', textAlign: 'center', paddingTop: 2 }}>
                   +{nodeData.incoming_edges.length - 6} more
                 </p>
               )}
@@ -334,7 +334,7 @@ export default function NodeDetail({ nodeId, nodeData, onClose }) {
                 />
               ))}
               {nodeData.outgoing_edges.length > 6 && (
-                <p style={{ fontSize: 10, color: '#3a3d52', textAlign: 'center', paddingTop: 2 }}>
+                <p style={{ fontSize: 10, color: '#526056', textAlign: 'center', paddingTop: 2 }}>
                   +{nodeData.outgoing_edges.length - 6} more
                 </p>
               )}

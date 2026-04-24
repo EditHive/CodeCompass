@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { useApi } from '../../hooks/useApi';
 import { traceFlow } from '../../services/api';
 
@@ -7,8 +7,8 @@ const STYLES = `
 
   .fv-root {
     height: 100%; display: flex; flex-direction: column;
-    background: #070810; font-family: 'Syne', sans-serif;
-    color: #e8eaf6; position: relative; overflow: hidden;
+    background: #070b08; font-family: 'Syne', sans-serif;
+    color: #eef4ef; position: relative; overflow: hidden;
   }
 
   /* subtle animated grid bg */
@@ -16,8 +16,8 @@ const STYLES = `
     content: '';
     position: absolute; inset: 0; pointer-events: none; z-index: 0;
     background-image:
-      linear-gradient(rgba(99,102,241,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(99,102,241,0.03) 1px, transparent 1px);
+      linear-gradient(rgba(249,115,22,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(20,184,166,0.03) 1px, transparent 1px);
     background-size: 40px 40px;
     mask-image: radial-gradient(ellipse 100% 100% at 50% 0%, black 50%, transparent 100%);
   }
@@ -29,25 +29,25 @@ const STYLES = `
   /* ── input row ── */
   .fv-input-row {
     padding: 14px 20px;
-    border-bottom: 1px solid rgba(99,102,241,0.1);
-    background: rgba(13,15,26,0.5); flex-shrink: 0;
+    border-bottom: 1px solid rgba(249,115,22,0.1);
+    background: rgba(13,18,14,0.5); flex-shrink: 0;
   }
   .fv-input-inner { display: flex; gap: 8px; align-items: center; }
   .fv-input-wrap { flex: 1; position: relative; }
   .fv-input-prefix {
     position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
     font-size: 10px; font-family: 'JetBrains Mono', monospace;
-    color: #4a4d6e; pointer-events: none; letter-spacing: 0;
+    color: #5e6d63; pointer-events: none; letter-spacing: 0;
   }
   .fv-input {
     width: 100%; padding: 10px 12px 10px 52px;
     background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(99,102,241,0.15); border-radius: 10px;
-    color: #e8eaf6; font-size: 12px; font-family: 'JetBrains Mono', monospace;
+    border: 1px solid rgba(249,115,22,0.15); border-radius: 10px;
+    color: #eef4ef; font-size: 12px; font-family: 'JetBrains Mono', monospace;
     outline: none; transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
     caret-color: #22d3ee;
   }
-  .fv-input::placeholder { color: #4a4d6e; }
+  .fv-input::placeholder { color: #5e6d63; }
   .fv-input:focus {
     border-color: rgba(34,211,238,0.35);
     background: rgba(34,211,238,0.03);
@@ -57,13 +57,13 @@ const STYLES = `
 
   .fv-btn {
     padding: 10px 16px; border: none; border-radius: 10px;
-    background: linear-gradient(135deg, #22d3ee, #06b6d4);
-    color: #070810; font-family: 'Syne', sans-serif;
+    background: linear-gradient(135deg, #f97316, #14b8a6);
+    color: #070b08; font-family: 'Syne', sans-serif;
     font-size: 12px; font-weight: 700; letter-spacing: 0.05em;
     cursor: pointer; display: flex; align-items: center; gap-6px;
     gap: 6px; flex-shrink: 0;
     transition: transform 0.15s, box-shadow 0.2s, opacity 0.2s;
-    box-shadow: 0 4px 16px rgba(34,211,238,0.25); position: relative; overflow: hidden;
+    box-shadow: 0 4px 16px rgba(249,115,22,0.25); position: relative; overflow: hidden;
   }
   .fv-btn::after {
     content: ''; position: absolute; top: 0; left: -100%; width: 60%; height: 100%;
@@ -71,13 +71,13 @@ const STYLES = `
     animation: fvShimmer 2.5s ease-in-out infinite;
   }
   @keyframes fvShimmer { 0%{left:-100%} 50%,100%{left:160%} }
-  .fv-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(34,211,238,0.4); }
+  .fv-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(249,115,22,0.4); }
   .fv-btn:active:not(:disabled) { transform: scale(0.97); }
   .fv-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
   .fv-spinner {
     width: 13px; height: 13px; border-radius: 50%;
-    border: 2px solid rgba(7,8,16,0.3); border-top-color: #070810;
+    border: 2px solid rgba(7,11,8,0.3); border-top-color: #070b08;
     animation: fvSpin 0.7s linear infinite;
   }
   @keyframes fvSpin { to { transform: rotate(360deg); } }
@@ -85,10 +85,10 @@ const STYLES = `
   /* ── scroll body ── */
   .fv-body {
     flex: 1; overflow-y: auto; padding: 16px 20px;
-    scrollbar-width: thin; scrollbar-color: rgba(99,102,241,0.2) transparent;
+    scrollbar-width: thin; scrollbar-color: rgba(249,115,22,0.2) transparent;
   }
   .fv-body::-webkit-scrollbar { width: 4px; }
-  .fv-body::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.2); border-radius: 2px; }
+  .fv-body::-webkit-scrollbar-thumb { background: rgba(249,115,22,0.2); border-radius: 2px; }
 
   /* ── error ── */
   .fv-error {
@@ -105,11 +105,11 @@ const STYLES = `
   }
   .fv-empty-icon {
     width: 48px; height: 48px; border-radius: 14px;
-    border: 1px solid rgba(99,102,241,0.2);
-    background: rgba(99,102,241,0.05);
+    border: 1px solid rgba(249,115,22,0.2);
+    background: rgba(249,115,22,0.05);
     display: flex; align-items: center; justify-content: center; font-size: 20px;
   }
-  .fv-empty-text { font-size: 11px; color: #4a4d6e; font-family: 'JetBrains Mono', monospace; text-align: center; line-height: 1.6; }
+  .fv-empty-text { font-size: 11px; color: #5e6d63; font-family: 'JetBrains Mono', monospace; text-align: center; line-height: 1.6; }
 
   /* ── summary card ── */
   .fv-summary {
@@ -132,15 +132,15 @@ const STYLES = `
     font-size: 10px; font-family: 'JetBrains Mono', monospace;
     padding: 3px 8px; border-radius: 6px;
     background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
-    color: #7c7fa8;
+    color: #9aa99f;
   }
   .fv-file-chip {
     font-size: 10px; font-family: 'JetBrains Mono', monospace;
     padding: 3px 9px; border-radius: 6px; cursor: default;
-    background: rgba(99,102,241,0.08); border: 1px solid rgba(99,102,241,0.2);
-    color: #818cf8; transition: background 0.2s;
+    background: rgba(249,115,22,0.08); border: 1px solid rgba(249,115,22,0.2);
+    color: #fb923c; transition: background 0.2s;
   }
-  .fv-file-chip:hover { background: rgba(99,102,241,0.15); }
+  .fv-file-chip:hover { background: rgba(249,115,22,0.15); }
 
   /* ── timeline ── */
   .fv-timeline { display: flex; flex-direction: column; gap: 0; }
@@ -171,13 +171,13 @@ const STYLES = `
   .fv-step-connector::after {
     content: ''; position: absolute;
     top: 0; bottom: 0; left: 0; width: 1px;
-    background: linear-gradient(180deg, var(--conn-color, rgba(99,102,241,0.25)), transparent);
+    background: linear-gradient(180deg, var(--conn-color, rgba(249,115,22,0.25)), transparent);
   }
 
   /* arrow tick on connector */
   .fv-step-arrow {
     width: 8px; height: 8px; display: flex; align-items: center; justify-content: center;
-    color: #4a4d6e; font-size: 9px; margin: 1px auto;
+    color: #5e6d63; font-size: 9px; margin: 1px auto;
   }
 
   /* right content */
@@ -189,13 +189,13 @@ const STYLES = `
     min-width: 0;
   }
   .fv-step-body:hover { background: rgba(255,255,255,0.04); }
-  .fv-step-body.expanded { border-color: rgba(99,102,241,0.18) !important; }
+  .fv-step-body.expanded { border-color: rgba(249,115,22,0.18) !important; }
 
   .fv-step-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; }
   .fv-step-emoji { font-size: 14px; line-height: 1; }
   .fv-step-fn {
     font-size: 12px; font-weight: 600; font-family: 'JetBrains Mono', monospace;
-    color: #e8eaf6; letter-spacing: 0.01em;
+    color: #eef4ef; letter-spacing: 0.01em;
   }
   .fv-step-fn span { opacity: 0.5; }
   .fv-op-badge {
@@ -204,17 +204,17 @@ const STYLES = `
     flex-shrink: 0;
   }
   .fv-step-expand-icon {
-    margin-left: auto; font-size: 10px; color: #4a4d6e;
+    margin-left: auto; font-size: 10px; color: #5e6d63;
     transition: transform 0.2s; flex-shrink: 0;
   }
   .fv-step-expand-icon.open { transform: rotate(180deg); }
 
   .fv-step-desc {
-    font-size: 11px; color: #7c7fa8; font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; color: #9aa99f; font-family: 'JetBrains Mono', monospace;
     line-height: 1.55; margin-bottom: 6px;
   }
   .fv-step-file {
-    font-size: 10px; color: #4a4d6e; font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; color: #5e6d63; font-family: 'JetBrains Mono', monospace;
     display: flex; align-items: center; gap: 5px;
   }
   .fv-step-file-dot {
@@ -224,35 +224,35 @@ const STYLES = `
   /* code snippet */
   .fv-code-wrap {
     margin-top: 10px; border-radius: 8px; overflow: hidden;
-    border: 1px solid rgba(99,102,241,0.12);
+    border: 1px solid rgba(249,115,22,0.12);
     animation: fvFadeUp 0.25s ease;
   }
   .fv-code-header {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 6px 12px; background: rgba(99,102,241,0.06);
-    border-bottom: 1px solid rgba(99,102,241,0.1);
+    padding: 6px 12px; background: rgba(249,115,22,0.06);
+    border-bottom: 1px solid rgba(249,115,22,0.1);
   }
-  .fv-code-lang { font-size: 9px; font-family: 'JetBrains Mono', monospace; color: #6366f1; letter-spacing: 0.1em; font-weight: 600; }
+  .fv-code-lang { font-size: 9px; font-family: 'JetBrains Mono', monospace; color: #f97316; letter-spacing: 0.1em; font-weight: 600; }
   .fv-code-copy {
-    font-size: 9px; font-family: 'JetBrains Mono', monospace; color: #4a4d6e;
+    font-size: 9px; font-family: 'JetBrains Mono', monospace; color: #5e6d63;
     background: none; border: none; cursor: pointer; padding: 0; letter-spacing: 0.06em;
     transition: color 0.2s;
   }
-  .fv-code-copy:hover { color: #818cf8; }
+  .fv-code-copy:hover { color: #fb923c; }
   .fv-code {
     padding: 12px 14px; max-height: 160px; overflow-y: auto;
-    background: rgba(7,8,16,0.8); font-size: 11px; line-height: 1.7;
-    font-family: 'JetBrains Mono', monospace; color: #a5b4fc;
+    background: rgba(7,11,8,0.8); font-size: 11px; line-height: 1.7;
+    font-family: 'JetBrains Mono', monospace; color: #fdba74;
     white-space: pre; scrollbar-width: thin;
-    scrollbar-color: rgba(99,102,241,0.2) transparent;
+    scrollbar-color: rgba(249,115,22,0.2) transparent;
   }
   .fv-code::-webkit-scrollbar { height: 3px; }
-  .fv-code::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.2); border-radius: 2px; }
+  .fv-code::-webkit-scrollbar-thumb { background: rgba(249,115,22,0.2); border-radius: 2px; }
 
   /* no-result */
   .fv-no-result {
     text-align: center; padding: 40px 20px;
-    font-size: 11px; color: #4a4d6e; font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; color: #5e6d63; font-family: 'JetBrains Mono', monospace;
   }
 
   @keyframes fvFadeUp {
@@ -265,25 +265,25 @@ const STYLES = `
   .fv-suggestion {
     font-size: 10px; font-family: 'JetBrains Mono', monospace;
     padding: 4px 10px; border-radius: 6px;
-    background: rgba(255,255,255,0.03); border: 1px solid rgba(99,102,241,0.15);
-    color: #7c7fa8; cursor: pointer; transition: all 0.15s; letter-spacing: 0.03em;
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(249,115,22,0.15);
+    color: #9aa99f; cursor: pointer; transition: all 0.15s; letter-spacing: 0.03em;
   }
-  .fv-suggestion:hover { background: rgba(99,102,241,0.08); border-color: rgba(99,102,241,0.3); color: #818cf8; }
+  .fv-suggestion:hover { background: rgba(249,115,22,0.08); border-color: rgba(249,115,22,0.3); color: #fb923c; }
 `;
 
 // ─── Operation metadata ────────────────────────────────────────────────────
 const OPS = {
-  authentication: { color: '#ec4899', glow: 'rgba(236,72,153,0.25)', icon: '🔐', label: 'auth' },
+  authentication: { color: '#f97316', glow: 'rgba(249,115,22,0.25)', icon: '🔐', label: 'auth' },
   database:       { color: '#10b981', glow: 'rgba(16,185,129,0.25)', icon: '💾', label: 'db' },
-  api_call:       { color: '#6366f1', glow: 'rgba(99,102,241,0.25)', icon: '🌐', label: 'api' },
+  api_call:       { color: '#38bdf8', glow: 'rgba(56,189,248,0.25)', icon: '🌐', label: 'api' },
   validation:     { color: '#22d3ee', glow: 'rgba(34,211,238,0.25)', icon: '✅', label: 'validate' },
   logging:        { color: '#71717a', glow: 'rgba(113,113,122,0.2)', icon: '📝', label: 'log' },
-  initialization: { color: '#8b5cf6', glow: 'rgba(139,92,246,0.25)', icon: '🚀', label: 'init' },
+  initialization: { color: '#f59e0b', glow: 'rgba(245,158,11,0.25)', icon: '🚀', label: 'init' },
   payment:        { color: '#eab308', glow: 'rgba(234,179,8,0.25)',  icon: '💳', label: 'payment' },
-  notification:   { color: '#f97316', glow: 'rgba(249,115,22,0.25)', icon: '📧', label: 'notify' },
-  computation:    { color: '#a78bfa', glow: 'rgba(167,139,250,0.25)', icon: '⚙️', label: 'compute' },
+  notification:   { color: '#14b8a6', glow: 'rgba(20,184,166,0.25)', icon: '📧', label: 'notify' },
+  computation:    { color: '#22d3ee', glow: 'rgba(34,211,238,0.25)', icon: '⚙️', label: 'compute' },
 };
-const DEFAULT_OP = { color: '#7c7fa8', glow: 'rgba(124,127,168,0.2)', icon: '⚙️', label: 'exec' };
+const DEFAULT_OP = { color: '#9aa99f', glow: 'rgba(154,169,159,0.2)', icon: '⚙️', label: 'exec' };
 
 const SUGGESTIONS = ['process_payment', 'login', 'register', 'send_email', 'validate_token'];
 
@@ -357,9 +357,9 @@ function StepCard({ step, index, total, isExpanded, onToggle }) {
         {/* File */}
         <div className="fv-step-file" style={{ color: op.color }}>
           <span style={{ opacity: 0.5 }}>◈</span>
-          <span style={{ color: '#4a4d6e' }}>
+          <span style={{ color: '#5e6d63' }}>
             {step.file}
-            <span style={{ color: '#6366f1', opacity: 0.7 }}>:{step.line_start}</span>
+            <span style={{ color: '#f97316', opacity: 0.7 }}>:{step.line_start}</span>
           </span>
         </div>
 
@@ -476,16 +476,16 @@ export default function FlowViewer({ onHighlightFlow }) {
               <div className="fv-empty" style={{ paddingTop: 40 }}>
                 <div style={{
                   width: 48, height: 48,
-                  background: 'linear-gradient(135deg, #6366f1 0%, #4ade80 100%)',
+                  background: 'linear-gradient(135deg, #f97316 0%, #14b8a6 100%)',
                   borderRadius: 14,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  boxShadow: '0 4px 16px rgba(74,222,128,0.2)',
+                  boxShadow: '0 4px 16px rgba(249,115,22,0.2)',
                   fontSize: 22,
                   marginBottom: 10,
                 }}>
                   🔄
                 </div>
-                <div style={{ fontSize: 16, fontWeight: 700, color: '#f0f1f7', letterSpacing: '-0.01em', fontFamily: 'Inter, sans-serif' }}>
+                <div style={{ fontSize: 16, fontWeight: 700, color: '#eef4ef', letterSpacing: '-0.01em', fontFamily: 'Inter, sans-serif' }}>
                   Execution Flow Tracker
                 </div>
                 <div className="fv-empty-text" style={{ marginTop: 8 }}>
@@ -501,7 +501,7 @@ export default function FlowViewer({ onHighlightFlow }) {
                   <div key={i} style={{
                     height: 68, borderRadius: 12,
                     background: 'rgba(255,255,255,0.02)',
-                    border: '1px solid rgba(99,102,241,0.08)',
+                    border: '1px solid rgba(249,115,22,0.08)',
                     animation: `fvPulse 1.4s ease-in-out ${i * 0.1}s infinite`,
                   }} />
                 ))}
@@ -519,9 +519,9 @@ export default function FlowViewer({ onHighlightFlow }) {
                     <span style={{ fontSize: 16 }}>🔄</span>
                     <span>{flowData.entry_point.name}()</span>
                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ opacity: 0.4 }}>
-                      <path d="M3 7h8M8 4l3 3-3 3" stroke="#22d3ee" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M3 7h8M8 4l3 3-3 3" stroke="#14b8a6" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
-                    <span style={{ color: '#7c7fa8', fontWeight: 400, fontSize: 11 }}>
+                    <span style={{ color: '#9aa99f', fontWeight: 400, fontSize: 11 }}>
                       {flowData.total_steps} execution steps
                     </span>
                   </div>
@@ -555,13 +555,13 @@ export default function FlowViewer({ onHighlightFlow }) {
                 <div style={{
                   marginTop: 20, padding: '10px 14px',
                   borderRadius: 8, background: 'rgba(255,255,255,0.02)',
-                  border: '1px solid rgba(99,102,241,0.1)',
+                  border: '1px solid rgba(249,115,22,0.1)',
                   display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                 }}>
-                  <span style={{ fontSize: 10, fontFamily: "'JetBrains Mono', monospace", color: '#4a4d6e' }}>
+                  <span style={{ fontSize: 10, fontFamily: "'JetBrains Mono', monospace", color: '#5e6d63' }}>
                     Click any step to view source
                   </span>
-                  <span style={{ fontSize: 10, fontFamily: "'JetBrains Mono', monospace", color: '#4a4d6e' }}>
+                  <span style={{ fontSize: 10, fontFamily: "'JetBrains Mono', monospace", color: '#5e6d63' }}>
                     {flowData.total_steps} steps · {flowData.files_involved.length} files
                   </span>
                 </div>
@@ -571,7 +571,7 @@ export default function FlowViewer({ onHighlightFlow }) {
             {/* No results */}
             {isEmpty && (
               <div className="fv-no-result">
-                No execution steps found for <span style={{ color: '#22d3ee' }}>"{funcName}"</span>
+                No execution steps found for <span style={{ color: '#14b8a6' }}>"{funcName}"</span>
               </div>
             )}
           </div>

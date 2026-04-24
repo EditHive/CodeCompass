@@ -4,7 +4,7 @@ import { getOnboarding } from '../../services/api';
 
 const PHASE_COLORS = {
   'Entry Point': '#f43f5e',
-  'Core Module': '#6366f1',
+  'Core Module': '#f97316',
   'Utility':     '#10b981',
 };
 
@@ -17,9 +17,9 @@ const PHASE_ICONS = {
 /* ─── Styles ────────────────────────────────────────────────────────────── */
 const s = {
   panel: {
-    background: '#0d0e1a',
+    background: '#101410',
     borderRadius: 16,
-    border: '1px solid rgba(99,102,241,0.18)',
+    border: '1px solid rgba(249,115,22,0.18)',
     overflow: 'hidden',
     fontFamily: "'SF Mono', 'Fira Code', monospace",
     maxWidth: 560,
@@ -31,10 +31,10 @@ const s = {
   /* ── header removed ── */
   subHeader: {
     padding: '24px 20px 16px',
-    background: '#0d0e1a',
+    background: '#101410',
   },
   subHeaderText: {
-    fontSize: 11, color: '#7b7fa8', lineHeight: 1.6,
+    fontSize: 11, color: '#718379', lineHeight: 1.6,
   },
   scrollArea: {
     flex: 1,
@@ -43,7 +43,7 @@ const s = {
   },
   sectionLabel: {
     fontSize: 9, fontWeight: 700, letterSpacing: '0.14em',
-    textTransform: 'uppercase', color: '#4b4f72',
+    textTransform: 'uppercase', color: '#526056',
     marginBottom: 12,
   },
   stepList: { display: 'flex', flexDirection: 'column' },
@@ -78,21 +78,21 @@ const s = {
     display: 'flex', alignItems: 'center', gap: 6,
     flexWrap: 'wrap', marginBottom: 3,
   },
-  stepNum: { fontSize: 9, color: '#4b4f72', letterSpacing: '0.06em', fontWeight: 700 },
-  stepLabel: { fontSize: 12, fontWeight: 700, color: '#e2e4f0' },
+  stepNum: { fontSize: 9, color: '#526056', letterSpacing: '0.06em', fontWeight: 700 },
+  stepLabel: { fontSize: 12, fontWeight: 700, color: '#eef4ef' },
   phaseBadge: {
     fontSize: 9, fontWeight: 700,
     padding: '2px 7px', borderRadius: 20,
     textTransform: 'uppercase', letterSpacing: '0.06em',
   },
   stepReason: {
-    fontSize: 10, color: '#9396b8', lineHeight: 1.6,
+    fontSize: 10, color: '#9baaa0', lineHeight: 1.6,
   },
   stepDocstring: {
-    fontSize: 10, color: '#6366f1', fontStyle: 'italic',
+    fontSize: 10, color: '#f97316', fontStyle: 'italic',
     lineHeight: 1.5, marginTop: 4,
     paddingLeft: 8,
-    borderLeft: '2px solid rgba(99,102,241,0.3)',
+    borderLeft: '2px solid rgba(249,115,22,0.3)',
   },
   exploreRow: {
     display: 'flex', alignItems: 'center', gap: 4,
@@ -101,7 +101,7 @@ const s = {
     opacity: 0, transition: 'opacity 0.15s',
   },
   divider: {
-    height: 1, background: 'rgba(99,102,241,0.1)', margin: '20px 0',
+    height: 1, background: 'rgba(249,115,22,0.1)', margin: '20px 0',
   },
   statsGrid: {
     display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8,
@@ -116,7 +116,7 @@ const s = {
   statVal: { fontSize: 20, fontWeight: 700, lineHeight: 1 },
   statLabel: {
     fontSize: 9, fontWeight: 700, letterSpacing: '0.1em',
-    textTransform: 'uppercase', color: '#7b7fa8', marginTop: 2,
+    textTransform: 'uppercase', color: '#718379', marginTop: 2,
   },
   centerBox: {
     display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -124,13 +124,13 @@ const s = {
   },
   spinner: {
     width: 28, height: 28,
-    border: '2px solid rgba(99,102,241,0.2)',
-    borderTop: '2px solid #6366f1',
+    border: '2px solid rgba(249,115,22,0.2)',
+    borderTop: '2px solid #f97316',
     borderRadius: '50%',
     animation: 'prism-spin 0.8s linear infinite',
     marginBottom: 10,
   },
-  loadingText: { fontSize: 11, color: '#7b7fa8', marginTop: 8 },
+  loadingText: { fontSize: 11, color: '#718379', marginTop: 8 },
   errorText: { fontSize: 11, color: '#f87171', textAlign: 'center' },
 };
 
@@ -164,7 +164,7 @@ function SummaryCard({ label, value, color }) {
 /* ─── StepRow ───────────────────────────────────────────────────────────── */
 function StepRow({ step, isLast, onSelectNode }) {
   const [hovered, setHovered] = useState(false);
-  const color = PHASE_COLORS[step.phase] || '#6366f1';
+  const color = PHASE_COLORS[step.phase] || '#f97316';
   const icon  = PHASE_ICONS[step.phase]  || '◇';
 
   return (
@@ -172,8 +172,8 @@ function StepRow({ step, isLast, onSelectNode }) {
       <button
         style={{
           ...s.stepRow,
-          background: hovered ? 'rgba(99,102,241,0.06)' : 'transparent',
-          borderColor: hovered ? 'rgba(99,102,241,0.18)' : 'transparent',
+          background: hovered ? 'rgba(249,115,22,0.06)' : 'transparent',
+          borderColor: hovered ? 'rgba(249,115,22,0.18)' : 'transparent',
         }}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
@@ -234,21 +234,21 @@ export default function OnboardingGuide({ onSelectNode }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
             <div style={{
               width: 38, height: 38,
-              background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
+              background: 'linear-gradient(135deg, #f97316 0%, #14b8a6 100%)',
               borderRadius: 10,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 4px 16px rgba(139,92,246,0.25)',
+              boxShadow: '0 4px 16px rgba(249,115,22,0.25)',
               fontSize: 18, color: '#fff',
             }}>
               🗺️
             </div>
             <div>
-              <div style={{ fontSize: 16, fontWeight: 700, color: '#f0f1f7', letterSpacing: '-0.01em', fontFamily: 'Inter, sans-serif' }}>
+              <div style={{ fontSize: 16, fontWeight: 700, color: '#eef4ef', letterSpacing: '-0.01em', fontFamily: 'Inter, sans-serif' }}>
                 Onboarding Guide
               </div>
               <p style={s.subHeaderText} style={{ fontSize: 11, color: '#64748b', marginTop: 2 }}>
                 Recommended exploration path &nbsp;·&nbsp;
-                <span style={{ color: '#8b5cf6', fontWeight: 700 }}>{displayData.total_files}</span> files
+                <span style={{ color: '#f97316', fontWeight: 700 }}>{displayData.total_files}</span> files
               </p>
             </div>
           </div>
@@ -292,7 +292,7 @@ export default function OnboardingGuide({ onSelectNode }) {
           <p style={s.sectionLabel}>Codebase breakdown</p>
           <div style={s.statsGrid}>
             <SummaryCard label="Entry Points" value={displayData.entry_points?.length  || 0} color="#f43f5e" />
-            <SummaryCard label="Core Modules" value={displayData.core_modules?.length  || 0} color="#6366f1" />
+            <SummaryCard label="Core Modules" value={displayData.core_modules?.length  || 0} color="#f97316" />
             <SummaryCard label="Utilities"    value={displayData.utility_modules?.length || 0} color="#10b981" />
           </div>
         </div>
